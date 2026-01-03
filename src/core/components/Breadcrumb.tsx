@@ -73,6 +73,10 @@ const routes = [
     name: "Configuraciones del tablero",
   },
   {
+    path: "/notifications-settings",
+    name: "Configuraciones de notificaciones",
+  },
+  {
     path: "/account",
     name: "Mi cuenta",
   },
