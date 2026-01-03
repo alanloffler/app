@@ -1,0 +1,234 @@
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+import type { ISetting } from "@settings/interfaces/setting.interface";
+import type { TSyncMode } from "@settings/interfaces/sync-mode.type";
+import { SettingsService } from "@settings/services/settings.service";
+import { tryCatch } from "@core/utils/try-catch";
+
+interface IStates {
+  _hasHydrated: boolean;
+  appSettings: ISetting[];
+  dashboardSettings: ISetting[];
+  error?: string | null;
+  hasLocalSettings: boolean;
+  loading?: boolean;
+  loadingAppSettings: Record<string, boolean>;
+  loadingDashboardSettings: Record<string, boolean>;
+  settings: ISetting[];
+
+  loadAppSettings: (forceFromApi?: boolean) => Promise<void>;
+  loadDashboardSettings: (forceFromApi?: boolean) => Promise<void>;
+  loadSettings: () => Promise<void>;
+  setHasHydrated: (state: boolean) => void;
+  updateAppSetting: (id: string, value: string, syncMode?: "local" | "remote") => Promise<void>;
+  updateDashboardSetting: (id: string, value: string, syncMode?: "local" | "remote") => Promise<void>;
+}
+
+export const useSettingsStore = create(
+  persist<IStates>(
+    (set, get) => ({
+      _hasHydrated: false,
+      appSettings: [],
+      dashboardSettings: [],
+      error: null,
+      hasLocalSettings: false,
+      loading: false,
+      loadingAppSettings: {},
+      loadingDashboardSettings: {},
+      settings: [],
+
+      loadSettings: async () => {
+        set({ loading: true, error: null });
+
+        const [response, error] = await tryCatch(SettingsService.findAll());
+        if (error) {
+          set({ error: error.message, loading: false });
+          return;
+        }
+
+        if (response && response.statusCode === 200 && response.data) {
+          set({ settings: response.data, loading: false });
+        }
+      },
+      loadAppSettings: async (forceFromApi: boolean = false) => {
+        const currentState = get();
+
+        if (!currentState._hasHydrated) {
+          await new Promise((resolve) => {
+            const checkHydrated = setInterval(() => {
+              if (get()._hasHydrated) {
+                clearInterval(checkHydrated);
+                resolve(true);
+              }
+            }, 10);
+          });
+        }
+
+        const state = get();
+
+        if (forceFromApi) {
+          set({ loading: true, error: null });
+
+          const [response, error] = await tryCatch(SettingsService.findByModule("app"));
+
+          if (error) {
+            set({ error: error.message, loading: false });
+            return;
+          }
+
+          if (response && response.statusCode === 200 && response.data) {
+            set({ appSettings: response.data, loading: false, hasLocalSettings: true });
+          }
+          return;
+        }
+
+        if (state.appSettings.length > 0 && state.hasLocalSettings) {
+          return;
+        }
+
+        set({ loading: true, error: null });
+
+        const [response, error] = await tryCatch(SettingsService.findByModule("app"));
+
+        if (error) {
+          set({ error: error.message, loading: false });
+          return;
+        }
+
+        if (response && response.statusCode === 200 && response.data) {
+          set({ appSettings: response.data, loading: false, hasLocalSettings: true });
+        }
+      },
+      loadDashboardSettings: async (forceFromApi: boolean = false) => {
+        const currentState = get();
+
+        if (!currentState._hasHydrated) {
+          await new Promise((resolve) => {
+            const checkHydrated = setInterval(() => {
+              if (get()._hasHydrated) {
+                clearInterval(checkHydrated);
+                resolve(true);
+              }
+            }, 10);
+          });
+        }
+
+        const state = get();
+
+        if (forceFromApi) {
+          set({ loading: true, error: null });
+
+          const [response, error] = await tryCatch(SettingsService.findByModule("dashboard"));
+
+          if (error) {
+            set({ error: error.message, loading: false });
+            return;
+          }
+
+          if (response && response.statusCode === 200 && response.data) {
+            set({ dashboardSettings: response.data, loading: false, hasLocalSettings: true });
+          }
+          return;
+        }
+
+        if (state.dashboardSettings.length > 0 && state.hasLocalSettings) {
+          return;
+        }
+
+        set({ loading: true, error: null });
+
+        const [response, error] = await tryCatch(SettingsService.findByModule("dashboard"));
+
+        if (error) {
+          set({ error: error.message, loading: false });
+          return;
+        }
+
+        if (response && response.statusCode === 200 && response.data) {
+          set({ dashboardSettings: response.data, loading: false, hasLocalSettings: true });
+        }
+      },
+      updateAppSetting: async (id: string, value: string, syncMode: TSyncMode = "remote") => {
+        set((state) => ({
+          loadingAppSettings: { ...state.loadingAppSettings, [id]: true },
+          error: null,
+        }));
+
+        if (syncMode === "local") {
+          set((state) => ({
+            appSettings: state.appSettings.map((setting) => (setting.id === id ? { ...setting, value } : setting)),
+            loadingAppSettings: { ...state.loadingAppSettings, [id]: false },
+            hasLocalSettings: true,
+          }));
+          return;
+        }
+
+        const [response, error] = await tryCatch(SettingsService.update(id, value));
+
+        if (error) {
+          set((state) => ({
+            error: error.message,
+            loadingAppSettings: { ...state.loadingAppSettings, [id]: false },
+          }));
+          return;
+        }
+
+        if (response && response.statusCode === 200 && response.data) {
+          set((state) => ({
+            appSettings: state.appSettings.map((setting) => (setting.id === id ? { ...setting, value } : setting)),
+            loadingAppSettings: { ...state.loadingAppSettings, [id]: false },
+            hasLocalSettings: true,
+          }));
+        }
+      },
+      updateDashboardSetting: async (id: string, value: string, syncMode: TSyncMode = "remote") => {
+        set((state) => ({
+          loadingDashboardSettings: { ...state.loadingDashboardSettings, [id]: true },
+          error: null,
+        }));
+
+        if (syncMode === "local") {
+          set((state) => ({
+            dashboardSettings: state.dashboardSettings.map((setting) =>
+              setting.id === id ? { ...setting, value } : setting,
+            ),
+            loadingDashboardSettings: { ...state.loadingDashboardSettings, [id]: false },
+            hasLocalSettings: true,
+          }));
+          return;
+        }
+
+        const [response, error] = await tryCatch(SettingsService.update(id, value));
+
+        if (error) {
+          set((state) => ({
+            error: error.message,
+            loadingDashboardSettings: { ...state.loadingDashboardSettings, [id]: false },
+          }));
+          return;
+        }
+
+        if (response && response.statusCode === 200 && response.data) {
+          set((state) => ({
+            dashboardSettings: state.dashboardSettings.map((setting) =>
+              setting.id === id ? { ...setting, value } : setting,
+            ),
+            loadingDashboardSettings: { ...state.loadingDashboardSettings, [id]: false },
+            hasLocalSettings: true,
+          }));
+        }
+      },
+      setHasHydrated: (state: boolean) => {
+        set({ _hasHydrated: state });
+      },
+    }),
+    {
+      name: "react-auth-settings",
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    },
+  ),
+);

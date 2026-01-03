@@ -1,0 +1,275 @@
+import { Check, FilePenLine, RotateCcw, Trash2 } from "lucide-react";
+
+import { Activity } from "react";
+import { BackButton } from "@components/BackButton";
+import { Badge } from "@components/Badge";
+import { Button } from "@components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
+import { CreatedAt } from "@components/CreatedAt";
+import { HoldButton } from "@components/ui/HoldButton";
+import { Link } from "react-router";
+import { Loader } from "@components/Loader";
+import { PageHeader } from "@components/pages/PageHeader";
+import { Protected } from "@core/auth/components/Protected";
+
+import { toast } from "sonner";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useParams } from "react-router";
+
+import type { IRole, IRolePermissions } from "@roles/interfaces/role.interface";
+import { ERoles } from "@auth/enums/role.enum";
+import { RolesService } from "@roles/services/roles.service";
+import { tryCatch } from "@core/utils/try-catch";
+import { useAuthStore } from "@auth/stores/auth.store";
+import { usePermission } from "@permissions/hooks/usePermission";
+import { useTryCatch } from "@core/hooks/useTryCatch";
+
+export default function ViewRole() {
+  const [role, setRole] = useState<IRole | undefined>(undefined);
+  const admin = useAuthStore((state) => state.admin);
+  const hasPermissions = usePermission(["roles-delete", "roles-delete-hard", "roles-restore", "roles-update"], "some");
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { isLoading: isLoadingRole, tryCatch: tryCatchRole } = useTryCatch();
+
+  const findOneRole = useCallback(
+    async function (id: string) {
+      const isSuperAdmin = admin?.role.value === ERoles.SUPER;
+      const serviceByRole = isSuperAdmin ? RolesService.findOneSoftRemoved(id) : RolesService.findOne(id);
+      const [response, responseError] = await tryCatchRole(serviceByRole);
+
+      if (responseError) {
+        toast.error(responseError.message);
+        return;
+      }
+
+      if (response && response.statusCode === 200) {
+        setRole(response.data);
+      }
+    },
+    [admin?.role.value, tryCatchRole],
+  );
+
+  useEffect(() => {
+    findOneRole(id!);
+  }, [id, findOneRole]);
+
+  const groupByCategory = (rolePermissions: IRolePermissions[]) => {
+    if (!rolePermissions) return {};
+
+    const grouped: Record<string, typeof rolePermissions> = {};
+
+    rolePermissions.forEach((rp) => {
+      const category = rp.permission?.category;
+      if (category) {
+        if (!grouped[category]) {
+          grouped[category] = [];
+        }
+        grouped[category].push(rp);
+      }
+    });
+
+    return grouped;
+  };
+
+  async function removeRole(id: string): Promise<void> {
+    const [response, error] = await tryCatch(RolesService.softRemove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      navigate(-1);
+    }
+  }
+
+  async function hardRemoveRole(id: string): Promise<void> {
+    const [response, error] = await tryCatch(RolesService.remove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      navigate(-1);
+    }
+  }
+
+  async function restoreRole(id: string): Promise<void> {
+    const [response, error] = await tryCatch(RolesService.restore(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      findOneRole(id);
+    }
+  }
+
+  function translate(content: string) {
+    if (content === "admin") return "Administradores";
+    if (content === "permissions") return "Permisos";
+    if (content === "settings") return "Configuraciones";
+    return content.charAt(0).toUpperCase() + content.slice(1);
+  }
+
+  return (
+    <section className="flex flex-col gap-6">
+      <PageHeader title="Detalles del rol" />
+      <Card className="relative w-full p-6 text-center md:p-10 lg:w-[80%] xl:w-[60%]">
+        {isLoadingRole ? (
+          <div className="flex min-w-80 justify-center">
+            <Loader size={20} text="Cargando rol" />
+          </div>
+        ) : (
+          <>
+            <BackButton />
+            <CardHeader>
+              <CardTitle className="text-xl">{role?.name}</CardTitle>
+              <CardDescription className="text-base">{role?.value}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6 px-0">
+              <ul className="flex flex-col gap-2 text-start">
+                <li className="flex gap-5">
+                  <span className="font-semibold">Nombre</span>
+                  <span>{role?.name}</span>
+                </li>
+                <li className="flex gap-5">
+                  <span className="font-semibold">Valor</span>
+                  <span>{role?.value}</span>
+                </li>
+                <li className="flex gap-5">
+                  <span className="font-semibold">Descripción</span>
+                  <span>{role?.description}</span>
+                </li>
+                <div className="flex flex-col gap-8">
+                  <div className="flex flex-col gap-4">
+                    <span className="font-semibold">Permisos:</span>
+                    <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+                      {role?.rolePermissions && role.rolePermissions.length > 0 ? (
+                        Object.entries(groupByCategory(role?.rolePermissions))
+                          .sort(([a], [b]) => translate(a).localeCompare(translate(b)))
+                          .map(([category, permissions]) => (
+                            <div className="flex flex-col gap-3" key={`category-block-${category}`}>
+                              <div className="dark:text-foreground flex text-xs font-semibold text-neutral-600 uppercase">
+                                {translate(category)}
+                              </div>
+                              <ul className="flex flex-col gap-2 pl-4">
+                                {permissions.map((rp, idx) => (
+                                  <li
+                                    key={`permission-${idx}`}
+                                    className="dark:text-foreground flex items-center gap-2 text-sm font-medium text-neutral-600"
+                                  >
+                                    <span className="bg-primary/20 rounded-full p-1">
+                                      <Check className="text-primary h-2.5 w-2.5" />
+                                    </span>
+                                    {rp.permission?.name}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))
+                      ) : (
+                        <span>Sin permisos</span>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="dark:bg-background flex flex-col items-start rounded-lg border bg-neutral-50 p-3">
+                    <span className="font-semibold">Usando este rol:</span>
+                    {role?.admins?.length && role.admins.length > 0 ? (
+                      <ul className="flex flex-col gap-2 pt-2 pl-4">
+                        {role?.admins.map((item, idx) => (
+                          <li className="flex items-center gap-3 text-sm" key={`admins-${item.id}`}>
+                            <Badge className="min-w-[29px] text-xs" size="small" variant="ic">
+                              {idx + 1}
+                            </Badge>
+                            <Button className="text-foreground h-fit p-0 font-normal" variant="link" asChild>
+                              <Link to={`/admin/view/${item.id}`}>
+                                {item.firstName} {item.lastName}
+                              </Link>
+                            </Button>
+                            <span className="text-muted-foreground">{item.userName}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span>Sin usuarios</span>
+                    )}
+                  </div>
+                </div>
+              </ul>
+              <CreatedAt>
+                {`Creado el ${role && new Date(role.createdAt.split("T")[0]).toLocaleDateString()}`}
+              </CreatedAt>
+            </CardContent>
+            <Activity mode={hasPermissions ? "visible" : "hidden"}>
+              <CardFooter className="justify-end gap-3 px-0">
+                {role?.deletedAt !== null ? (
+                  <div className="flex w-full items-center justify-between">
+                    <Badge size="small" variant="red">
+                      Eliminado
+                    </Badge>
+                    <Protected requiredPermission="roles-restore">
+                      <HoldButton callback={() => id && restoreRole(id)} size="icon" type="restore" variant="outline">
+                        <RotateCcw className="h-4 w-4" />
+                      </HoldButton>
+                    </Protected>
+                  </div>
+                ) : (
+                  <>
+                    {role?.value !== ERoles.SUPER ? (
+                      <>
+                        <Protected requiredPermission="roles-update">
+                          <Button className="px-5! hover:text-green-500" variant="outline" asChild>
+                            <Link to={`/roles/edit/${id}`}>
+                              <FilePenLine className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </Protected>
+                        <Protected requiredPermission="roles-delete">
+                          <HoldButton callback={() => id && removeRole(id)} size="icon" type="delete" variant="outline">
+                            <Trash2 className="h-4 w-4" />
+                          </HoldButton>
+                        </Protected>
+                        <Protected requiredPermission="roles-delete-hard">
+                          <HoldButton
+                            callback={() => id && hardRemoveRole(id)}
+                            size="icon"
+                            type="hard-delete"
+                            variant="outline"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span>!</span>
+                          </HoldButton>
+                        </Protected>
+                      </>
+                    ) : (
+                      admin?.role.value === ERoles.SUPER && (
+                        <Protected requiredPermission="roles-update">
+                          <Button className="px-5! hover:text-green-500" variant="outline" asChild>
+                            <Link to={`/roles/edit/${id}`}>
+                              <FilePenLine className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </Protected>
+                      )
+                    )}
+                  </>
+                )}
+              </CardFooter>
+            </Activity>
+          </>
+        )}
+      </Card>
+    </section>
+  );
+}

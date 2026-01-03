@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@account/*": ["./src/features/account/*"],
+      "@admin/*": ["./src/features/admin/*"],
+      "@auth/*": ["./src/core/auth/*"],
+      "@components/*": ["./src/core/components/*"],
+      "@core/*": ["./src/core/*"],
+      "@dashboard/*": ["./src/features/dashboard/*"],
+      "@layouts/*": ["./src/features/layouts/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@login/*": ["./src/features/login/*"],
+      "@permissions/*": ["./src/features/permissions/*"],
+      "@roles/*": ["./src/features/roles/*"],
+      "@settings/*": ["./src/features/settings/*"]
+    }
+  }
+}
