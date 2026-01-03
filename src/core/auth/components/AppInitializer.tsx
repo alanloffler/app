@@ -16,6 +16,7 @@ export function AppInitializer({ children }: IProps) {
   const lastAdminId = useRef<string | null>(null);
   const loadAppSettings = useSettingsStore((state) => state.loadAppSettings);
   const loadDashboardSettings = useSettingsStore((state) => state.loadDashboardSettings);
+  const loadNotificationsSettings = useSettingsStore((state) => state.loadNotificationsSettings);
   const setAdmin = useAuthStore((state) => state.setAdmin);
   const { setTheme } = useTheme();
 
@@ -40,6 +41,7 @@ export function AppInitializer({ children }: IProps) {
 
           await loadAppSettings();
           await loadDashboardSettings();
+          await loadNotificationsSettings(true);
 
           const { appSettings } = useSettingsStore.getState();
           const themeSetting = appSettings.find((setting) => setting.submodule === "theme");
@@ -73,7 +75,7 @@ export function AppInitializer({ children }: IProps) {
     return () => {
       isMounted = false;
     };
-  }, [admin, setTheme, setAdmin, loadAppSettings, loadDashboardSettings]);
+  }, [admin, setTheme, setAdmin, loadAppSettings, loadDashboardSettings, loadNotificationsSettings]);
 
   if (!isInitialized) {
     return null;
