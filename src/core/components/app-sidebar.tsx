@@ -2,6 +2,7 @@ import {
   GalleryVerticalEnd,
   KeyRound,
   LayoutDashboard,
+  Megaphone,
   OctagonAlert,
   Package,
   Settings,
@@ -59,6 +60,11 @@ const data = {
           title: "Aplicación",
           url: "/app-settings",
           icon: Package,
+        },
+        {
+          title: "Notificaciones",
+          url: "/notifications-settings",
+          icon: Megaphone,
         },
         {
           title: "Tablero",
