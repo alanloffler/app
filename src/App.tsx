@@ -31,6 +31,8 @@ const AppSettings = lazy(() => import("./features/settings/AppSettings"));
 const DashboardSettings = lazy(() => import("./features/settings/DashboardSettings"));
 const NotificationsSettings = lazy(() => import("./features/settings/NotificationsSettings"));
 
+const Users = lazy(() => import("./features/users/Users"));
+
 const Account = lazy(() => import("./features/account/Account"));
 
 const NotFound = lazy(() => import("./core/components/NotFound"));
@@ -321,6 +323,22 @@ const router = createBrowserRouter([
             }
           >
             <Account />
+          </Suspense>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            <ProtectedRoute requiredPermission="users-view">
+              <Users />
+            </ProtectedRoute>
           </Suspense>
         ),
       },
