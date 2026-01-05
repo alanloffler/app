@@ -11,13 +11,19 @@ import { useNavigate } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import type { TAuthType } from "@auth/interfaces/auth.type";
 import { AuthService } from "@auth/services/auth.service";
 import { cn } from "@lib/utils";
 import { loginSchema } from "@login/schemas/login.schema";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+interface IProps {
+  className?: string;
+  type: TAuthType;
+}
+
+export function LoginForm({ className, type }: IProps) {
   const navigate = useNavigate();
   const { isLoading: isFetching, tryCatch: tryCatchAdmin } = useTryCatch();
   const { isLoading: isLogin, tryCatch: tryCatchSubmit } = useTryCatch();
@@ -32,7 +38,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
     const { email, password } = data;
-    const [loginResponse, loginError] = await tryCatchSubmit(AuthService.signIn({ email, password }));
+    const [loginResponse, loginError] = await tryCatchSubmit(AuthService.signIn({ email, password, type }));
 
     if (loginError) {
       toast.error(loginError.message);
@@ -54,7 +60,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   }
 
   return (
-    <div className={cn("flex w-full flex-col gap-6", className)} {...props}>
+    <div className={cn("flex w-full flex-col gap-6", className)}>
       <Card className="mx-auto w-full max-w-6xl overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8 lg:p-10" onSubmit={form.handleSubmit(onSubmit)}>
