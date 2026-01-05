@@ -2,15 +2,18 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { IAdmin } from "@admin/interfaces/admin.interface";
+import type { TAuthType } from "@auth/interfaces/auth.type";
 import { AccountService } from "@account/services/profile.service";
 
 interface AuthState {
   admin?: IAdmin;
   loadingAdmin: boolean;
+  type?: TAuthType;
   clearAdmin: () => void;
   refreshAdmin: () => Promise<void>;
   setAdmin: (admin?: IAdmin) => void;
   setLoadingAdmin: (loading: boolean) => void;
+  setType: (type?: TAuthType) => void;
 }
 
 export const useAuthStore = create(
@@ -18,10 +21,12 @@ export const useAuthStore = create(
     (set, get) => ({
       admin: undefined,
       loadingAdmin: false,
+      type: undefined,
 
-      clearAdmin: () => set({ admin: undefined }),
+      clearAdmin: () => set({ admin: undefined, type: undefined }),
       setAdmin: (admin) => set({ admin }),
       setLoadingAdmin: (loading) => set({ loadingAdmin: loading }),
+      setType: (type) => set({ type }),
       refreshAdmin: async () => {
         const currentAdmin = get().admin;
         if (!currentAdmin) return;
