@@ -37,7 +37,7 @@ export function AppInitializer({ children }: IProps) {
 
       try {
         if (admin) {
-          const response = await AuthService.getAdmin();
+          const response = await AuthService.getMe();
 
           await loadAppSettings();
           await loadDashboardSettings();
