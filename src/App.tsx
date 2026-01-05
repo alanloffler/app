@@ -1,13 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { lazy, Suspense } from "react";
 
+import { AdminLogin } from "@login/AdminLogin";
 import { AppInitializer } from "@auth/components/AppInitializer";
 import { GuestRoute } from "@auth/components/GuestRoute";
-import { Login } from "@login/Login";
 import { PageLoader } from "@components/PageLoader";
 import { ProtectedLayout } from "@auth/components/ProtectedLayout";
 import { ProtectedRoute } from "@auth/components/ProtectedRoute";
 import { Toaster } from "@components/ui/sonner";
+import { UserLogin } from "@login/UserLogin";
 
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard"));
 
@@ -36,10 +37,18 @@ const NotFound = lazy(() => import("./core/components/NotFound"));
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: (
+      <GuestRoute>
+        <AdminLogin />
+      </GuestRoute>
+    ),
+  },
+  {
     path: "/",
     element: (
       <GuestRoute>
-        <Login />
+        <UserLogin />
       </GuestRoute>
     ),
   },
