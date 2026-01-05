@@ -22,4 +22,10 @@ export type TPermission =
   | "settings-delete-hard"
   | "settings-update"
   | "settings-view"
+  | "users-create"
+  | "users-delete"
+  | "users-delete-hard"
+  | "users-restore"
+  | "users-update"
+  | "users-view"
   | "*";
