@@ -11,10 +11,11 @@ import {
   User2,
   UserPlus2,
 } from "lucide-react";
-
 import { KeyRoundPlus } from "@components/icons/KeyRoundPlus";
-import { NavMain } from "@components/nav-main";
+import { Pacients } from "@components/icons/Pacients";
+
 import { NavActions } from "@components/nav-actions";
+import { NavMain } from "@components/nav-main";
 import { NavUser } from "@components/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@components/ui/sidebar";
 import { TeamSwitcher } from "@components/team-switcher";
@@ -33,6 +34,12 @@ const data = {
     plan: "v 0.1",
   },
   navMain: [
+    {
+      title: "Pacientes",
+      url: "/users",
+      icon: Pacients,
+      permission: "users-view" as TPermission,
+    },
     {
       title: "Administradores",
       url: "/admin",
