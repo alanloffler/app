@@ -25,7 +25,7 @@ interface IProps {
 
 export function LoginForm({ className, type }: IProps) {
   const navigate = useNavigate();
-  const { isLoading: isFetching, tryCatch: tryCatchAdmin } = useTryCatch();
+  const { isLoading: isFetching, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isLogin, tryCatch: tryCatchSubmit } = useTryCatch();
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -42,18 +42,21 @@ export function LoginForm({ className, type }: IProps) {
 
     if (loginError) {
       toast.error(loginError.message);
+      return;
     }
 
     if (loginResponse && loginResponse.statusCode === 200) {
-      const [adminResponse, adminError] = await tryCatchAdmin(AuthService.getAdmin());
+      const [userResponse, userError] = await tryCatchUser(AuthService.getMe());
 
-      if (adminError) {
-        toast.error(adminError.message);
+      if (userError) {
+        toast.error(userError.message);
+        return;
       }
 
-      if (adminResponse && adminResponse.statusCode === 200) {
-        useAuthStore.getState().setAdmin(adminResponse.data);
-        toast.success(`Bienvenido ${adminResponse.data?.firstName} ${adminResponse.data?.lastName}`);
+      if (userResponse && userResponse.statusCode === 200) {
+        useAuthStore.getState().setAdmin(userResponse.data);
+        useAuthStore.getState().setType(loginResponse.data?.type as TAuthType);
+        toast.success(`Bienvenido ${userResponse.data?.firstName} ${userResponse.data?.lastName}`);
         navigate("/dashboard");
       }
     }
