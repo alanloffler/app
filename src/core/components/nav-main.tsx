@@ -16,6 +16,8 @@ import {
   useSidebar,
 } from "@components/ui/sidebar";
 
+import type { ComponentType, SVGProps } from "react";
+
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { cn } from "@lib/utils";
 import { useActiveRoute } from "@core/hooks/useActiveRoute";
@@ -23,7 +25,7 @@ import { useSettingsStore } from "@settings/stores/settings.store";
 
 interface IProps {
   items: {
-    icon?: LucideIcon;
+    icon?: LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
     isActive?: boolean;
     items?: IItem[];
     permission: TPermission;
@@ -33,7 +35,7 @@ interface IProps {
 }
 
 interface IItem {
-  icon?: LucideIcon;
+  icon?: LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
   title: string;
   url: string;
 }
