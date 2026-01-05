@@ -7,7 +7,9 @@ export interface ICredentials {
 }
 
 export interface ISignIn {
-  id: string;
   email: string;
+  id: string;
   role: string;
+  roleId: string;
+  type?: string;
 }
