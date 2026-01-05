@@ -1,6 +1,7 @@
 import type { IAdmin } from "@admin/interfaces/admin.interface";
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
 import type { ICredentials, ISignIn } from "@auth/interfaces/auth.interface";
+import type { IUser } from "@users/interfaces/user.interface";
 import { apiClient } from "@core/client/client";
 
 class AuthModuleService {
@@ -24,8 +25,8 @@ class AuthModuleService {
     return response.data;
   }
 
-  public async getAdmin(): Promise<IApiResponse<IAdmin>> {
-    const response = await apiClient.get<IApiResponse<IAdmin>>("/auth/admin");
+  public async getMe(): Promise<IApiResponse<IAdmin | IUser>> {
+    const response = await apiClient.get<IApiResponse<IAdmin | IUser>>("/auth/me");
     return response.data;
   }
 }
