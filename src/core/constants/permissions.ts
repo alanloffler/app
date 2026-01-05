@@ -48,4 +48,16 @@ export const PERMISSIONS = [
       { name: "Ver", value: "roles-view" },
     ],
   },
+  {
+    name: "Usuarios",
+    value: "users",
+    actions: [
+      { name: "Crear", value: "users-create" },
+      { name: "Editar", value: "users-update" },
+      { name: "Eliminar", value: "users-delete" },
+      { name: "Eliminar permanente", value: "users-delete-hard" },
+      { name: "Restaurar", value: "users-restore" },
+      { name: "Ver", value: "users-view" },
+    ],
+  },
 ];
