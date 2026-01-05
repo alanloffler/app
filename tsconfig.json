@@ -23,7 +23,8 @@
       "@login/*": ["./src/features/login/*"],
       "@permissions/*": ["./src/features/permissions/*"],
       "@roles/*": ["./src/features/roles/*"],
-      "@settings/*": ["./src/features/settings/*"]
+      "@settings/*": ["./src/features/settings/*"],
+      "@users/*": ["./src/features/users/*"]
     }
   }
 }
