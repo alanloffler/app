@@ -20,8 +20,7 @@ class AuthModuleService {
   }
 
   public async signOut(): Promise<IApiResponse<null>> {
-    // TODO: type get()
-    const response = await apiClient.get("/auth/signOut");
+    const response = await apiClient.get<IApiResponse<null>>("/auth/signOut");
     return response.data;
   }
 
