@@ -2,12 +2,13 @@ import { Navigate, Outlet } from "react-router";
 
 import type { ReactNode } from "react";
 
+import type { TPermission } from "@permissions/interfaces/permission.type";
 import { useAuthStore } from "@auth/stores/auth.store";
 
 interface IProps {
   children: ReactNode;
   redirectTo?: string;
-  requiredPermission?: string | string[];
+  requiredPermission?: TPermission | TPermission[];
 }
 
 export function ProtectedRoute({ children, redirectTo = "/", requiredPermission }: IProps) {
