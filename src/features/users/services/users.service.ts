@@ -40,6 +40,21 @@ class UsersModuleService {
     const response = await apiClient.get(`/users/${id}`);
     return response.data;
   }
+
+  public async checkEmailAvailability(email: string): Promise<IApiResponse<boolean>> {
+    const response = await apiClient.get(`/users/email-availability/${email}`);
+    return response.data;
+  }
+
+  public async checkIcAvailability(id: string): Promise<IApiResponse<boolean>> {
+    const response = await apiClient.get(`/users/ic-availability/${id}`);
+    return response.data;
+  }
+
+  public async checkUsernameAvailability(username: string): Promise<IApiResponse<boolean>> {
+    const response = await apiClient.get(`/users/username-availability/${username}`);
+    return response.data;
+  }
 }
 
 export const UsersService = UsersModuleService.getInstance();
