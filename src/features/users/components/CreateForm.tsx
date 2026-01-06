@@ -138,7 +138,8 @@ export function CreateForm() {
       }
 
       if (roles?.statusCode === 200) {
-        setRoles(roles?.data);
+        const filteredRoles = roles.data?.filter((role) => role.value === "user");
+        setRoles(filteredRoles);
       }
     }
 
