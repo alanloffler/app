@@ -103,56 +103,58 @@ export function DataTable<TData, TValue>({
           </Activity>
         </div>
       </div>
-      <Table className="dark:bg-muted">
-        <TableHeader className="dark:bg-primary-foreground bg-neutral-100">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    className="py-2.5"
-                    key={header.id}
-                    style={{
-                      minWidth: header.column.columnDef.minSize,
-                      width: header.column.getSize(),
-                    }}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    style={{
-                      minWidth: cell.column.columnDef.minSize,
-                      width: cell.column.getSize(),
-                    }}
-                    key={cell.id}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div className="p-3">
+        <Table className="dark:bg-muted">
+          <TableHeader className="dark:bg-primary-foreground bg-neutral-100">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      className="py-2.5"
+                      key={header.id}
+                      style={{
+                        minWidth: header.column.columnDef.minSize,
+                        width: header.column.getSize(),
+                      }}
+                    >
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                Sin resultados
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      {!loading && (
-        <Pagination table={table} setPagination={setPagination} pagination={pagination} pageSizes={pageSizes} />
-      )}
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      style={{
+                        minWidth: cell.column.columnDef.minSize,
+                        width: cell.column.getSize(),
+                      }}
+                      key={cell.id}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Sin resultados
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {!loading && (
+          <Pagination table={table} setPagination={setPagination} pagination={pagination} pageSizes={pageSizes} />
+        )}
+      </div>
     </div>
   );
 }
