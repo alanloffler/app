@@ -77,6 +77,14 @@ const routes = [
     name: "Configuraciones de notificaciones",
   },
   {
+    path: "/users",
+    name: "Pacientes",
+  },
+  {
+    path: "/users/view/:id",
+    name: "Ver",
+  },
+  {
     path: "/account",
     name: "Mi cuenta",
   },
