@@ -17,6 +17,10 @@ const routes = [
     name: "Inicio",
   },
   {
+    path: "/calendar",
+    name: "Agenda",
+  },
+  {
     path: "/admin",
     name: "Administradores",
   },
