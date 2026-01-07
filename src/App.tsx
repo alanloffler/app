@@ -33,6 +33,7 @@ const NotificationsSettings = lazy(() => import("./features/settings/Notificatio
 
 const Users = lazy(() => import("./features/users/Users"));
 const CreateUser = lazy(() => import("./features/users/views/CreateUser"));
+const EditUser = lazy(() => import("./features/users/views/EditUser"));
 const ViewUser = lazy(() => import("./features/users/views/ViewUser"));
 
 const Account = lazy(() => import("./features/account/Account"));
@@ -356,6 +357,22 @@ const router = createBrowserRouter([
           >
             <ProtectedRoute requiredPermission={["users-view", "users-create"]}>
               <CreateUser />
+            </ProtectedRoute>
+          </Suspense>
+        ),
+      },
+      {
+        path: "users/edit/:id",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            <ProtectedRoute requiredPermission={["users-view", "users-update"]}>
+              <EditUser />
             </ProtectedRoute>
           </Suspense>
         ),
