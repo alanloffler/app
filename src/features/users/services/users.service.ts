@@ -38,6 +38,16 @@ class UsersModuleService {
     return response.data;
   }
 
+  public async findOneWithCredentials(id: string): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.get(`/users/${id}/credentials`);
+    return response.data;
+  }
+
+  public async update(id: string, data: Partial<IUser>): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.patch(`/users/${id}`, data);
+    return response.data;
+  }
+
   public async remove(id: string): Promise<IApiResponse<IUser>> {
     const response = await apiClient.delete(`/users/${id}`);
     return response.data;
