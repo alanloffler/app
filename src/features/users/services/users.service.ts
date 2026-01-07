@@ -38,6 +38,11 @@ class UsersModuleService {
     return response.data;
   }
 
+  public async remove(id: string): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.delete(`/users/${id}`);
+    return response.data;
+  }
+
   public async softRemove(id: string): Promise<IApiResponse<IUser>> {
     const response = await apiClient.delete(`/users/soft-remove/${id}`);
     return response.data;
