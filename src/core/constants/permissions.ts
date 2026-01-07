@@ -4,8 +4,8 @@ export const PERMISSIONS = [
     value: "admin",
     actions: [
       { name: "Crear", value: "admin-create" },
-      { name: "Editar contraseña", value: "admin-update-password" },
       { name: "Editar", value: "admin-update" },
+      { name: "Editar contraseña", value: "admin-update-password" },
       { name: "Eliminar", value: "admin-delete" },
       { name: "Eliminar permanente", value: "admin-delete-hard" },
       { name: "Estadisticas", value: "admin-stats" },
@@ -54,6 +54,7 @@ export const PERMISSIONS = [
     actions: [
       { name: "Crear", value: "users-create" },
       { name: "Editar", value: "users-update" },
+      { name: "Editar contraseña", value: "users-update-password" },
       { name: "Eliminar", value: "users-delete" },
       { name: "Eliminar permanente", value: "users-delete-hard" },
       { name: "Restaurar", value: "users-restore" },
