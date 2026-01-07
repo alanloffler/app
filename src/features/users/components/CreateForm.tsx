@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { IRole } from "@roles/interfaces/role.interface";
 import { RolesService } from "@roles/services/roles.service";
 import { UsersService } from "@users/services/users.service";
-import { createAdminSchema } from "@admin/schemas/create-admin.schema";
+import { createUserSchema } from "@users/schemas/create-user.schema";
 import { tryCatch } from "@core/utils/try-catch";
 import { useDebounce } from "@core/hooks/useDebounce";
 import { useTryCatch } from "@core/hooks/useTryCatch";
@@ -34,8 +34,8 @@ export function CreateForm() {
 
   const debouncedUsername = useDebounce(username, 500);
 
-  const form = useForm<z.infer<typeof createAdminSchema>>({
-    resolver: zodResolver(createAdminSchema),
+  const form = useForm<z.infer<typeof createUserSchema>>({
+    resolver: zodResolver(createUserSchema),
     defaultValues: {
       email: "",
       firstName: "",
@@ -48,7 +48,7 @@ export function CreateForm() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof createAdminSchema>) {
+  async function onSubmit(data: z.infer<typeof createUserSchema>) {
     if (emailError) {
       form.setError("email", { message: emailError });
       return;
