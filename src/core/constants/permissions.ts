@@ -14,6 +14,11 @@ export const PERMISSIONS = [
     ],
   },
   {
+    name: "Calendario",
+    value: "calendar",
+    actions: [{ name: "Ver", value: "calendar-view" }],
+  },
+  {
     name: "Configuraciones",
     value: "settings",
     actions: [
