@@ -48,17 +48,17 @@ class AdminModuleService {
     return response.data;
   }
 
-  public async remove(id: string): Promise<IApiResponse<any>> {
+  public async remove(id: string): Promise<IApiResponse<IAdmin>> {
     const response = await apiClient.delete(`/admin/${id}`);
     return response.data;
   }
 
-  public async softRemove(id: string): Promise<IApiResponse<any>> {
+  public async softRemove(id: string): Promise<IApiResponse<IAdmin>> {
     const response = await apiClient.delete(`/admin/soft-remove/${id}`);
     return response.data;
   }
 
-  public async restore(id: string): Promise<IApiResponse<any>> {
+  public async restore(id: string): Promise<IApiResponse<IAdmin>> {
     const response = await apiClient.patch(`/admin/restore/${id}`);
     return response.data;
   }
