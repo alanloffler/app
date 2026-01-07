@@ -27,5 +27,6 @@ export type TPermission =
   | "users-delete-hard"
   | "users-restore"
   | "users-update"
+  | "users-update-password"
   | "users-view"
   | "*";
