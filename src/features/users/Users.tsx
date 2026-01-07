@@ -202,7 +202,7 @@ export default function Users() {
           {!row.original.deletedAt && (
             <Protected requiredPermission="users-update">
               <Button className="px-5! hover:text-green-500" variant="outline" asChild>
-                <Link to={`/admin/edit/${row.original.id}`}>
+                <Link to={`/users/edit/${row.original.id}`}>
                   <FilePenLine className="h-4 w-4" />
                 </Link>
               </Button>
