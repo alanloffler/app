@@ -1,4 +1,5 @@
 import {
+  Calendar,
   GalleryVerticalEnd,
   KeyRound,
   LayoutDashboard,
@@ -29,11 +30,17 @@ import { useAuthStore } from "@auth/stores/auth.store";
 
 const data = {
   teams: {
-    name: "React Auth API",
+    name: "App",
     logo: GalleryVerticalEnd,
     plan: "v 0.1",
   },
   navMain: [
+    {
+      title: "Agenda",
+      url: "/calendar",
+      icon: Calendar,
+      permission: "calendar-view" as TPermission,
+    },
     {
       title: "Pacientes",
       url: "/users",
