@@ -78,18 +78,17 @@ export default function Users() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.remove(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   fetchUsers();
-    // }
+    const [response, error] = await tryCatch(UsersService.remove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      fetchUsers();
+    }
   }
 
   useEffect(() => {
