@@ -6,6 +6,7 @@ export type TPermission =
   | "admin-update"
   | "admin-update-password"
   | "admin-view"
+  | "calendar-view"
   | "permissions-create"
   | "permissions-delete"
   | "permissions-delete-hard"
