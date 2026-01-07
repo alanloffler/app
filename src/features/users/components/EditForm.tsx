@@ -16,8 +16,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import type { IAdmin } from "@admin/interfaces/admin.interface";
 import type { IRole } from "@roles/interfaces/role.interface";
+import type { IUser } from "@users/interfaces/user.interface";
 import { RolesService } from "@roles/services/roles.service";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
@@ -32,7 +32,7 @@ interface IProps {
 }
 
 export function EditForm({ userId }: IProps) {
-  const [adminToUpdate, setAdminToUpdate] = useState<IAdmin | null>(null);
+  const [userToUpdate, setUserToUpdate] = useState<IUser | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [icError, setIcError] = useState<string | null>(null);
   const [passwordField, setPasswordField] = useState<boolean>(true);
@@ -43,7 +43,7 @@ export function EditForm({ userId }: IProps) {
   const canUpdatePassword = usePermission("users-update-password");
   const navigate = useNavigate();
   const refreshAdmin = useAuthStore((state) => state.refreshAdmin);
-  const { isLoading: isLoadingAdmin, tryCatch: tryCatchAdmin } = useTryCatch();
+  const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isLoadingRoles, tryCatch: tryCatchRoles } = useTryCatch();
   const { isLoading: isSaving, tryCatch: tryCatchSubmit } = useTryCatch();
 
@@ -73,14 +73,15 @@ export function EditForm({ userId }: IProps) {
     }
 
     if (roles && roles.statusCode === 200) {
-      setRoles(roles.data);
+      const filteredRoles = roles.data?.filter((role) => role.value === "user");
+      setRoles(filteredRoles);
     }
   }, [form.control, tryCatchRoles]);
 
   useEffect(() => {
     async function checkUsername() {
       if (!debouncedUsername || debouncedUsername.length <= 3) return;
-      if (debouncedUsername === adminToUpdate?.userName) return;
+      if (debouncedUsername === userToUpdate?.userName) return;
 
       const [response, error] = await tryCatch(UsersService.checkUsernameAvailability(debouncedUsername));
       if (response?.data === false || error) {
@@ -91,38 +92,38 @@ export function EditForm({ userId }: IProps) {
     }
 
     checkUsername();
-  }, [debouncedUsername, adminToUpdate?.userName, form]);
+  }, [debouncedUsername, userToUpdate?.userName, form]);
 
   useEffect(() => {
     async function findOneWithCredentials(): Promise<void> {
-      const [admin, adminError] = await tryCatchAdmin(UsersService.findOneWithCredentials(userId));
+      const [user, userError] = await tryCatchUser(UsersService.findOneWithCredentials(userId));
 
-      if (adminError) {
-        toast.error(adminError.message);
+      if (userError) {
+        toast.error(userError.message);
         return;
       }
 
-      if (admin && admin.statusCode === 200) {
-        if (admin.data) {
+      if (user && user.statusCode === 200) {
+        if (user.data) {
           form.reset({
-            ic: admin.data.ic,
-            userName: admin.data.userName,
+            ic: user.data.ic,
+            userName: user.data.userName,
             password: "",
-            firstName: admin.data.firstName,
-            lastName: admin.data.lastName,
-            email: admin.data.email,
-            phoneNumber: admin.data.phoneNumber,
-            roleId: admin.data.roleId,
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            email: user.data.email,
+            phoneNumber: user.data.phoneNumber,
+            roleId: user.data.roleId,
           });
 
-          setAdminToUpdate(admin.data);
+          setUserToUpdate(user.data);
           getRoles();
         }
       }
     }
 
     findOneWithCredentials();
-  }, [userId, form, getRoles, tryCatchAdmin]);
+  }, [userId, form, getRoles, tryCatchUser]);
 
   function togglePasswordField(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
@@ -146,7 +147,7 @@ export function EditForm({ userId }: IProps) {
     }
 
     // Check again for race condition: before first check another admin use same ic
-    if (data.email !== adminToUpdate?.email) {
+    if (data.email !== userToUpdate?.email) {
       const [emailAvailableResponse, emailAvailableError] = await tryCatch(
         UsersService.checkEmailAvailability(data.email),
       );
@@ -160,7 +161,7 @@ export function EditForm({ userId }: IProps) {
     }
 
     // Check again for race condition: before first check another admin use same ic
-    if (data.ic !== adminToUpdate?.ic) {
+    if (data.ic !== userToUpdate?.ic) {
       const [icAvailableResponse, icAvailableError] = await tryCatch(UsersService.checkIcAvailability(data.ic));
 
       if (icAvailableResponse?.data === false || icAvailableError) {
@@ -172,7 +173,7 @@ export function EditForm({ userId }: IProps) {
     }
 
     // Check again for race condition: before first check another admin use same username
-    if (data.userName !== adminToUpdate?.userName) {
+    if (data.userName !== userToUpdate?.userName) {
       const [usernameAvailableResponse, usernameAvailableError] = await tryCatch(
         UsersService.checkUsernameAvailability(data.userName),
       );
@@ -199,7 +200,7 @@ export function EditForm({ userId }: IProps) {
     }
 
     if (update?.statusCode === 200) {
-      if (adminToUpdate?.ic === admin?.ic) {
+      if (userToUpdate?.ic === admin?.ic) {
         refreshAdmin();
       }
       toast.success(update.message);
@@ -216,8 +217,8 @@ export function EditForm({ userId }: IProps) {
     <Card className="relative">
       <BackButton />
       <CardHeader>
-        <CardTitle>Editar Administrador</CardTitle>
-        <CardDescription>Actualizá los datos del administrador</CardDescription>
+        <CardTitle>Editar Paciente</CardTitle>
+        <CardDescription>Actualizá los datos del paciente</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <form className="grid grid-cols-1 gap-6" id="edit-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -432,7 +433,7 @@ export function EditForm({ userId }: IProps) {
       </CardContent>
       <CardFooter className="flex items-center justify-between pt-4">
         <div>
-          {isLoadingAdmin && <Loader className="text-sm" size={18} text="Cargando administrador" />}
+          {isLoadingUser && <Loader className="text-sm" size={18} text="Cargando paciente" />}
           {isLoadingRoles && <Loader className="text-sm" size={18} text="Cargando roles" />}
         </div>
         <div className="flex gap-4">
