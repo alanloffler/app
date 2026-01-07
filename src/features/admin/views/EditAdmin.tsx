@@ -1,4 +1,4 @@
-import { EditForm } from "@/features/admin/components/EditForm";
+import { EditForm } from "@admin/components/EditForm";
 
 import { useParams } from "react-router";
 
