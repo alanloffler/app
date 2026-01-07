@@ -212,9 +212,11 @@ export default function Users() {
             </Protected>
           )}
           {row.original.deletedAt ? (
-            <HoldButton callback={() => restoreUser(row.original.id)} size="icon" type="restore" variant="outline">
-              <RotateCcw className="h-4 w-4" />
-            </HoldButton>
+            <Protected requiredPermission="users-restore">
+              <HoldButton callback={() => restoreUser(row.original.id)} size="icon" type="restore" variant="outline">
+                <RotateCcw className="h-4 w-4" />
+              </HoldButton>
+            </Protected>
           ) : (
             <>
               <Protected requiredPermission="users-delete">
