@@ -245,7 +245,7 @@ export function EditForm({ userId }: IProps) {
                       setIcError(null);
                       form.clearErrors("ic");
 
-                      if (value.length > 7 && value !== adminToUpdate?.ic) {
+                      if (value.length > 7 && value !== userToUpdate?.ic) {
                         const [response, error] = await tryCatch(UsersService.checkIcAvailability(value));
                         if (response?.data === false || error) {
                           const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado";
@@ -367,7 +367,7 @@ export function EditForm({ userId }: IProps) {
                       const emailValue = e.target.value;
                       const emailValidation = z.email().safeParse(emailValue);
 
-                      if (emailValidation.success && emailValue !== adminToUpdate?.email) {
+                      if (emailValidation.success && emailValue !== userToUpdate?.email) {
                         const [response, error] = await tryCatch(UsersService.checkEmailAvailability(emailValue));
                         if (response?.data === false || error) {
                           const errorMsg = error ? "Error al comprobar email" : "Email ya registrado";
