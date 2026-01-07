@@ -2,7 +2,7 @@ import z from "zod";
 
 import { userSchema } from "@users/schemas/users.schema";
 
-export const updateAdminSchema = userSchema.extend({
+export const updateUserSchema = userSchema.extend({
   password: z
     .string()
     .optional()
