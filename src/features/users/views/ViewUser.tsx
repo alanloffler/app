@@ -79,18 +79,17 @@ export default function ViewUser() {
   }
 
   async function restoreUser(id: string) {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.restore(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   findOneUser(id);
-    // }
+    const [response, error] = await tryCatch(UsersService.restore(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      findOneUser(id);
+    }
   }
 
   useEffect(() => {
