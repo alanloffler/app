@@ -1,5 +1,6 @@
 import { FilePenLine, RotateCcw, Trash2 } from "lucide-react";
 
+import { Activity } from "react";
 import { BackButton } from "@components/BackButton";
 import { Button } from "@components/ui/button";
 import { Badge } from "@components/Badge";
@@ -12,7 +13,8 @@ import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
 
 import { toast } from "sonner";
-import { Activity, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useParams } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
@@ -27,6 +29,7 @@ export default function ViewUser() {
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const hasPermissions = usePermission(["users-delete", "users-delete-hard", "users-restore", "users-update"], "some");
+  const navigate = useNavigate();
   const { id } = useParams();
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
 
@@ -64,18 +67,17 @@ export default function ViewUser() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.remove(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   navigate(-1);
-    // }
+    const [response, error] = await tryCatch(UsersService.remove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      navigate(-1);
+    }
   }
 
   async function restoreUser(id: string) {
