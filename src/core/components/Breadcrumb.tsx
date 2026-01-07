@@ -85,6 +85,10 @@ const routes = [
     name: "Ver",
   },
   {
+    path: "/users/edit/:id",
+    name: "Editar",
+  },
+  {
     path: "/account",
     name: "Mi cuenta",
   },
