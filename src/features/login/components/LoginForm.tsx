@@ -1,3 +1,5 @@
+import { Eye, EyeOff } from "lucide-react";
+
 import { Button } from "@components/ui/button";
 import { Card, CardContent } from "@components/ui/card";
 import { Controller } from "react-hook-form";
@@ -6,6 +8,7 @@ import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
 
 import { toast } from "sonner";
+import { type MouseEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { z } from "zod";
@@ -24,6 +27,7 @@ interface IProps {
 }
 
 export function LoginForm({ className, type }: IProps) {
+  const [passwordField, setPasswordField] = useState<boolean>(true);
   const navigate = useNavigate();
   const { isLoading: isFetching, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isLogin, tryCatch: tryCatchSubmit } = useTryCatch();
@@ -62,6 +66,11 @@ export function LoginForm({ className, type }: IProps) {
     }
   }
 
+  function togglePasswordField(event: MouseEvent<HTMLButtonElement>): void {
+    event.preventDefault();
+    setPasswordField(!passwordField);
+  }
+
   return (
     <div className={cn("flex w-full flex-col gap-6", className)}>
       <Card className="mx-auto w-full max-w-6xl overflow-hidden p-0">
@@ -69,7 +78,7 @@ export function LoginForm({ className, type }: IProps) {
           <form className="p-6 md:p-8 lg:p-10" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className="mb-6 flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold md:text-3xl">React Auth API</h1>
+                <h1 className="text-2xl font-bold md:text-3xl">App</h1>
                 <p className="text-muted-foreground text-sm text-balance md:text-base">Ingresá al sistema</p>
               </div>
               <Controller
@@ -89,13 +98,21 @@ export function LoginForm({ className, type }: IProps) {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                    <Input
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      id="password"
-                      className="h-11 md:h-12"
-                      type="password"
-                    />
+                    <div className="flex items-center gap-2">
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="password"
+                        className="h-11 md:h-12"
+                        type={passwordField ? "password" : "text"}
+                      />
+                      <button
+                        className="p-1 transition-colors duration-150 hover:text-sky-500"
+                        onClick={(e) => togglePasswordField(e)}
+                      >
+                        {passwordField ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                      </button>
+                    </div>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
