@@ -12,6 +12,8 @@ import { UserLogin } from "@login/UserLogin";
 
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard"));
 
+const Calendar = lazy(() => import("./features/calendar/Calendar"));
+
 const Admin = lazy(() => import("./features/admin/Admin"));
 const CreateAdmin = lazy(() => import("./features/admin/views/CreateAdmin"));
 const EditAdmin = lazy(() => import("./features/admin/views/EditAdmin"));
@@ -72,6 +74,20 @@ const router = createBrowserRouter([
             }
           >
             <Dashboard />
+          </Suspense>
+        ),
+      },
+      {
+        path: "calendar",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            <Calendar />
           </Suspense>
         ),
       },
