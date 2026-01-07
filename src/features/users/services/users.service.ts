@@ -23,9 +23,8 @@ class UsersModuleService {
     return response.data;
   }
 
-  // TODO: Implement real endpoint to include those users soft removed
   public async findAllSoftRemoved(): Promise<IApiResponse<IUser[]>> {
-    const response = await apiClient.get("/users");
+    const response = await apiClient.get("/users/soft-removed");
     return response.data;
   }
 
@@ -34,10 +33,13 @@ class UsersModuleService {
     return response.data;
   }
 
-  // TODO: Implement real endpoint for soft removed
   public async findOneSoftRemoved(id: string): Promise<IApiResponse<IUser>> {
-    // const response = await apiClient.get(`/users/${id}/soft-removed`);
-    const response = await apiClient.get(`/users/${id}`);
+    const response = await apiClient.get(`/users/${id}/soft-removed`);
+    return response.data;
+  }
+
+  public async softRemove(id: string): Promise<IApiResponse<any>> {
+    const response = await apiClient.delete(`/users/soft-remove/${id}`);
     return response.data;
   }
 
