@@ -49,34 +49,32 @@ export default function Users() {
   }, [fetchUsers]);
 
   async function removeUser(id: string): Promise<void> {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.softRemove(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   fetchUsers();
-    // }
+    const [response, error] = await tryCatch(UsersService.softRemove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      fetchUsers();
+    }
   }
 
   async function restoreUser(id: string) {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.restore(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   fetchUsers();
-    // }
+    const [response, error] = await tryCatch(UsersService.restore(id));
+
+    if (error) {
+      toast.error(error.message);
+
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      fetchUsers();
+    }
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
