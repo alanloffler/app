@@ -18,11 +18,12 @@ import { useParams } from "react-router";
 import type { IUser } from "@users/interfaces/user.interface";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
+import { tryCatch } from "@core/utils/try-catch";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
-export default function ViewAdmin() {
+export default function ViewUser() {
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const hasPermissions = usePermission(["users-delete", "users-delete-hard", "users-restore", "users-update"], "some");
@@ -49,18 +50,17 @@ export default function ViewAdmin() {
   );
 
   async function removeUser(id: string): Promise<void> {
-    console.log(id);
-    // const [response, error] = await tryCatch(AdminService.softRemove(id));
-    //
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
-    //
-    // if (response && response.statusCode === 200) {
-    //   toast.success(response.message);
-    //   findOneUser(id);
-    // }
+    const [response, error] = await tryCatch(UsersService.softRemove(id));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200) {
+      toast.success(response.message);
+      findOneUser(id);
+    }
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
@@ -140,9 +140,11 @@ export default function ViewAdmin() {
                     <Badge size="small" variant="red">
                       Eliminado
                     </Badge>
-                    <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
-                      <RotateCcw className="h-4 w-4" />
-                    </HoldButton>
+                    <Protected requiredPermission="users-restore">
+                      <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
+                        <RotateCcw className="h-4 w-4" />
+                      </HoldButton>
+                    </Protected>
                   </div>
                 ) : (
                   <>
