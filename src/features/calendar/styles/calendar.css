@@ -4,6 +4,7 @@
   --color-gray-500: #717680;
 
   font-size: 13px;
+  min-height: 85vh;
 }
 
 /* Table */
