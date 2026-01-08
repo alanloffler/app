@@ -1,0 +1,78 @@
+.calendar {
+  --text-color-primary: #181d27;
+  --text-color-secondary: #414651;
+  --calendar-gray-medium: #717680;
+
+  font-size: 13px;
+}
+
+/* Header */
+.rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.rbc-toolbar button {
+  font-size: 13px;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+.rbc-toolbar-label::first-letter {
+  text-transform: uppercase;
+}
+
+/* Days */
+.rbc-header {
+  padding: 8px;
+}
+
+.rbc-header > span {
+  text-transform: lowercase;
+  font-weight: 500;
+  color: var(--calendar-gray-medium) !important;
+  font-size: 12px;
+}
+
+/* Day slot */
+.rbc-off-range-bg {
+  background: #fafafa;
+}
+
+.rbc-button-link {
+  color: var(--text-color-secondary);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.rbc-date-cell {
+  padding: 4px;
+  text-align: left;
+}
+
+.rbc-date-cell > .rbc-button-link {
+  background-color: #eaeaea;
+  border-radius: 100%;
+  padding: 2px;
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.rbc-date-cell.rbc-now > .rbc-button-link {
+  margin: 0 auto;
+  justify-content: center;
+  vertical-align: middle;
+  background-color: var(--primary);
+  border-radius: 100%;
+  padding: 2px;
+  color: white !important;
+  width: 24px;
+  height: 24px;
+}
+
+.rbc-today {
+  background-color: white;
+}
