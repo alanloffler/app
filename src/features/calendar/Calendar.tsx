@@ -1,15 +1,19 @@
-import "./styles/calendar.css";
+import "@calendar/styles/calendar.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-import { Calendar as Schedule, dateFnsLocalizer } from "react-big-calendar";
+import { Calendar as Schedule } from "react-big-calendar";
+import { Toolbar } from "@calendar/components/Toolbar";
 
+import type { ToolbarProps } from "react-big-calendar";
 import { es } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { dateFnsLocalizer } from "react-big-calendar";
+
+import type { CalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState<string | null>(null);
 
   const locales = {
     "es-AR": es,
@@ -39,7 +43,7 @@ export default function Calendar() {
     showMore: (total: number) => `${total} más...`,
   };
 
-  const events = [
+  const events: CalendarEvent[] = [
     {
       id: 0,
       title: "Event 1",
@@ -84,39 +88,28 @@ export default function Calendar() {
     },
   ];
 
-  useEffect(() => {
-    console.log(currentDate);
-    const month = format(currentDate, "MMMM", { locale: es });
-    setCurrentMonth(month);
-  }, [currentDate]);
-
   return (
-    <div className="myCustomHeight">
-      <div>{currentMonth}</div>
-      <Schedule
-        className="calendar"
-        culture="es-AR"
-        defaultDate={new Date()}
-        defaultView="month"
-        endAccessor="end"
-        events={events}
-        localizer={localizer}
-        messages={messages}
-        startAccessor="start"
-        style={{ height: 700 }}
-        views={["month", "week", "day"]}
-        onSelectEvent={(event) => {
-          console.log(event);
-        }}
-        onNavigate={(date) => {
-          setCurrentDate(date);
-        }}
-      />
-    </div>
-    //     selectable={true}
-    // onSelectSlot={(date) => {
-    //   console.log(date);
-    //   setCurrentDate(date.start);
-    // }}
+    <Schedule
+      className="calendar"
+      components={{
+        toolbar: (props: ToolbarProps<CalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
+      }}
+      culture="es-AR"
+      defaultDate={new Date()}
+      defaultView="month"
+      endAccessor="end"
+      events={events}
+      localizer={localizer}
+      messages={messages}
+      onNavigate={(date) => {
+        setCurrentDate(date);
+      }}
+      onSelectEvent={(event) => {
+        console.log(event);
+      }}
+      startAccessor="start"
+      style={{ height: 700 }}
+      views={["month", "week", "day"]}
+    />
   );
 }
