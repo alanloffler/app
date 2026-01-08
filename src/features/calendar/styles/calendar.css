@@ -1,7 +1,7 @@
 .calendar {
   --text-color-primary: #181d27;
   --text-color-secondary: #414651;
-  --calendar-gray-medium: #717680;
+  --color-gray-500: #717680;
 
   font-size: 13px;
 }
@@ -23,21 +23,29 @@
   text-transform: uppercase;
 }
 
-/* Days */
 .rbc-header {
-  padding: 8px;
+  padding: 8px !important;
 }
 
 .rbc-header > span {
   text-transform: lowercase;
   font-weight: 500;
-  color: var(--calendar-gray-medium) !important;
+  color: var(--color-gray-500) !important;
   font-size: 12px;
 }
 
-/* Day slot */
+/* Day slot off range */
 .rbc-off-range-bg {
-  background: #fafafa;
+  background: #fbfbfb !important;
+}
+
+/* Days */
+.rbc-row-segment {
+  padding: 2px 6px !important;
+}
+.rbc-show-more {
+  color: var(--color-gray-500) !important;
+  font-weight: 600;
 }
 
 .rbc-button-link {
@@ -47,18 +55,23 @@
 }
 
 .rbc-date-cell {
-  padding: 4px;
+  text-align: left !important;
+  padding: 6px;
   text-align: left;
 }
 
 .rbc-date-cell > .rbc-button-link {
-  background-color: #eaeaea;
   border-radius: 100%;
-  padding: 2px;
-  width: 24px;
   height: 24px;
   justify-content: center;
+  padding: 2px;
   vertical-align: middle;
+  width: 24px;
+}
+
+/* Today day slot */
+.rbc-today {
+  background-color: white !important;
 }
 
 .rbc-date-cell.rbc-now > .rbc-button-link {
@@ -73,6 +86,17 @@
   height: 24px;
 }
 
-.rbc-today {
-  background-color: white;
+/* Events */
+.rbc-event {
+  background-color: #ecfdf5 !important;
+  border-radius: 4px;
+  border: 1px solid #a7f3d0 !important;
+  color: #059669 !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rbc-event:hover {
+  background-color: #d1fae5 !important;
+  transition: all 0.2s ease-out;
 }
