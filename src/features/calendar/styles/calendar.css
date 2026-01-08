@@ -6,23 +6,12 @@
   font-size: 13px;
 }
 
+/* Table */
+[role="table"] {
+  border-radius: 0px 0px 10px 10px;
+}
+
 /* Header */
-.rbc-toolbar-label {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-color-primary);
-}
-
-.rbc-toolbar button {
-  font-size: 13px;
-  color: var(--text-color-secondary);
-  font-weight: 500;
-}
-
-.rbc-toolbar-label::first-letter {
-  text-transform: uppercase;
-}
-
 .rbc-header {
   padding: 8px !important;
 }
@@ -39,10 +28,23 @@
   background: #fbfbfb !important;
 }
 
-/* Days */
+.rbc-off-range-bg:last-child {
+  border-bottom-right-radius: 10px !important;
+}
+
+/* Borders color */
+[role="rowgroup"],
+[role="table"],
+.rbc-header,
+.rbc-day-bg {
+  border-color: #e6e6e8 !important;
+}
+
+/* Day slot */
 .rbc-row-segment {
   padding: 2px 6px !important;
 }
+
 .rbc-show-more {
   color: var(--color-gray-500) !important;
   font-weight: 600;
