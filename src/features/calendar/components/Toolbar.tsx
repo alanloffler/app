@@ -1,4 +1,4 @@
-import { DateItem } from "@calendar/components/DateItem";
+import { DateHeader } from "@calendar/components/DateHeader";
 import { Navigation } from "@calendar/components/Navigation";
 
 import type { ToolbarProps } from "react-big-calendar";
@@ -12,7 +12,7 @@ interface IProps extends ToolbarProps<CalendarEvent> {
 export function Toolbar(props: IProps) {
   return (
     <div className="flex items-center justify-between rounded-t-lg border border-b-0 p-6">
-      <DateItem currentDate={props.currentDate} />
+      <DateHeader currentDate={props.currentDate} />
       <Navigation {...props} />
     </div>
   );
