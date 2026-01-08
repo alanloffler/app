@@ -1,13 +1,20 @@
-import { Calendar as Schedule, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import { es } from "date-fns/locale";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./styles/calendar.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import { Calendar as Schedule, dateFnsLocalizer } from "react-big-calendar";
+
+import { es } from "date-fns/locale";
+import { format, parse, startOfWeek, getDay } from "date-fns";
+import { useEffect, useState } from "react";
 
 export default function Calendar() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState<string | null>(null);
+
   const locales = {
     "es-AR": es,
   };
+
   const localizer = dateFnsLocalizer({
     format,
     parse,
@@ -29,7 +36,7 @@ export default function Calendar() {
     time: "Hora",
     event: "Evento",
     noEventsInRange: "No hay eventos en este rango",
-    showMore: (total: number) => `+ Ver más (${total})`,
+    showMore: (total: number) => `${total} más...`,
   };
 
   const events = [
@@ -61,15 +68,36 @@ export default function Calendar() {
       end: new Date("2026-01-08T11:30:00"),
       resourceId: 4,
     },
+    {
+      id: 4,
+      title: "Event 5",
+      start: new Date("2026-01-08T11:30:00"),
+      end: new Date("2026-01-08T12:00:00"),
+      resourceId: 5,
+    },
+    {
+      id: 5,
+      title: "Event 6",
+      start: new Date("2026-01-08T13:00:00"),
+      end: new Date("2026-01-08T13:30:00"),
+      resourceId: 6,
+    },
   ];
+
+  useEffect(() => {
+    console.log(currentDate);
+    const month = format(currentDate, "MMMM", { locale: es });
+    setCurrentMonth(month);
+  }, [currentDate]);
 
   return (
     <div className="myCustomHeight">
+      <div>{currentMonth}</div>
       <Schedule
         className="calendar"
         culture="es-AR"
         defaultDate={new Date()}
-        defaultView="week"
+        defaultView="month"
         endAccessor="end"
         events={events}
         localizer={localizer}
@@ -77,7 +105,18 @@ export default function Calendar() {
         startAccessor="start"
         style={{ height: 700 }}
         views={["month", "week", "day"]}
+        onSelectEvent={(event) => {
+          console.log(event);
+        }}
+        onNavigate={(date) => {
+          setCurrentDate(date);
+        }}
       />
     </div>
+    //     selectable={true}
+    // onSelectSlot={(date) => {
+    //   console.log(date);
+    //   setCurrentDate(date.start);
+    // }}
   );
 }
