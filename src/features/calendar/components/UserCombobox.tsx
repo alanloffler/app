@@ -12,11 +12,13 @@ import { cn } from "@lib/utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
-  value?: string;
+  "aria-invalid"?: boolean;
+  id?: string;
   onChange?: (value: string) => void;
+  value?: string;
 }
 
-export function UserCombobox({ value = "", onChange }: IProps) {
+export function UserCombobox({ "aria-invalid": ariaInvalid, id, onChange, value = "" }: IProps) {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
@@ -43,12 +45,14 @@ export function UserCombobox({ value = "", onChange }: IProps) {
       <PopoverTrigger asChild>
         <Button
           aria-expanded={open}
+          aria-invalid={ariaInvalid}
           className={cn(
             "w-[200px] disabled:opacity-100",
             value || error || isLoading ? "justify-between" : "justify-end",
-            error ? "text-destructive border-destructive" : "",
+            error || ariaInvalid ? "text-destructive border-destructive" : "",
           )}
           disabled={isLoading || error !== null}
+          id={id}
           role="combobox"
           variant="outline"
         >
