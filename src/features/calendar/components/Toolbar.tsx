@@ -1,3 +1,4 @@
+import { AddEvent } from "@calendar/components/AddEvent";
 import { DateHeader } from "@calendar/components/DateHeader";
 import { Navigation } from "@calendar/components/Navigation";
 
@@ -22,7 +23,10 @@ export function Toolbar(props: IProps) {
       )}
     >
       <DateHeader currentDate={props.currentDate} />
-      <Navigation {...props} />
+      <div className="flex items-center gap-3">
+        <Navigation {...props} />
+        <AddEvent />
+      </div>
     </div>
   );
 }
