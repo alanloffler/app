@@ -185,7 +185,8 @@ body {
     @apply bg-background text-foreground;
   }
 
-  button {
+  button,
+  label {
     @apply cursor-pointer;
   }
 
