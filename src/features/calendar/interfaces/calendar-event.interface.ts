@@ -4,4 +4,5 @@ export interface CalendarEvent {
   resourceId: number;
   start: Date;
   title: string;
+  userId: string;
 }
