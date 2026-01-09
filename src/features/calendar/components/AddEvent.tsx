@@ -7,6 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field"
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
+import { UserCombobox } from "@calendar/components/UserCombobox";
 
 import type z from "zod";
 import { es } from "date-fns/locale";
@@ -25,8 +26,18 @@ export function AddEvent() {
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
+      userId: "",
     },
   });
+
+  async function onSubmit(data: z.infer<typeof eventSchema>) {
+    console.log(data);
+  }
+
+  function resetForm(): void {
+    form.reset();
+    // navigate("/roles");
+  }
 
   return (
     <Sheet>
@@ -42,7 +53,7 @@ export function AddEvent() {
           <SheetDescription className="text-base">
             Completá el formulario para agregar un turno a la agenda
           </SheetDescription>
-          <form className="flex flex-col gap-6 pt-4" id="create-event">
+          <form className="flex flex-col gap-6 pt-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="grid grid-cols-3 gap-6">
               <Controller
                 name="title"
@@ -51,6 +62,24 @@ export function AddEvent() {
                   <Field data-invalid={fieldState.invalid} className="col-span-2">
                     <FieldLabel htmlFor="title">Título del turno</FieldLabel>
                     <Input aria-invalid={fieldState.invalid} id="title" {...field} />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup className="grid grid-cols-3 gap-6">
+              <Controller
+                name="userId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-2" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="userId">Usuario</FieldLabel>
+                    <UserCombobox
+                      aria-invalid={fieldState.invalid}
+                      id="userId"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -156,7 +185,7 @@ export function AddEvent() {
               </Field>
             </FieldGroup>
             <div className="flex justify-end gap-4 pt-8">
-              <Button variant="ghost" onClick={() => form.reset()}>
+              <Button variant="ghost" onClick={resetForm}>
                 Cancelar
               </Button>
               <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
