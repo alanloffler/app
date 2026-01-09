@@ -44,13 +44,13 @@ export function Navigation(props: IProps) {
         </Button>
       </ButtonGroup>
       <Select value={props.view} onValueChange={handleViewChange}>
-        <SelectTrigger className="text-foreground! min-w-36.5 text-sm font-medium" id="calendar-view">
+        <SelectTrigger className="text-foreground! min-w-26.5 text-sm font-medium" id="calendar-view">
           <SelectValue placeholder="Vista" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="day">Vista Diaria</SelectItem>
-          <SelectItem value="week">Vista Semanal</SelectItem>
-          <SelectItem value="month">Vista Mensual</SelectItem>
+          <SelectItem value="day">Día</SelectItem>
+          <SelectItem value="week">Semana</SelectItem>
+          <SelectItem value="month">Mes</SelectItem>
         </SelectContent>
       </Select>
     </div>
