@@ -26,12 +26,10 @@ export function UserCombobox({ value = "", onChange }: IProps) {
     const [response, error] = await tryCatch(UsersService.findAll());
 
     if (error) {
-      console.error(error);
       setError("Error");
     }
 
     if (response && response?.statusCode === 200) {
-      console.log(response);
       setUsers(response?.data);
     }
   }, [tryCatch]);
