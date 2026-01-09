@@ -11,20 +11,21 @@ import { UserCombobox } from "@calendar/components/UserCombobox";
 
 import type z from "zod";
 import { es } from "date-fns/locale";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { eventSchema } from "@calendar/schemas/event.schema";
 
 export function AddEvent() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState<Date | undefined>(new Date());
+  const [openSheet, setOpenSheet] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
+      date: "",
       title: "",
       userId: "",
     },
@@ -34,13 +35,12 @@ export function AddEvent() {
     console.log(data);
   }
 
-  function resetForm(): void {
-    form.reset();
-    // navigate("/roles");
-  }
+  useEffect(() => {
+    if (openSheet === false) form.reset();
+  }, [openSheet, form]);
 
   return (
-    <Sheet>
+    <Sheet open={openSheet} onOpenChange={setOpenSheet}>
       <SheetTrigger asChild>
         <Button>
           <Plus className="h-4 w-4" />
@@ -77,8 +77,8 @@ export function AddEvent() {
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
-                      value={field.value}
                       onChange={field.onChange}
+                      value={field.value}
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -86,20 +86,34 @@ export function AddEvent() {
               />
             </FieldGroup>
             <FieldGroup className="grid grid-cols-3 gap-6">
-              <Field className="col-span-2">
-                <FieldLabel>Fecha</FieldLabel>
-                <Calendar
-                  locale={es}
-                  mode="single"
-                  month={month}
-                  onMonthChange={setMonth}
-                  selected={date}
-                  onSelect={setDate}
-                  className="bg-transparent p-0"
-                  disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
-                />
-                {date && <span>{format(date, "yyyy/MM/dd HH:mm", { locale: es })}</span>}
-              </Field>
+              <Controller
+                name="date"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-2" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="date">Fecha</FieldLabel>
+                    <Calendar
+                      aria-invalid={fieldState.invalid}
+                      className="bg-transparent p-0"
+                      disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                      id="date"
+                      locale={es}
+                      mode="single"
+                      month={month}
+                      onMonthChange={setMonth}
+                      onSelect={(date) => {
+                        if (date) {
+                          field.onChange(format(date, "yyyy-MM-dd'T'HH:mm:ss"));
+                        } else {
+                          field.onChange("");
+                        }
+                      }}
+                      selected={field.value ? parseISO(field.value) : undefined}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
               <Field>
                 {/* TODO: dynamic comp */}
                 <FieldLabel>Horario</FieldLabel>
@@ -110,12 +124,12 @@ export function AddEvent() {
                       size="sm"
                       onClick={(e) => {
                         e.preventDefault();
-                        if (date) {
-                          const newDate = new Date(date);
+                        const currentDate = form.getValues("date");
+                        if (currentDate) {
+                          const newDate = parseISO(currentDate);
                           newDate.setHours(7);
                           newDate.setMinutes(0);
-                          console.log(newDate);
-                          setDate(newDate);
+                          form.setValue("date", format(newDate, "yyyy-MM-dd'T'HH:mm:ss"), { shouldDirty: true });
                         }
                       }}
                     >
@@ -185,7 +199,15 @@ export function AddEvent() {
               </Field>
             </FieldGroup>
             <div className="flex justify-end gap-4 pt-8">
-              <Button variant="ghost" onClick={resetForm}>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  form.clearErrors();
+                  form.reset();
+                  setOpenSheet(false);
+                }}
+              >
                 Cancelar
               </Button>
               <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
