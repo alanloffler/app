@@ -2,18 +2,23 @@ import "@calendar/styles/calendar.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { Calendar as Schedule } from "react-big-calendar";
+import { PageLoader } from "@components/PageLoader";
 import { Toolbar } from "@calendar/components/Toolbar";
 
 import type { ToolbarProps } from "react-big-calendar";
+import { dateFnsLocalizer } from "react-big-calendar";
 import { es } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
-import { useState } from "react";
-import { dateFnsLocalizer } from "react-big-calendar";
+import { useCallback, useEffect, useState } from "react";
 
-import type { CalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import { CalendarService } from "@calendar/services/calendar.service";
+import { useTryCatch } from "@/core/hooks/useTryCatch";
 
 export default function Calendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
+  const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
 
   const locales = {
     "es-AR": es,
@@ -43,56 +48,26 @@ export default function Calendar() {
     showMore: (total: number) => `${total} más...`,
   };
 
-  const events: CalendarEvent[] = [
-    {
-      id: 0,
-      title: "Event 1",
-      start: new Date("2026-01-07T10:00:00"),
-      end: new Date("2026-01-07T10:30:00"),
-      resourceId: 1,
-    },
-    {
-      id: 1,
-      title: "Event 2",
-      start: new Date("2026-01-07T10:30:00"),
-      end: new Date("2026-01-07T11:00:00"),
-      resourceId: 2,
-    },
-    {
-      id: 2,
-      title: "Event 3",
-      start: new Date("2026-01-08T10:00:00"),
-      end: new Date("2026-01-08T10:30:00"),
-      resourceId: 3,
-    },
-    {
-      id: 3,
-      title: "Event 4",
-      start: new Date("2026-01-08T11:00:00"),
-      end: new Date("2026-01-08T11:30:00"),
-      resourceId: 4,
-    },
-    {
-      id: 4,
-      title: "Event 5",
-      start: new Date("2026-01-08T11:30:00"),
-      end: new Date("2026-01-08T12:00:00"),
-      resourceId: 5,
-    },
-    {
-      id: 5,
-      title: "Event 6",
-      start: new Date("2026-01-08T13:00:00"),
-      end: new Date("2026-01-08T13:30:00"),
-      resourceId: 6,
-    },
-  ];
+  const getAllEvents = useCallback(async () => {
+    const [response, error] = await tryCatchEvents(CalendarService.findAll());
+
+    if (error) console.log(error);
+    if (response && response?.statusCode === 200) {
+      setEvents(response.data);
+    }
+  }, [tryCatchEvents]);
+
+  useEffect(() => {
+    getAllEvents();
+  }, [getAllEvents]);
+
+  if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
   return (
     <Schedule
       className="calendar"
       components={{
-        toolbar: (props: ToolbarProps<CalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
+        toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
       }}
       culture="es-AR"
       defaultDate={new Date()}
