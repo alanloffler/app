@@ -1,8 +1,8 @@
 export interface ICalendarEvent {
-  end: Date;
+  endDate: Date;
   id: number;
   resourceId: number;
-  start: Date;
+  startDate: Date;
   title: string;
   userId: string;
 }
