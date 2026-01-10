@@ -1,0 +1,179 @@
+import { Button } from "@components/ui/button";
+
+import type z from "zod";
+import type { UseFormReturn } from "react-hook-form";
+import { format, parseISO } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+
+import type { eventSchema } from "@calendar/schemas/event.schema";
+import { cn } from "@lib/utils";
+
+interface IProps {
+  config: {
+    beginHour: string;
+    endHour: string;
+    exceptions?: { from: string; to: string };
+    slotDuration: string;
+  };
+  isInvalid?: boolean;
+  form: UseFormReturn<z.infer<typeof eventSchema>>;
+}
+
+function parseTime(time: string): { hours: number; minutes: number } {
+  const [hours, minutes] = time.split(":").map(Number);
+  return { hours, minutes };
+}
+
+function timeToMinutes(time: string): number {
+  const { hours, minutes } = parseTime(time);
+  return hours * 60 + minutes;
+}
+
+export function HourGrid({ config, form, isInvalid }: IProps) {
+  const [selectedHour, setSelectedHour] = useState<string | null>(null);
+  const dateValue = form.watch("date");
+
+  useEffect(() => {
+    if (!dateValue) {
+      setSelectedHour(null);
+      return;
+    }
+
+    const date = new Date(dateValue);
+    const hasValidHour = date.getHours() !== 0 || date.getMinutes() !== 0;
+
+    if (!hasValidHour) {
+      setSelectedHour(null);
+    }
+  }, [dateValue]);
+
+  const { beginHour, endHour, exceptions, slotDuration } = config;
+
+  const { slots, separatorIndex } = useMemo(() => {
+    if (!beginHour || !endHour || !slotDuration) return { slots: [], separatorIndex: -1 };
+
+    const duration = parseInt(slotDuration, 10) || 30;
+    const beginMinutes = timeToMinutes(beginHour);
+    const endMinutes = timeToMinutes(endHour);
+    const hasExceptions = exceptions?.from && exceptions?.to;
+
+    const formatSlot = (mins: number): string => {
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+    };
+
+    if (!hasExceptions) {
+      const allSlots: string[] = [];
+      for (let mins = beginMinutes; mins < endMinutes; mins += duration) {
+        allSlots.push(formatSlot(mins));
+      }
+      return { slots: allSlots, separatorIndex: -1 };
+    }
+
+    const exceptionFromMinutes = timeToMinutes(exceptions.from);
+    const exceptionToMinutes = timeToMinutes(exceptions.to);
+
+    const morningSlots: string[] = [];
+    for (let mins = beginMinutes; mins < exceptionFromMinutes; mins += duration) {
+      morningSlots.push(formatSlot(mins));
+    }
+
+    const afternoonSlots: string[] = [];
+    for (let mins = exceptionToMinutes; mins < endMinutes; mins += duration) {
+      afternoonSlots.push(formatSlot(mins));
+    }
+
+    return {
+      slots: [...morningSlots, ...afternoonSlots],
+      separatorIndex: morningSlots.length,
+    };
+  }, [beginHour, endHour, exceptions, slotDuration]);
+
+  function handleHourClick(hour: string) {
+    const currentDate = form.getValues("date");
+    if (!currentDate) return;
+
+    const newDate = parseISO(currentDate);
+    const isToggleOff = selectedHour === hour;
+
+    if (isToggleOff) {
+      newDate.setHours(0);
+      newDate.setMinutes(0);
+      newDate.setSeconds(0);
+      setSelectedHour(null);
+    } else {
+      const { hours, minutes } = parseTime(hour);
+      newDate.setHours(hours);
+      newDate.setMinutes(minutes);
+      newDate.setSeconds(0);
+      setSelectedHour(hour);
+    }
+
+    form.setValue("date", format(newDate, "yyyy-MM-dd'T'HH:mm:ssXXX"), { shouldDirty: true, shouldValidate: true });
+  }
+
+  if (slots.length === 0) return null;
+
+  const beforeSeparator = separatorIndex > 0 ? slots.slice(0, separatorIndex) : slots;
+  const afterSeparator = separatorIndex > 0 ? slots.slice(separatorIndex) : [];
+
+  const totalSlots = beforeSeparator.length + afterSeparator.length;
+  const gridCols = totalSlots < 21 ? "grid-cols-2" : totalSlots < 34 ? "grid-cols-3" : "grid-cols-4";
+
+  function getButtonClasses(hour: string) {
+    return cn(
+      "hover:text-foreground text-foreground/60 h-fit w-[52px]",
+      totalSlots < 31 ? "px-2 py-1 text-sm" : "px-1.5 py-1 text-xs",
+      isInvalid && "border-destructive",
+      selectedHour === hour &&
+        "bg-primary border-primary hover:bg-primary hover:border-primary text-white hover:text-white",
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className={cn("grid gap-1", gridCols)}>
+        {beforeSeparator.map((hour) => (
+          <Button
+            className={getButtonClasses(hour)}
+            key={hour}
+            onClick={() => handleHourClick(hour)}
+            type="button"
+            variant="outline"
+          >
+            {hour}
+          </Button>
+        ))}
+      </div>
+      {afterSeparator.length > 0 && (
+        <>
+          <div
+            className={cn(
+              "h-px w-full",
+              isInvalid ? "bg-destructive" : "bg-gray-300",
+              gridCols === "grid-cols-2"
+                ? "max-w-[108px]"
+                : gridCols === "grid-cols-3"
+                  ? "max-w-[164px]"
+                  : "max-w-[220px]",
+            )}
+          />
+          <div className={cn("grid gap-1", gridCols)}>
+            {afterSeparator.map((hour) => (
+              <Button
+                className={getButtonClasses(hour)}
+                key={hour}
+                onClick={() => handleHourClick(hour)}
+                type="button"
+                variant="outline"
+              >
+                {hour}
+              </Button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
