@@ -1,4 +1,4 @@
-export interface CalendarEvent {
+export interface ICalendarEvent {
   end: Date;
   id: number;
   resourceId: number;
