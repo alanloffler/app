@@ -4,8 +4,9 @@ import { Button } from "@components/ui/button";
 import { Calendar } from "@components/ui/calendar";
 import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
+import { HourGrid } from "@calendar/components/HourGrid";
 import { Input } from "@components/ui/input";
-import { Loader } from "@components/Loader";
+// import { Loader } from "@components/Loader";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 import { UserCombobox } from "@calendar/components/UserCombobox";
 
@@ -18,6 +19,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { eventSchema } from "@calendar/schemas/event.schema";
 
+const config = {
+  beginHour: "07:00",
+  endHour: "20:00",
+  exceptions: { from: "12:00", to: "13:00" },
+  slotDuration: "30",
+};
+
 export function AddEvent() {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
@@ -25,7 +33,7 @@ export function AddEvent() {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      date: "",
+      date: format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"),
       title: "",
       userId: "",
     },
@@ -47,7 +55,7 @@ export function AddEvent() {
           Turno
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:min-w-[500px]">
+      <SheetContent className="sm:min-w-[620px]">
         <SheetHeader className="pt-8">
           <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
           <SheetDescription className="text-base">
@@ -72,131 +80,64 @@ export function AddEvent() {
                 name="userId"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field className="col-span-2" data-invalid={fieldState.invalid}>
+                  <Field className="col-span-3" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="userId">Usuario</FieldLabel>
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
                       onChange={field.onChange}
                       value={field.value}
+                      width="w-[240px]!"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
             </FieldGroup>
-            <FieldGroup className="grid grid-cols-3 gap-6">
+            <FieldGroup className="grid grid-cols-5 gap-6">
               <Controller
                 name="date"
                 control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field className="col-span-2" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="date">Fecha</FieldLabel>
-                    <Calendar
-                      aria-invalid={fieldState.invalid}
-                      className="bg-transparent p-0"
-                      disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
-                      id="date"
-                      locale={es}
-                      mode="single"
-                      month={month}
-                      onMonthChange={setMonth}
-                      onSelect={(date) => {
-                        if (date) {
-                          field.onChange(format(date, "yyyy-MM-dd'T'HH:mm:ss"));
-                        } else {
-                          field.onChange("");
-                        }
-                      }}
-                      selected={field.value ? parseISO(field.value) : undefined}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
+                render={({ field, fieldState }) => {
+                  const hasDate = Boolean(field.value);
+                  const hasValidHour =
+                    hasDate &&
+                    (() => {
+                      const date = new Date(field.value);
+                      return date.getHours() !== 0 || date.getMinutes() !== 0;
+                    })();
+                  const isDateInvalid = fieldState.invalid && !hasDate;
+                  const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
+
+                  return (
+                    <>
+                      <Field className="col-span-3" data-invalid={isDateInvalid}>
+                        <FieldLabel htmlFor="date">Fecha</FieldLabel>
+                        <Calendar
+                          aria-invalid={isDateInvalid}
+                          className="bg-transparent p-0"
+                          disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                          id="date"
+                          locale={es}
+                          mode="single"
+                          month={month}
+                          onMonthChange={setMonth}
+                          onSelect={(date) => {
+                            field.onChange(date ? format(date, "yyyy-MM-dd'T'00:00:00XXX") : "");
+                          }}
+                          selected={field.value ? parseISO(field.value) : undefined}
+                        />
+                        {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
+                      </Field>
+                      <Field className="col-span-2" data-invalid={isHourInvalid}>
+                        <FieldLabel>Horario</FieldLabel>
+                        <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
+                        {isHourInvalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    </>
+                  );
+                }}
               />
-              <Field>
-                {/* TODO: dynamic comp */}
-                <FieldLabel>Horario</FieldLabel>
-                <div className="flex flex-col gap-3">
-                  <div className="grid grid-cols-2 gap-1 text-sm">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const currentDate = form.getValues("date");
-                        if (currentDate) {
-                          const newDate = parseISO(currentDate);
-                          newDate.setHours(7);
-                          newDate.setMinutes(0);
-                          form.setValue("date", format(newDate, "yyyy-MM-dd'T'HH:mm:ss"), { shouldDirty: true });
-                        }
-                      }}
-                    >
-                      07:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      07:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      08:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      08:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      09:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      09:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      10:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      10:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      11:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      11:30
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    <Button variant="outline" size="sm">
-                      15:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      15:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      16:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      16:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      17:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      17:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      18:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      18:30
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      19:00
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      19:30
-                    </Button>
-                  </div>
-                </div>
-              </Field>
             </FieldGroup>
             <div className="flex justify-end gap-4 pt-8">
               <Button
@@ -211,7 +152,8 @@ export function AddEvent() {
                 Cancelar
               </Button>
               <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
-                {false ? <Loader color="white" text="Guardando" /> : "Guardar"}
+                Guardar
+                {/* {false ? <Loader color="white" text="Guardando" /> : "Guardar"} */}
               </Button>
             </div>
           </form>
