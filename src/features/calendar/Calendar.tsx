@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
-import { useTryCatch } from "@/core/hooks/useTryCatch";
+import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
