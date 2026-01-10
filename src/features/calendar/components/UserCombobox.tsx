@@ -13,12 +13,13 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
   "aria-invalid"?: boolean;
+  width?: string;
   id?: string;
   onChange?: (value: string) => void;
   value?: string;
 }
 
-export function UserCombobox({ "aria-invalid": ariaInvalid, id, onChange, value = "" }: IProps) {
+export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange, value = "" }: IProps) {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
@@ -36,18 +37,25 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, id, onChange, value 
     }
   }, [tryCatch]);
 
+  function getSelectedUser(value: string): string {
+    const user = users?.find((user) => user.id === value);
+    if (!users || !value || !user) return "";
+
+    return `${user.firstName} ${user.lastName}`;
+  }
+
   useEffect(() => {
     findUsers();
   }, [findUsers]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild className={cn(width ? width : "w-full")}>
         <Button
           aria-expanded={open}
           aria-invalid={ariaInvalid}
           className={cn(
-            "w-[200px] disabled:opacity-100",
+            "font-normal disabled:opacity-100",
             value || error || isLoading ? "justify-between" : "justify-end",
             error || ariaInvalid ? "text-destructive border-destructive" : "",
           )}
@@ -57,12 +65,12 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, id, onChange, value 
           variant="outline"
         >
           {isLoading && "Cargando..."}
-          {error && "Error"}
-          {value ? users?.find((user) => user.id === value)?.firstName : ""}
+          {error || (ariaInvalid && "Error")}
+          {value ? getSelectedUser(value) : ""}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className={cn("p-0", width ? width : "w-full")}>
         <Command>
           <CommandInput placeholder="" className="h-9" />
           <CommandList>
