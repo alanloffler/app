@@ -4,10 +4,10 @@ import { Button } from "@components/ui/button";
 import { ButtonGroup } from "@components/ui/button-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 
-import type { CalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import type { ToolbarProps } from "react-big-calendar";
 
-interface IProps extends ToolbarProps<CalendarEvent> {
+interface IProps extends ToolbarProps<ICalendarEvent> {
   currentDate: Date;
 }
 
