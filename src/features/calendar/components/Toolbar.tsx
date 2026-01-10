@@ -5,7 +5,7 @@ import { Navigation } from "@calendar/components/Navigation";
 import type { ToolbarProps } from "react-big-calendar";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
-import { cn } from "@/lib/utils";
+import { cn } from "@lib/utils";
 import { useSidebar } from "@components/ui/sidebar";
 
 interface IProps extends ToolbarProps<ICalendarEvent> {
