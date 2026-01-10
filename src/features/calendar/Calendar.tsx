@@ -2,6 +2,7 @@ import "@calendar/styles/calendar.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { Calendar as Schedule } from "react-big-calendar";
+import { Notification } from "@components/notifications/Notification";
 import { PageLoader } from "@components/PageLoader";
 import { Toolbar } from "@calendar/components/Toolbar";
 
@@ -9,6 +10,7 @@ import type { ToolbarProps } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
 import { es } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
+import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
@@ -17,6 +19,7 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [stickyNotification, setStickyNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
 
@@ -51,7 +54,12 @@ export default function Calendar() {
   const getAllEvents = useCallback(async () => {
     const [response, error] = await tryCatchEvents(CalendarService.findAll());
 
-    if (error) console.log(error);
+    if (error) {
+      toast.error(error.message);
+      setStickyNotification(true);
+      return;
+    }
+
     if (response && response?.statusCode === 200) {
       setEvents(response.data);
     }
@@ -64,27 +72,30 @@ export default function Calendar() {
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
   return (
-    <Schedule
-      className="calendar"
-      components={{
-        toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
-      }}
-      culture="es-AR"
-      defaultDate={new Date()}
-      defaultView="month"
-      endAccessor="end"
-      events={events}
-      localizer={localizer}
-      messages={messages}
-      onNavigate={(date) => {
-        setCurrentDate(date);
-      }}
-      onSelectEvent={(event) => {
-        console.log(event);
-      }}
-      startAccessor="start"
-      style={{ height: 700 }}
-      views={["month", "week", "day"]}
-    />
+    <div className="flex flex-col gap-4">
+      {stickyNotification && <Notification />}
+      <Schedule
+        className="calendar"
+        components={{
+          toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
+        }}
+        culture="es-AR"
+        defaultDate={new Date()}
+        defaultView="month"
+        endAccessor="endDate"
+        events={events}
+        localizer={localizer}
+        messages={messages}
+        onNavigate={(date) => {
+          setCurrentDate(date);
+        }}
+        onSelectEvent={(event) => {
+          console.log(event);
+        }}
+        startAccessor="startDate"
+        style={{ height: 700 }}
+        views={["month", "week", "day"]}
+      />
+    </div>
   );
 }
