@@ -28,7 +28,7 @@ class CalendarModuleService {
         title: "Event 2",
         start: new Date("2026-01-07T10:30:00"),
         end: new Date("2026-01-07T11:00:00"),
-        resourceId: 2,
+        resourceId: 1,
         userId: "439a4db0-d527-473e-9566-27aee5fcbd35",
       },
       {
@@ -36,7 +36,7 @@ class CalendarModuleService {
         title: "Event 3",
         start: new Date("2026-01-08T10:00:00"),
         end: new Date("2026-01-08T10:30:00"),
-        resourceId: 3,
+        resourceId: 1,
         userId: "439a4db0-d527-473e-9566-27aee5fcbd35",
       },
       {
@@ -44,7 +44,7 @@ class CalendarModuleService {
         title: "Event 4",
         start: new Date("2026-01-08T11:00:00"),
         end: new Date("2026-01-08T11:30:00"),
-        resourceId: 4,
+        resourceId: 1,
         userId: "439a4db0-d527-473e-9566-27aee5fcbd35",
       },
       {
@@ -52,7 +52,7 @@ class CalendarModuleService {
         title: "Event 5",
         start: new Date("2026-01-08T11:30:00"),
         end: new Date("2026-01-08T12:00:00"),
-        resourceId: 5,
+        resourceId: 1,
         userId: "439a4db0-d527-473e-9566-27aee5fcbd35",
       },
       {
@@ -60,7 +60,7 @@ class CalendarModuleService {
         title: "Event 6",
         start: new Date("2026-01-08T13:00:00"),
         end: new Date("2026-01-08T13:30:00"),
-        resourceId: 6,
+        resourceId: 1,
         userId: "439a4db0-d527-473e-9566-27aee5fcbd35",
       },
     ];
