@@ -2,7 +2,7 @@ import "@calendar/styles/calendar.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { Calendar as Schedule } from "react-big-calendar";
-import { Notification } from "@components/notifications/Notification";
+import { ErrorNotification } from "@components/notifications/ErrorNotification";
 import { PageLoader } from "@components/PageLoader";
 import { Toolbar } from "@calendar/components/Toolbar";
 
@@ -19,7 +19,8 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [stickyNotification, setStickyNotification] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
 
@@ -56,7 +57,8 @@ export default function Calendar() {
 
     if (error) {
       toast.error(error.message);
-      setStickyNotification(true);
+      setErrorMessage(error.message);
+      setErrorNotification(true);
       return;
     }
 
@@ -72,8 +74,8 @@ export default function Calendar() {
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
   return (
-    <div className="flex flex-col gap-4">
-      {stickyNotification && <Notification />}
+    <div className="flex flex-col gap-8">
+      {errorNotification && <ErrorNotification message={errorMessage} />}
       <Schedule
         className="calendar"
         components={{
