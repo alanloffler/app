@@ -4,11 +4,11 @@ import { Navigation } from "@calendar/components/Navigation";
 
 import type { ToolbarProps } from "react-big-calendar";
 
-import type { CalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@components/ui/sidebar";
 
-interface IProps extends ToolbarProps<CalendarEvent> {
+interface IProps extends ToolbarProps<ICalendarEvent> {
   currentDate: Date;
 }
 
