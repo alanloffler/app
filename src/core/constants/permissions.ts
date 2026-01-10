@@ -54,6 +54,16 @@ export const PERMISSIONS = [
     ],
   },
   {
+    name: "Turnos",
+    value: "events",
+    actions: [
+      { name: "Crear", value: "events-create" },
+      { name: "Editar", value: "events-update" },
+      { name: "Eliminar permanente", value: "events-delete-hard" },
+      { name: "Ver", value: "events-view" },
+    ],
+  },
+  {
     name: "Usuarios",
     value: "users",
     actions: [
