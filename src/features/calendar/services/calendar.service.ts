@@ -13,6 +13,11 @@ class CalendarModuleService {
     return CalendarModuleService.instance;
   }
 
+  public async create(data: Omit<ICalendarEvent, "id">): Promise<IApiResponse<ICalendarEvent>> {
+    const response = await apiClient.post("/events", data);
+    return response.data;
+  }
+
   public async findAll(): Promise<IApiResponse<ICalendarEvent[]>> {
     const response = await apiClient.get("/events");
     const data = response.data;
