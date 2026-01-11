@@ -2,7 +2,7 @@ import type { IUserEvent } from "@calendar/interfaces/user-event.interface";
 
 export interface ICalendarEvent {
   endDate: Date;
-  id: number;
+  id: string;
   professionalId: string;
   startDate: Date;
   title: string;
