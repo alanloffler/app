@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, Smartphone, User2 } from "lucide-react";
+import { BriefcaseMedical, CalendarDays, Clock, Smartphone } from "lucide-react";
 import { Patients } from "@components/icons/Patients";
 import { WhatsApp } from "@components/icons/WhatsApp";
 
@@ -37,7 +37,7 @@ export function ViewEvent({ event, openSheet, setOpenSheet }: IProps) {
             <ul className="flex flex-col gap-3">
               <li>
                 <div className="flex items-center gap-3">
-                  <User2 className="h-5 w-5 shrink-0" strokeWidth={1.5} />
+                  <BriefcaseMedical className="h-4.5 w-4.5 shrink-0" strokeWidth={1.5} />
                   {/* TODO: get professional data, must make entity @backend */}
                   <span>{event.professionalId}</span>
                 </div>
