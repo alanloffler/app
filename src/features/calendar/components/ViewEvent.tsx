@@ -162,7 +162,7 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
                   ${event.endDate && format(event.endDate, "HH':'mm", { locale: es })}`}
               </p>
             </div>
-            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-100 p-2 text-sm text-red-600">
+            <div className="mx-auto flex w-fit items-center gap-2 rounded-md border border-red-200 bg-red-100 p-2 text-sm text-red-600">
               <CircleX className="h-4 w-4" />
               Esta acción no se puede deshacer
             </div>
