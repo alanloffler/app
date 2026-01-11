@@ -55,7 +55,7 @@ export function AddEvent() {
           Turno
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:min-w-[620px]">
+      <SheetContent className="sm:min-w-[620px]" onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader className="pt-8">
           <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
           <SheetDescription className="text-base">
