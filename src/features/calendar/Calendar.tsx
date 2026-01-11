@@ -16,6 +16,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
+import { cn } from "@lib/utils";
+import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Calendar() {
@@ -25,6 +27,7 @@ export default function Calendar() {
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
+  const canViewEvent = usePermission("events-view");
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
 
   const locales = {
@@ -81,7 +84,7 @@ export default function Calendar() {
       <div className="flex flex-col gap-8">
         {errorNotification && <ErrorNotification message={errorMessage} />}
         <Schedule
-          className="calendar"
+          className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
           }}
@@ -104,7 +107,7 @@ export default function Calendar() {
           views={["month", "week", "day"]}
         />
       </div>
-      <ViewEvent event={selectedEvent} openSheet={openSheet} setOpenSheet={setOpenSheet} />
+      <ViewEvent event={selectedEvent} openSheet={openSheet} setOpenSheet={setOpenSheet} onRemoveEvent={getAllEvents} />
     </>
   );
 }
