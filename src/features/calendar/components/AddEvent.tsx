@@ -7,6 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field"
 import { HourGrid } from "@calendar/components/HourGrid";
 import { Input } from "@components/ui/input";
 // import { Loader } from "@components/Loader";
+import { Protected } from "@auth/components/Protected";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 import { UserCombobox } from "@calendar/components/UserCombobox";
 
@@ -19,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { eventSchema } from "@calendar/schemas/event.schema";
 
+// TODO: get config from backend
 const config = {
   beginHour: "07:00",
   endHour: "20:00",
@@ -49,12 +51,14 @@ export function AddEvent() {
 
   return (
     <Sheet open={openSheet} onOpenChange={setOpenSheet}>
-      <SheetTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4" />
-          Turno
-        </Button>
-      </SheetTrigger>
+      <Protected requiredPermission="events-create">
+        <SheetTrigger asChild>
+          <Button>
+            <Plus className="h-4 w-4" />
+            Turno
+          </Button>
+        </SheetTrigger>
+      </Protected>
       <SheetContent className="sm:min-w-[620px]" onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader className="pt-8">
           <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
