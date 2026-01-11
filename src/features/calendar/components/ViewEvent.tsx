@@ -1,4 +1,14 @@
-import { BriefcaseMedical, CalendarDays, CircleX, Clock, FilePenLine, Smartphone, Trash2 } from "lucide-react";
+import {
+  BellRing,
+  BriefcaseMedical,
+  CalendarDays,
+  CircleX,
+  Clock,
+  FilePenLine,
+  Mail,
+  Smartphone,
+  Trash2,
+} from "lucide-react";
 import { Patients } from "@components/icons/Patients";
 import { WhatsApp } from "@components/icons/WhatsApp";
 
@@ -12,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
 import { Link } from "react-router";
 import { Loader } from "@components/Loader";
 import { Protected } from "@auth/components/Protected";
@@ -59,6 +70,10 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
       setOpenSheet(false);
       onRemoveEvent();
     }
+  }
+
+  function notify(type: "Email" | "WhatsApp"): void {
+    toast.success(`Notificación enviada por ${type}`);
   }
 
   return (
@@ -115,27 +130,43 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
                 </li>
               </ul>
               <Activity mode={hasPermissions ? "visible" : "hidden"}>
-                <footer className="mt-4 flex justify-end gap-3">
+                <footer className="mt-4 flex justify-end gap-1">
                   <Protected requiredPermission="events-delete-hard">
-                    <Button className="hover:text-rose-500" onClick={removeEventDialog} size="icon" variant="outline">
+                    <Button
+                      className="hover:bg-rose-50 hover:text-rose-600"
+                      onClick={removeEventDialog}
+                      size="icon"
+                      variant="ghost"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </Protected>
                   <Protected requiredPermission="events-update">
-                    <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
+                    <Button className="hover:bg-green-50 hover:text-green-600" size="icon" variant="ghost" asChild>
                       <Link to={`/patient/${event.user.id}`}>
                         <FilePenLine className="h-4 w-4" />
                       </Link>
                     </Button>
                   </Protected>
                   <Protected requiredPermission="events-notify">
-                    <Button
-                      className="hover:text-green-600"
-                      onClick={() => console.log("Enviar recordatorio")}
-                      variant="outline"
-                    >
-                      <WhatsApp className="h-3.5! w-3.5!" />
-                    </Button>
+                    {/* TODO: implement notifications with email and WhatsApp */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button className="hover:bg-fuchsia-50 hover:text-fuchsia-600" size="icon" variant="ghost">
+                          <BellRing className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => notify("Email")}>
+                          <Mail className="h-4 w-4" />
+                          Email
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => notify("WhatsApp")}>
+                          <WhatsApp className="h-3.5! w-3.5!" />
+                          WhatsApp
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </Protected>
                 </footer>
               </Activity>
