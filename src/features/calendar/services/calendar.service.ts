@@ -32,6 +32,11 @@ class CalendarModuleService {
 
     return events;
   }
+
+  public async remove(id: string): Promise<IApiResponse<ICalendarEvent>> {
+    const response = await apiClient.delete(`/events/${id}`);
+    return response.data;
+  }
 }
 
 export const CalendarService = CalendarModuleService.getInstance();
