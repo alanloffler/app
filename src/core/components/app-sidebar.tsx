@@ -13,7 +13,7 @@ import {
   UserPlus2,
 } from "lucide-react";
 import { KeyRoundPlus } from "@components/icons/KeyRoundPlus";
-import { Pacients } from "@components/icons/Pacients";
+import { Patients } from "@components/icons/Patients";
 
 import { NavActions } from "@components/nav-actions";
 import { NavMain } from "@components/nav-main";
@@ -44,7 +44,7 @@ const data = {
     {
       title: "Pacientes",
       url: "/users",
-      icon: Pacients,
+      icon: Patients,
       permission: "users-view" as TPermission,
     },
     {
