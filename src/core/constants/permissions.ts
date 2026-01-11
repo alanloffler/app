@@ -60,6 +60,7 @@ export const PERMISSIONS = [
       { name: "Crear", value: "events-create" },
       { name: "Editar", value: "events-update" },
       { name: "Eliminar permanente", value: "events-delete-hard" },
+      { name: "Enviar notificaciones", value: "events-notify" },
       { name: "Ver", value: "events-view" },
     ],
   },
