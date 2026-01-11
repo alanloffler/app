@@ -184,15 +184,6 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-
-  button,
-  label {
-    @apply cursor-pointer;
-  }
-
-  button:disabled {
-    @apply cursor-not-allowed;
-  }
 }
 
 @layer utilities {
@@ -220,5 +211,16 @@ body {
 
   .dark ::-webkit-scrollbar-track {
     background: var(--accent);
+  }
+
+  button:not([disabled]),
+  label,
+  [role="button"]:not([disabled]),
+  [data-slot="select-item"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
   }
 }
