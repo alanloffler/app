@@ -5,6 +5,7 @@ import { Calendar as Schedule } from "react-big-calendar";
 import { ErrorNotification } from "@components/notifications/ErrorNotification";
 import { PageLoader } from "@components/PageLoader";
 import { Toolbar } from "@calendar/components/Toolbar";
+import { ViewEvent } from "@calendar/components/ViewEvent";
 
 import type { ToolbarProps } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
@@ -22,6 +23,8 @@ export default function Calendar() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
+  const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
 
   const locales = {
@@ -74,30 +77,34 @@ export default function Calendar() {
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
   return (
-    <div className="flex flex-col gap-8">
-      {errorNotification && <ErrorNotification message={errorMessage} />}
-      <Schedule
-        className="calendar"
-        components={{
-          toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
-        }}
-        culture="es-AR"
-        defaultDate={new Date()}
-        defaultView="month"
-        endAccessor="endDate"
-        events={events}
-        localizer={localizer}
-        messages={messages}
-        onNavigate={(date) => {
-          setCurrentDate(date);
-        }}
-        onSelectEvent={(event) => {
-          console.log(event);
-        }}
-        startAccessor="startDate"
-        style={{ height: 700 }}
-        views={["month", "week", "day"]}
-      />
-    </div>
+    <>
+      <div className="flex flex-col gap-8">
+        {errorNotification && <ErrorNotification message={errorMessage} />}
+        <Schedule
+          className="calendar"
+          components={{
+            toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
+          }}
+          culture="es-AR"
+          defaultDate={new Date()}
+          defaultView="month"
+          endAccessor="endDate"
+          events={events}
+          localizer={localizer}
+          messages={messages}
+          onNavigate={(date) => {
+            setCurrentDate(date);
+          }}
+          onSelectEvent={(event) => {
+            setSelectedEvent(event);
+            setOpenSheet(true);
+          }}
+          startAccessor="startDate"
+          style={{ height: 700 }}
+          views={["month", "week", "day"]}
+        />
+      </div>
+      <ViewEvent event={selectedEvent} openSheet={openSheet} setOpenSheet={setOpenSheet} />
+    </>
   );
 }
