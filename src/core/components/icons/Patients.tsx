@@ -1,4 +1,4 @@
-// https://svg.health/
+// https://healthicons.org/
 
 import type { SVGProps } from "react";
 
