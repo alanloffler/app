@@ -10,7 +10,7 @@ import { cn } from "@lib/utils";
 
 interface IProps {
   config: {
-    beginHour: string;
+    startHour: string;
     endHour: string;
     exceptions?: { from: string; to: string };
     slotDuration: string;
@@ -47,13 +47,13 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
     }
   }, [dateValue]);
 
-  const { beginHour, endHour, exceptions, slotDuration } = config;
+  const { startHour, endHour, exceptions, slotDuration } = config;
 
   const { slots, separatorIndex } = useMemo(() => {
-    if (!beginHour || !endHour || !slotDuration) return { slots: [], separatorIndex: -1 };
+    if (!startHour || !endHour || !slotDuration) return { slots: [], separatorIndex: -1 };
 
     const duration = parseInt(slotDuration, 10) || 30;
-    const beginMinutes = timeToMinutes(beginHour);
+    const startMinutes = timeToMinutes(startHour);
     const endMinutes = timeToMinutes(endHour);
     const hasExceptions = exceptions?.from && exceptions?.to;
 
@@ -65,7 +65,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
 
     if (!hasExceptions) {
       const allSlots: string[] = [];
-      for (let mins = beginMinutes; mins < endMinutes; mins += duration) {
+      for (let mins = startMinutes; mins < endMinutes; mins += duration) {
         allSlots.push(formatSlot(mins));
       }
       return { slots: allSlots, separatorIndex: -1 };
@@ -75,7 +75,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
     const exceptionToMinutes = timeToMinutes(exceptions.to);
 
     const morningSlots: string[] = [];
-    for (let mins = beginMinutes; mins < exceptionFromMinutes; mins += duration) {
+    for (let mins = startMinutes; mins < exceptionFromMinutes; mins += duration) {
       morningSlots.push(formatSlot(mins));
     }
 
@@ -88,7 +88,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
       slots: [...morningSlots, ...afternoonSlots],
       separatorIndex: morningSlots.length,
     };
-  }, [beginHour, endHour, exceptions, slotDuration]);
+  }, [startHour, endHour, exceptions, slotDuration]);
 
   function handleHourClick(hour: string) {
     const currentDate = form.getValues("startDate");
