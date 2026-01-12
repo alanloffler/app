@@ -103,3 +103,14 @@
   background-color: #d1fae5 !important;
   transition: all 0.2s ease-out;
 }
+
+/* Day view */
+.rbc-slot-lunch {
+  background-color: #f9f9f9;
+}
+
+.rbc-label {
+  color: var(--color-gray-500) !important;
+  font-size: 12px;
+  font-weight: 500;
+}
