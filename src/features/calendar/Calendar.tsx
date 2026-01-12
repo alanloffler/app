@@ -86,7 +86,9 @@ export default function Calendar() {
         <Schedule
           className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
           components={{
-            toolbar: (props: ToolbarProps<ICalendarEvent>) => <Toolbar {...props} currentDate={currentDate} />,
+            toolbar: (props: ToolbarProps<ICalendarEvent>) => (
+              <Toolbar {...props} currentDate={currentDate} onCreateEvent={getAllEvents} />
+            ),
           }}
           culture="es-AR"
           defaultDate={new Date()}
