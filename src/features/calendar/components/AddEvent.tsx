@@ -91,7 +91,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
       </Protected>
       <SheetContent className="sm:min-w-[620px]">
         <ScrollArea
-          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 h-full w-full"
+          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 h-dvh sm:h-full sm:w-full"
           color="blue"
           type="auto"
         >
@@ -101,7 +101,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
               Completá el formulario para agregar un turno a la agenda
             </SheetDescription>
           </SheetHeader>
-          <form className="flex flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
+          <form className="flex min-h-0 flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="grid grid-cols-3 gap-6">
               <Controller
                 name="title"
@@ -134,7 +134,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                 )}
               />
             </FieldGroup>
-            <FieldGroup className="flex flex-col gap-6 md:grid md:grid-cols-5">
+            <FieldGroup>
               <Controller
                 name="startDate"
                 control={form.control}
@@ -150,31 +150,41 @@ export function AddEvent({ onCreateEvent }: IProps) {
                   const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
 
                   return (
-                    <>
-                      <Field className="h-fit md:col-span-3" data-invalid={isDateInvalid}>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:grid-rows-1">
+                      <Field
+                        className="md:col-span-3"
+                        data-invalid={isDateInvalid}
+                        style={{ position: "relative", zIndex: 2 }}
+                      >
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
-                        <Calendar
-                          aria-invalid={isDateInvalid}
-                          className="bg-transparent p-0"
-                          disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
-                          id="date"
-                          locale={es}
-                          mode="single"
-                          month={month}
-                          onMonthChange={setMonth}
-                          onSelect={(date) => {
-                            field.onChange(date ? format(date, "yyyy-MM-dd'T'00:00:00XXX") : "");
-                          }}
-                          selected={field.value ? parseISO(field.value) : undefined}
-                        />
-                        {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
+                        <div className="flex-1">
+                          <Calendar
+                            aria-invalid={isDateInvalid}
+                            className="aspect-square h-fit w-full"
+                            disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                            id="date"
+                            locale={es}
+                            mode="single"
+                            month={month}
+                            onMonthChange={setMonth}
+                            onSelect={(date) => {
+                              field.onChange(date ? format(date, "yyyy-MM-dd'T'00:00:00XXX") : "");
+                            }}
+                            selected={field.value ? parseISO(field.value) : undefined}
+                          />
+                          {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
+                        </div>
                       </Field>
-                      <Field className="md:col-span-2" data-invalid={isHourInvalid}>
+                      <Field
+                        className="md:col-span-2"
+                        data-invalid={isHourInvalid}
+                        style={{ position: "relative", zIndex: 1 }}
+                      >
                         <FieldLabel>Horario</FieldLabel>
                         <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
-                    </>
+                    </div>
                   );
                 }}
               />
