@@ -78,6 +78,36 @@ export default function Calendar() {
     getAllEvents();
   }, [getAllEvents]);
 
+  // TODO: get config from backend
+  const config = {
+    startHour: "07:00",
+    endHour: "20:00",
+    exceptions: { from: "12:00", to: "15:00" },
+    slotDuration: "30",
+  };
+
+  const maxHour = new Date();
+  maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
+
+  const minHour = new Date();
+  minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
+
+  const isLunchTime = (date: Date): boolean => {
+    const from = parse(config.exceptions.from, "HH:mm", new Date());
+    const to = parse(config.exceptions.to, "HH:mm", new Date());
+    const hour = date.getHours();
+    return hour >= from.getHours() && hour < to.getHours();
+  };
+
+  const slotPropGetter = (date: Date) => {
+    if (isLunchTime(date)) {
+      return {
+        className: "rbc-slot-lunch",
+      };
+    }
+    return {};
+  };
+
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
   return (
@@ -97,12 +127,14 @@ export default function Calendar() {
             ),
           }}
           culture="es-AR"
-          defaultDate={new Date()}
-          defaultView="month"
+          defaultDate={minHour}
+          defaultView="day"
           endAccessor="endDate"
           events={events}
           localizer={localizer}
+          max={maxHour}
           messages={messages}
+          min={minHour}
           onNavigate={(date) => {
             setCurrentDate(date);
           }}
@@ -110,6 +142,7 @@ export default function Calendar() {
             setSelectedEvent(event);
             setOpenSheet(true);
           }}
+          slotPropGetter={slotPropGetter}
           startAccessor="startDate"
           style={{ height: 700 }}
           views={["month", "week", "day"]}
