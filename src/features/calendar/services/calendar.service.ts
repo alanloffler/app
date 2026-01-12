@@ -1,5 +1,8 @@
+import type z from "zod";
+
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { eventSchema } from "@calendar/schemas/event.schema";
 import { apiClient } from "@core/client/client";
 
 class CalendarModuleService {
@@ -13,7 +16,7 @@ class CalendarModuleService {
     return CalendarModuleService.instance;
   }
 
-  public async create(data: Omit<ICalendarEvent, "id">): Promise<IApiResponse<ICalendarEvent>> {
+  public async create(data: z.infer<typeof eventSchema>): Promise<IApiResponse<ICalendarEvent>> {
     const response = await apiClient.post("/events", data);
     return response.data;
   }
