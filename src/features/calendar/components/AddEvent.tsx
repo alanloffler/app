@@ -8,6 +8,7 @@ import { HourGrid } from "@calendar/components/HourGrid";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
 import { Protected } from "@auth/components/Protected";
+import { ScrollArea } from "@components/ui/scroll-area";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 import { UserCombobox } from "@calendar/components/UserCombobox";
 
@@ -88,13 +89,19 @@ export function AddEvent({ onCreateEvent }: IProps) {
           </Button>
         </SheetTrigger>
       </Protected>
-      <SheetContent className="sm:min-w-[620px]" onOpenAutoFocus={(e) => e.preventDefault()}>
-        <SheetHeader className="pt-8">
-          <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
-          <SheetDescription className="text-base">
-            Completá el formulario para agregar un turno a la agenda
-          </SheetDescription>
-          <form className="flex flex-col gap-6 pt-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
+      <SheetContent className="sm:min-w-[620px]">
+        <ScrollArea
+          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 h-full w-full"
+          color="blue"
+          type="auto"
+        >
+          <SheetHeader className="shrink-0 pt-8">
+            <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
+            <SheetDescription className="text-base">
+              Completá el formulario para agregar un turno a la agenda
+            </SheetDescription>
+          </SheetHeader>
+          <form className="flex flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="grid grid-cols-3 gap-6">
               <Controller
                 name="title"
@@ -127,7 +134,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                 )}
               />
             </FieldGroup>
-            <FieldGroup className="grid grid-cols-5 gap-6">
+            <FieldGroup className="flex flex-col gap-6 md:grid md:grid-cols-5">
               <Controller
                 name="startDate"
                 control={form.control}
@@ -144,7 +151,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
 
                   return (
                     <>
-                      <Field className="col-span-3" data-invalid={isDateInvalid}>
+                      <Field className="h-fit md:col-span-3" data-invalid={isDateInvalid}>
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
                         <Calendar
                           aria-invalid={isDateInvalid}
@@ -162,7 +169,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                         />
                         {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
                       </Field>
-                      <Field className="col-span-2" data-invalid={isHourInvalid}>
+                      <Field className="md:col-span-2" data-invalid={isHourInvalid}>
                         <FieldLabel>Horario</FieldLabel>
                         <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
@@ -189,7 +196,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
               </Button>
             </div>
           </form>
-        </SheetHeader>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
