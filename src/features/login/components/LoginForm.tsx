@@ -109,6 +109,7 @@ export function LoginForm({ className, type }: IProps) {
                       <button
                         className="p-1 transition-colors duration-150 hover:text-sky-500"
                         onClick={(e) => togglePasswordField(e)}
+                        type="button"
                       >
                         {passwordField ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
                       </button>
