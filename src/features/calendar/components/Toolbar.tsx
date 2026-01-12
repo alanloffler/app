@@ -10,6 +10,7 @@ import { useSidebar } from "@components/ui/sidebar";
 
 interface IProps extends ToolbarProps<ICalendarEvent> {
   currentDate: Date;
+  onCreateEvent: () => void;
 }
 
 export function Toolbar(props: IProps) {
@@ -25,7 +26,7 @@ export function Toolbar(props: IProps) {
       <DateHeader currentDate={props.currentDate} />
       <div className="flex items-center gap-3">
         <Navigation {...props} />
-        <AddEvent />
+        <AddEvent onCreateEvent={props.onCreateEvent} />
       </div>
     </div>
   );
