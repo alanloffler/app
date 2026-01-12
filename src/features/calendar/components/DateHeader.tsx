@@ -1,23 +1,38 @@
+import { endOfMonth, endOfWeek, format, getWeekOfMonth, startOfMonth, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
-import { format, endOfMonth, startOfMonth, getWeekOfMonth } from "date-fns";
 import { useMemo } from "react";
 
+import type { TView } from "@calendar/interfaces/calendar-view.type";
+
 interface IProps {
+  calendarView: TView;
   currentDate: Date;
 }
 
-export function DateHeader({ currentDate }: IProps) {
-  const { month, monthShort, day, year, week, firstDay, lastDay } = useMemo(() => {
+export function DateHeader({ calendarView, currentDate }: IProps) {
+  const { month, monthShort, day, dayString, year, week, firstDay, lastDay } = useMemo(() => {
+    let _firstDay = "";
+    let _lastDay = "";
+
+    if (calendarView === "week") {
+      _firstDay = format(startOfWeek(currentDate, { locale: es }), "d", { locale: es });
+      _lastDay = format(endOfWeek(currentDate, { locale: es }), "d", { locale: es });
+    } else if (calendarView === "month") {
+      _firstDay = format(startOfMonth(currentDate), "d", { locale: es });
+      _lastDay = format(endOfMonth(currentDate), "d", { locale: es });
+    }
+
     return {
       day: format(currentDate, "d", { locale: es }),
-      firstDay: format(startOfMonth(currentDate), "d", { locale: es }),
-      lastDay: format(endOfMonth(currentDate), "d", { locale: es }),
+      dayString: format(currentDate, "EEEE", { locale: es }),
+      firstDay: _firstDay,
+      lastDay: _lastDay,
       month: format(currentDate, "MMMM", { locale: es }),
       monthShort: format(currentDate, "MMM", { locale: es }),
       week: getWeekOfMonth(currentDate, { locale: es }),
       year: format(currentDate, "yyyy", { locale: es }),
     };
-  }, [currentDate]);
+  }, [calendarView, currentDate]);
 
   return (
     <div className="flex items-center gap-3">
@@ -34,9 +49,13 @@ export function DateHeader({ currentDate }: IProps) {
           </span>
           <div className="rounded-sm border px-1.5 py-0.5 text-xs font-medium text-gray-700">Semana {week}</div>
         </div>
-        <div className="text-sm text-gray-600 capitalize">
-          <span>{`${firstDay} ${monthShort} ${year} - ${lastDay} ${monthShort} ${year}`}</span>
-        </div>
+        {calendarView === "day" ? (
+          <div className="text-sm text-gray-600 capitalize">{dayString}</div>
+        ) : (
+          <div className="text-sm text-gray-600 capitalize">
+            <span>{`${firstDay} ${monthShort} ${year} - ${lastDay} ${monthShort} ${year}`}</span>
+          </div>
+        )}
       </div>
     </div>
   );
