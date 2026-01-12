@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const eventSchema = z.object({
-  date: z
+  startDate: z
     .string()
     .nonempty("La fecha y horario son obligatorios")
     .refine(
