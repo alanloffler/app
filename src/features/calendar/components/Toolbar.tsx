@@ -26,7 +26,7 @@ export function Toolbar(props: IProps) {
       )}
     >
       <DateHeader calendarView={props.calendarView} currentDate={props.currentDate} />
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-center gap-3 md:flex-row">
         <Navigation {...props} />
         <AddEvent onCreateEvent={props.onCreateEvent} />
       </div>
