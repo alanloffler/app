@@ -6,19 +6,22 @@ import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { HourGrid } from "@calendar/components/HourGrid";
 import { Input } from "@components/ui/input";
-// import { Loader } from "@components/Loader";
+import { Loader } from "@components/Loader";
 import { Protected } from "@auth/components/Protected";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 import { UserCombobox } from "@calendar/components/UserCombobox";
 
 import type z from "zod";
+import { addMinutes, format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { format, parseISO } from "date-fns";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { CalendarService } from "@calendar/services/calendar.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
+import { useTryCatch } from "@core/hooks/useTryCatch";
 
 // TODO: get config from backend
 const config = {
@@ -28,21 +31,47 @@ const config = {
   slotDuration: "30",
 };
 
-export function AddEvent() {
+interface IProps {
+  onCreateEvent: () => void;
+}
+
+export function AddEvent({ onCreateEvent }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      date: format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"),
+      startDate: format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"),
       title: "",
       userId: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof eventSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof eventSchema>): Promise<void> {
+    const startDate = parseISO(data.startDate);
+    const endDate = addMinutes(startDate, Number(config.slotDuration));
+
+    const transformedData = {
+      ...data,
+      endDate: format(endDate, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+      // TODO: handle professional with entity (todo at backend)
+      professionalId: "d501e1ec-3861-449b-8a5e-55ad03e33053",
+    };
+
+    const [response, error] = await tryCatchCreateEvent(CalendarService.create(transformedData));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 201) {
+      toast.success("Turno creado exitosamente");
+      setOpenSheet(false);
+      onCreateEvent();
+    }
   }
 
   useEffect(() => {
@@ -100,7 +129,7 @@ export function AddEvent() {
             </FieldGroup>
             <FieldGroup className="grid grid-cols-5 gap-6">
               <Controller
-                name="date"
+                name="startDate"
                 control={form.control}
                 render={({ field, fieldState }) => {
                   const hasDate = Boolean(field.value);
@@ -156,8 +185,7 @@ export function AddEvent() {
                 Cancelar
               </Button>
               <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
-                Guardar
-                {/* {false ? <Loader color="white" text="Guardando" /> : "Guardar"} */}
+                {isSaving ? <Loader color="white" text="Guardando" /> : "Guardar"}
               </Button>
             </div>
           </form>
