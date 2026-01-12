@@ -5,13 +5,12 @@ import { ButtonGroup } from "@components/ui/button-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { TView } from "@calendar/interfaces/calendar-view.type";
 import type { ToolbarProps } from "react-big-calendar";
 
 interface IProps extends ToolbarProps<ICalendarEvent> {
   currentDate: Date;
 }
-
-type TView = "day" | "week" | "month";
 
 export function Navigation(props: IProps) {
   function goToPrevious(): void {
