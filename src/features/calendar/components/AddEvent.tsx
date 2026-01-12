@@ -25,7 +25,7 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 // TODO: get config from backend
 const config = {
-  beginHour: "07:00",
+  startHour: "07:00",
   endHour: "20:00",
   exceptions: { from: "12:00", to: "13:00" },
   slotDuration: "30",
