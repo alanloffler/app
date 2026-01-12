@@ -79,12 +79,13 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
               {users?.map((user) => (
                 <CommandItem
                   key={user.id}
-                  value={user.id}
+                  keywords={[user.firstName, user.lastName]}
                   onSelect={(currentValue) => {
                     const newValue = currentValue === value ? "" : currentValue;
                     onChange?.(newValue);
                     setOpen(false);
                   }}
+                  value={user.id}
                 >
                   {user.firstName} {user.lastName}
                   <Check className={cn("ml-auto", value === user.id ? "opacity-100" : "opacity-0")} />
