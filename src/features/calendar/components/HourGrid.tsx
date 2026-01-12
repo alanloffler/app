@@ -31,7 +31,7 @@ function timeToMinutes(time: string): number {
 
 export function HourGrid({ config, form, isInvalid }: IProps) {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
-  const dateValue = form.watch("date");
+  const dateValue = form.watch("startDate");
 
   useEffect(() => {
     if (!dateValue) {
@@ -91,7 +91,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
   }, [beginHour, endHour, exceptions, slotDuration]);
 
   function handleHourClick(hour: string) {
-    const currentDate = form.getValues("date");
+    const currentDate = form.getValues("startDate");
     if (!currentDate) return;
 
     const newDate = parseISO(currentDate);
@@ -110,7 +110,10 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
       setSelectedHour(hour);
     }
 
-    form.setValue("date", format(newDate, "yyyy-MM-dd'T'HH:mm:ssXXX"), { shouldDirty: true, shouldValidate: true });
+    form.setValue("startDate", format(newDate, "yyyy-MM-dd'T'HH:mm:ssXXX"), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   }
 
   if (slots.length === 0) return null;
