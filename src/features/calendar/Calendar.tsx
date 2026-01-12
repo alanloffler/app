@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { TView } from "@calendar/interfaces/calendar-view.type";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { cn } from "@lib/utils";
 import { usePermission } from "@permissions/hooks/usePermission";
@@ -87,7 +88,12 @@ export default function Calendar() {
           className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-              <Toolbar {...props} currentDate={currentDate} onCreateEvent={getAllEvents} />
+              <Toolbar
+                {...props}
+                calendarView={props.view as TView}
+                currentDate={currentDate}
+                onCreateEvent={getAllEvents}
+              />
             ),
           }}
           culture="es-AR"
