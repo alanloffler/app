@@ -24,9 +24,15 @@
   --color-off-range: #0c0c0c;
 }
 
-/* Table */
-[role="table"] {
+/* Table & Time slots rounded */
+[role="table"],
+.rbc-time-view {
   border-radius: 0px 0px 10px 10px;
+}
+
+/* Disable All day slot on header */
+.rbc-allday-cell {
+  display: none !important;
 }
 
 /* Header */
@@ -48,6 +54,10 @@
 }
 
 /* Week & Day view: time slot */
+.rbc-time-content {
+  border: 1px !important;
+}
+
 .rbc-time-slot {
   min-height: 27px !important;
 }
