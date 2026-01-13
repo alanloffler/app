@@ -10,11 +10,11 @@ interface IProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function EditEvent({ event, open, setOpen }: IProps) {
+export function EditEventSheet({ event, open, setOpen }: IProps) {
   return (
     <Sheet open={event !== null && open} onOpenChange={setOpen}>
       <SheetTrigger asChild></SheetTrigger>
-      <SheetContent className="sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <SheetContent className="sm:min-w-[480px]" onFocus={(e) => e.preventDefault()}>
         <SheetHeader className="pt-8">
           <SheetTitle className="text-lg">Edición del turno</SheetTitle>
           <SheetDescription className="text-base">Formulario para la edición del turno seleccionado</SheetDescription>
