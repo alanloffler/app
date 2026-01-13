@@ -128,9 +128,12 @@ export default function Calendar() {
           }}
           culture="es-AR"
           defaultDate={minHour}
-          defaultView="day"
+          defaultView="month"
           endAccessor="endDate"
           events={events}
+          formats={{
+            eventTimeRangeFormat: (date) => format(date.start, "HH:mm"),
+          }}
           localizer={localizer}
           max={maxHour}
           messages={messages}
