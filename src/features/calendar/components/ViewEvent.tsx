@@ -151,7 +151,7 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
                   <Protected requiredPermission="events-notify">
                     {/* TODO: implement notifications with email and WhatsApp */}
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild>
                         <Button className="hover:bg-fuchsia-50 hover:text-fuchsia-600" size="icon" variant="ghost">
                           <BellRing className="h-4 w-4" />
                         </Button>
