@@ -42,7 +42,11 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
     const date = new Date(dateValue);
     const hasValidHour = date.getHours() !== 0 || date.getMinutes() !== 0;
 
-    if (!hasValidHour) {
+    if (hasValidHour) {
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      setSelectedHour(`${hours}:${minutes}`);
+    } else {
       setSelectedHour(null);
     }
   }, [dateValue]);
