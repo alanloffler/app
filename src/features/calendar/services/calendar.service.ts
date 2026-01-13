@@ -29,6 +29,11 @@ class CalendarModuleService {
     return { ...data, data: this.toDate(data.data) };
   }
 
+  public async remove(id: string): Promise<IApiResponse<ICalendarEvent>> {
+    const response = await apiClient.delete(`/events/${id}`);
+    return response.data;
+  }
+
   private toDate(events: ICalendarEvent[]) {
     if (events) {
       return events.map((event: any) => ({
@@ -39,11 +44,6 @@ class CalendarModuleService {
     }
 
     return events;
-  }
-
-  public async remove(id: string): Promise<IApiResponse<ICalendarEvent>> {
-    const response = await apiClient.delete(`/events/${id}`);
-    return response.data;
   }
 }
 
