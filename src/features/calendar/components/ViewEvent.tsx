@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from "@components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
-import { Link } from "react-router";
+import { EditEvent } from "@calendar/components/EditEvent";
 import { Loader } from "@components/Loader";
 import { Protected } from "@auth/components/Protected";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
@@ -46,6 +46,7 @@ interface IProps {
 }
 
 export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IProps) {
+  const [openEditSheet, setOpenEditSheet] = useState<boolean>(false);
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const hasPermissions = usePermission(["events-delete-hard", "events-update", "events-notify"], "some");
   const { isLoading: isRemoving, tryCatch: tryCatchRemoveEvent } = useTryCatch();
@@ -142,10 +143,13 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
                     </Button>
                   </Protected>
                   <Protected requiredPermission="events-update">
-                    <Button className="hover:bg-green-50 hover:text-green-600" size="icon" variant="ghost" asChild>
-                      <Link to={`/patient/${event.user.id}`}>
-                        <FilePenLine className="h-4 w-4" />
-                      </Link>
+                    <Button
+                      className="hover:bg-green-50 hover:text-green-600"
+                      onClick={() => setOpenEditSheet(true)}
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <FilePenLine className="h-4 w-4" />
                     </Button>
                   </Protected>
                   <Protected requiredPermission="events-notify">
@@ -174,6 +178,9 @@ export function ViewEvent({ event, openSheet, onRemoveEvent, setOpenSheet }: IPr
           </div>
         </SheetContent>
       </Sheet>
+
+      <EditEvent event={event} open={openEditSheet} setOpen={setOpenEditSheet} />
+
       <Dialog open={openRemoveDialog} onOpenChange={setOpenRemoveDialog}>
         <DialogContent className="gap-6 sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
