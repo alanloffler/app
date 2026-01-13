@@ -16,12 +16,12 @@
 
 .dark .calendar {
   --color-border: #2a2a2a;
-  --color-event-bg: #022c22; /* emerald-950 */
+  --color-event-bg: #022c2299; /* emerald-950 */
   --color-event-border: #022c22; /* emerald-950 */
   --color-event-hover: #064e3b; /* emerald-900 */
   --color-event: #10b981; /* emerald-500 */
   --color-label: #717880; /* gray-500 */
-  --color-off-range: #090909;
+  --color-off-range: #0c0c0c;
 }
 
 /* Table */
@@ -47,6 +47,28 @@
   vertical-align: middle !important;
 }
 
+/* Week & Day view: time slot */
+.rbc-time-slot {
+  min-height: 27px !important;
+}
+
+.rbc-events-container {
+  margin-right: 4px !important;
+}
+
+.rbc-events-container .rbc-event {
+  display: flex;
+  width: full !important;
+  padding: 2px 0px 2px 4px !important;
+  border-radius: 4px;
+  margin: 4px 0px 0px 2px;
+  max-height: 14px !important;
+}
+
+.rbc-events-container .rbc-event .rbc-event-content {
+  line-height: 13px;
+}
+
 /* Day slot off range */
 .rbc-off-range-bg {
   background: var(--color-off-range) !important;
@@ -67,7 +89,8 @@
 .rbc-time-slot,
 .rbc-timeslot-group,
 .rbc-label,
-.rbc-time-header-content {
+.rbc-time-header-content,
+.rbc-time-header {
   border-color: var(--color-border) !important;
 }
 
@@ -77,14 +100,11 @@
 }
 
 /* Day slot */
-.rbc-row-segment {
-  padding: 2px 6px !important;
-}
-
 .rbc-show-more {
   background-color: transparent !important;
   color: var(--color-label) !important;
   font-weight: 600;
+  padding: 4px !important;
 }
 
 .rbc-button-link {
@@ -126,6 +146,10 @@
 }
 
 /* Events */
+.rbc-row-segment {
+  margin-top: 2px !important;
+}
+
 .rbc-event {
   background-color: var(--color-event-bg) !important;
   border-radius: 4px;
@@ -133,6 +157,17 @@
   color: var(--color-event) !important;
   font-size: 12px;
   font-weight: 600;
+}
+
+.rbc-row .rbc-event {
+  margin: 0px 4px !important;
+  width: 100% !important;
+  max-width: calc(100% - 8px) !important;
+}
+
+.rbc-row .rbc-event .rbc-event-content {
+  margin: 0px 2px !important;
+  width: fit-content !important;
 }
 
 .rbc-event:hover {
