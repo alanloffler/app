@@ -59,24 +59,32 @@ export default function Calendar() {
     showMore: (total: number) => `${total} más...`,
   };
 
-  const getAllEvents = useCallback(async () => {
-    const [response, error] = await tryCatchEvents(CalendarService.findAll());
+  const refreshEvents = useCallback(
+    async (keepSelectedOpen?: boolean) => {
+      const [response, error] = await tryCatchEvents(CalendarService.findAll());
 
-    if (error) {
-      toast.error(error.message);
-      setErrorMessage(error.message);
-      setErrorNotification(true);
-      return;
-    }
+      if (error) {
+        toast.error(error.message);
+        setErrorMessage(error.message);
+        setErrorNotification(true);
+        return;
+      }
 
-    if (response && response?.statusCode === 200) {
-      setEvents(response.data);
-    }
-  }, [tryCatchEvents]);
+      if (response && response?.statusCode === 200) {
+        setEvents(response.data);
+
+        if (keepSelectedOpen && selectedEvent && response.data) {
+          const updated = response.data.find((e) => e.id === selectedEvent.id);
+          if (updated) setSelectedEvent(updated);
+        }
+      }
+    },
+    [tryCatchEvents, selectedEvent],
+  );
 
   useEffect(() => {
-    getAllEvents();
-  }, [getAllEvents]);
+    refreshEvents();
+  }, [refreshEvents]);
 
   // TODO: get config from backend
   const config = {
@@ -122,7 +130,7 @@ export default function Calendar() {
                 {...props}
                 calendarView={props.view as TView}
                 currentDate={currentDate}
-                onCreateEvent={getAllEvents}
+                onCreateEvent={refreshEvents}
               />
             ),
           }}
@@ -151,7 +159,7 @@ export default function Calendar() {
           views={["month", "week", "day"]}
         />
       </div>
-      <ViewEvent event={selectedEvent} openSheet={openSheet} setOpenSheet={setOpenSheet} onRemoveEvent={getAllEvents} />
+      <ViewEvent event={selectedEvent} onRefresh={refreshEvents} openSheet={openSheet} setOpenSheet={setOpenSheet} />
     </>
   );
 }
