@@ -40,13 +40,13 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
   event: ICalendarEvent | null;
-  open: boolean;
   onRemoveEvent: () => Promise<void>;
+  open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setOpenEditSheet: Dispatch<SetStateAction<boolean>>;
 }
 
-export function ViewEventSheet({ event, open, onRemoveEvent, setOpen, setOpenEditSheet }: IProps) {
+export function ViewEventSheet({ event, onRemoveEvent, open, setOpen, setOpenEditSheet }: IProps) {
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const { isLoading: isRemoving, tryCatch: tryCatchRemoveEvent } = useTryCatch();
   const hasPermissions = usePermission(["events-delete-hard", "events-update", "events-notify"], "some");
