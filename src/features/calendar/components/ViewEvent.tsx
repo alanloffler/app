@@ -7,24 +7,35 @@ import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interfa
 
 interface IProps {
   event: ICalendarEvent | null;
-  onRemoveEvent: () => Promise<void>;
+  onRefresh: (keepOpen?: boolean) => Promise<void>;
   openSheet: boolean;
   setOpenSheet: Dispatch<SetStateAction<boolean>>;
 }
 
-export function ViewEvent({ event, onRemoveEvent, openSheet: openAddSheet, setOpenSheet: setOpenAddSheet }: IProps) {
+export function ViewEvent({ event, onRefresh, openSheet, setOpenSheet }: IProps) {
   const [openEditSheet, setOpenEditSheet] = useState<boolean>(false);
+
+  async function handleRemove(): Promise<void> {
+    setOpenEditSheet(false);
+    setOpenSheet(false);
+    await onRefresh();
+  }
+
+  async function handleUpdate(): Promise<void> {
+    setOpenEditSheet(false);
+    await onRefresh(true);
+  }
 
   return (
     <>
       <ViewEventSheet
         event={event}
-        open={openAddSheet}
-        onRemoveEvent={onRemoveEvent}
-        setOpen={setOpenAddSheet}
+        onRemoveEvent={handleRemove}
+        open={openSheet}
+        setOpen={setOpenSheet}
         setOpenEditSheet={setOpenEditSheet}
       />
-      <EditEventSheet event={event} open={openEditSheet} setOpen={setOpenEditSheet} />
+      <EditEventSheet event={event} onUpdateEvent={handleUpdate} open={openEditSheet} setOpen={setOpenEditSheet} />
     </>
   );
 }
