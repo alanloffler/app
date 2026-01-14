@@ -75,10 +75,6 @@
   max-height: 14px !important;
 }
 
-.rbc-events-container .rbc-event .rbc-event-content {
-  line-height: 13px;
-}
-
 /* Day slot off range */
 .rbc-off-range-bg {
   background: var(--color-off-range) !important;
@@ -184,6 +180,19 @@
   background-color: var(--color-event-hover) !important;
   border-color: var(--color-event-hover) !important;
   transition: all 0.2s ease-out;
+}
+
+.rbc-event-label {
+  font-size: 11px !important;
+  font-weight: 400;
+  line-height: 14px !important;
+}
+
+.rbc-event-content {
+  padding-left: 4px;
+  font-size: 12px !important;
+  font-weight: 600;
+  line-height: 14px !important;
 }
 
 /* Day view */
