@@ -7,7 +7,7 @@ import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interfa
 
 interface IProps {
   event: ICalendarEvent | null;
-  onRefresh: (keepOpen?: boolean) => Promise<void>;
+  onRefresh: () => Promise<void>;
   openSheet: boolean;
   setOpenSheet: Dispatch<SetStateAction<boolean>>;
 }
@@ -15,27 +15,22 @@ interface IProps {
 export function ViewEvent({ event, onRefresh, openSheet, setOpenSheet }: IProps) {
   const [openEditSheet, setOpenEditSheet] = useState<boolean>(false);
 
-  async function handleRemove(): Promise<void> {
+  async function handleEventChange(): Promise<void> {
     setOpenEditSheet(false);
     setOpenSheet(false);
     await onRefresh();
-  }
-
-  async function handleUpdate(): Promise<void> {
-    setOpenEditSheet(false);
-    await onRefresh(true);
   }
 
   return (
     <>
       <ViewEventSheet
         event={event}
-        onRemoveEvent={handleRemove}
+        onRemoveEvent={handleEventChange}
         open={openSheet}
         setOpen={setOpenSheet}
         setOpenEditSheet={setOpenEditSheet}
       />
-      <EditEventSheet event={event} onUpdateEvent={handleUpdate} open={openEditSheet} setOpen={setOpenEditSheet} />
+      <EditEventSheet event={event} onUpdateEvent={handleEventChange} open={openEditSheet} setOpen={setOpenEditSheet} />
     </>
   );
 }
