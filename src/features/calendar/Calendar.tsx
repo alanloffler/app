@@ -7,7 +7,7 @@ import { PageLoader } from "@components/PageLoader";
 import { Toolbar } from "@calendar/components/Toolbar";
 import { ViewEvent } from "@calendar/components/ViewEvent";
 
-import type { ToolbarProps } from "react-big-calendar";
+import type { Event, ToolbarProps, View } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
 import { es } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
@@ -22,6 +22,60 @@ import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
+// TODO: get config from backend
+const config = {
+  startHour: "07:00",
+  endHour: "20:00",
+  exceptions: { from: "12:00", to: "15:00" },
+  slotDuration: "30",
+};
+
+const locales = { "es-AR": es };
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+const messages = {
+  allDay: "Todo el día",
+  previous: "Anterior",
+  next: "Siguiente",
+  today: "Hoy",
+  month: "Mes",
+  week: "Semana",
+  day: "Día",
+  agenda: "Agenda",
+  date: "Fecha",
+  time: "Hora",
+  event: "Evento",
+  noEventsInRange: "No hay eventos en este rango",
+  showMore: (total: number) => `${total} más...`,
+};
+
+const maxHour = new Date();
+maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
+
+const minHour = new Date();
+minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
+
+function isLunchTime(date: Date): boolean {
+  const from = parse(config.exceptions.from, "HH:mm", new Date());
+  const to = parse(config.exceptions.to, "HH:mm", new Date());
+  const hour = date.getHours();
+  return hour >= from.getHours() && hour < to.getHours();
+}
+
+function slotPropGetter(date: Date) {
+  if (isLunchTime(date)) {
+    return { className: "rbc-slot-lunch" };
+  }
+  return {};
+}
+
 export default function Calendar() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
@@ -31,34 +85,6 @@ export default function Calendar() {
   const canViewEvent = usePermission("events-view");
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
   const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
-
-  const locales = {
-    "es-AR": es,
-  };
-
-  const localizer = dateFnsLocalizer({
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales,
-  });
-
-  const messages = {
-    allDay: "Todo el día",
-    previous: "Anterior",
-    next: "Siguiente",
-    today: "Hoy",
-    month: "Mes",
-    week: "Semana",
-    day: "Día",
-    agenda: "Agenda",
-    date: "Fecha",
-    time: "Hora",
-    event: "Evento",
-    noEventsInRange: "No hay eventos en este rango",
-    showMore: (total: number) => `${total} más...`,
-  };
 
   const refreshEvents = useCallback(async () => {
     const [response, error] = await tryCatchEvents(CalendarService.findAll());
@@ -79,35 +105,18 @@ export default function Calendar() {
     refreshEvents();
   }, [refreshEvents]);
 
-  // TODO: get config from backend
-  const config = {
-    startHour: "07:00",
-    endHour: "20:00",
-    exceptions: { from: "12:00", to: "15:00" },
-    slotDuration: "30",
-  };
+  const onView = useCallback(
+    (view: View) => {
+      if (view === "month") setSelectedDate(new Date());
+      setSelectedView(view as TView);
+    },
+    [setSelectedDate, setSelectedView],
+  );
 
-  const maxHour = new Date();
-  maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
-
-  const minHour = new Date();
-  minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
-
-  const isLunchTime = (date: Date): boolean => {
-    const from = parse(config.exceptions.from, "HH:mm", new Date());
-    const to = parse(config.exceptions.to, "HH:mm", new Date());
-    const hour = date.getHours();
-    return hour >= from.getHours() && hour < to.getHours();
-  };
-
-  const slotPropGetter = (date: Date) => {
-    if (isLunchTime(date)) {
-      return {
-        className: "rbc-slot-lunch",
-      };
-    }
-    return {};
-  };
+  const onSelectEvent = useCallback((event: Event) => {
+    setSelectedEvent(event as ICalendarEvent);
+    setOpenSheet(true);
+  }, []);
 
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
@@ -119,12 +128,7 @@ export default function Calendar() {
           className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-              <Toolbar
-                {...props}
-                calendarView={props.view as TView}
-                currentDate={selectedDate}
-                onCreateEvent={refreshEvents}
-              />
+              <Toolbar {...props} calendarView={props.view as TView} currentDate={selectedDate} onCreateEvent={refreshEvents} />
             ),
           }}
           culture="es-AR"
@@ -132,21 +136,15 @@ export default function Calendar() {
           endAccessor="endDate"
           events={events}
           formats={{
-            eventTimeRangeFormat: (date) => format(date.start, "HH:mm"),
+            eventTimeRangeFormat: (range) => format(range.start, "HH:mm"),
           }}
           localizer={localizer}
           max={maxHour}
           messages={messages}
           min={minHour}
           onNavigate={setSelectedDate}
-          onSelectEvent={(event) => {
-            setSelectedEvent(event);
-            setOpenSheet(true);
-          }}
-          onView={(view) => {
-            if (view === "month") setSelectedDate(new Date());
-            setSelectedView(view as TView);
-          }}
+          onSelectEvent={onSelectEvent}
+          onView={onView}
           slotPropGetter={slotPropGetter}
           startAccessor="startDate"
           style={{ height: 700 }}
