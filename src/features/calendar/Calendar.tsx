@@ -59,28 +59,20 @@ export default function Calendar() {
     showMore: (total: number) => `${total} más...`,
   };
 
-  const refreshEvents = useCallback(
-    async (keepSelectedOpen?: boolean) => {
-      const [response, error] = await tryCatchEvents(CalendarService.findAll());
+  const refreshEvents = useCallback(async () => {
+    const [response, error] = await tryCatchEvents(CalendarService.findAll());
 
-      if (error) {
-        toast.error(error.message);
-        setErrorMessage(error.message);
-        setErrorNotification(true);
-        return;
-      }
+    if (error) {
+      toast.error(error.message);
+      setErrorMessage(error.message);
+      setErrorNotification(true);
+      return;
+    }
 
-      if (response && response?.statusCode === 200) {
-        setEvents(response.data);
-
-        if (keepSelectedOpen && selectedEvent && response.data) {
-          const updated = response.data.find((e) => e.id === selectedEvent.id);
-          if (updated) setSelectedEvent(updated);
-        }
-      }
-    },
-    [tryCatchEvents, selectedEvent],
-  );
+    if (response && response?.statusCode === 200) {
+      setEvents(response.data);
+    }
+  }, [tryCatchEvents]);
 
   useEffect(() => {
     refreshEvents();
