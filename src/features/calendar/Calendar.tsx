@@ -53,7 +53,7 @@ const messages = {
   time: "Hora",
   event: "Evento",
   noEventsInRange: "No hay eventos en este rango",
-  showMore: (total: number) => `${total} más...`,
+  showMore: (total: number) => `${total} más`,
 };
 
 const maxHour = new Date();
@@ -128,7 +128,12 @@ export default function Calendar() {
           className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-              <Toolbar {...props} calendarView={props.view as TView} currentDate={selectedDate} onCreateEvent={refreshEvents} />
+              <Toolbar
+                {...props}
+                calendarView={props.view as TView}
+                currentDate={selectedDate}
+                onCreateEvent={refreshEvents}
+              />
             ),
           }}
           culture="es-AR"
