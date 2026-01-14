@@ -158,10 +158,12 @@ export function AddEvent({ onCreateEvent }: IProps) {
                       >
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
                         <div className="flex-1">
+                          {/* TODO: disable days from db config */}
+                          {/* disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]} */}
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
-                            disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                            disabled={[{ dayOfWeek: [0, 6] }]}
                             id="date"
                             locale={es}
                             mode="single"
