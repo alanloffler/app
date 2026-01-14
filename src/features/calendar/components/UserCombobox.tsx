@@ -56,7 +56,7 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
           aria-invalid={ariaInvalid}
           className={cn(
             "font-normal disabled:opacity-100",
-            value || error || isLoading ? "justify-between" : "justify-end",
+            value || error || isLoading ? "justify-between!" : "justify-end!",
             error || ariaInvalid ? "text-destructive border-destructive" : "",
           )}
           disabled={isLoading || error !== null}
@@ -65,7 +65,7 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
           variant="outline"
         >
           {isLoading && "Cargando..."}
-          {error || (ariaInvalid && "Error")}
+          {error && "Error"}
           {value ? getSelectedUser(value) : ""}
           <ChevronsUpDown className="opacity-50" />
         </Button>
