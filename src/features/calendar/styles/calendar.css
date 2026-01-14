@@ -36,13 +36,15 @@
 }
 
 /* Header */
-.rbc-header,
-.rbc-header .rbc-button-link {
+.rbc-header {
   padding: 8px !important;
-  text-transform: lowercase;
-  font-weight: 500;
+}
+
+.rbc-header,
+.rbc-header > span {
+  font-weight: 600 !important;
   color: var(--color-label) !important;
-  font-size: 12px;
+  font-size: 12px !important;
 }
 
 .rbc-time-header-content .rbc-header {
@@ -180,6 +182,11 @@
   background-color: var(--color-event-hover) !important;
   border-color: var(--color-event-hover) !important;
   transition: all 0.2s ease-out;
+}
+
+.rbc-event:focus {
+  background-color: var(--color-event-hover) !important;
+  outline: none !important;
 }
 
 .rbc-event-label {
