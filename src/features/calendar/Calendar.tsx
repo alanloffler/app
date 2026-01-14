@@ -18,11 +18,11 @@ import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interfa
 import type { TView } from "@calendar/interfaces/calendar-view.type";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { cn } from "@lib/utils";
+import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Calendar() {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
@@ -30,6 +30,7 @@ export default function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
   const canViewEvent = usePermission("events-view");
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
+  const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
 
   const locales = {
     "es-AR": es,
@@ -121,14 +122,13 @@ export default function Calendar() {
               <Toolbar
                 {...props}
                 calendarView={props.view as TView}
-                currentDate={currentDate}
+                currentDate={selectedDate}
                 onCreateEvent={refreshEvents}
               />
             ),
           }}
           culture="es-AR"
-          defaultDate={minHour}
-          defaultView="month"
+          date={selectedDate}
           endAccessor="endDate"
           events={events}
           formats={{
@@ -138,16 +138,19 @@ export default function Calendar() {
           max={maxHour}
           messages={messages}
           min={minHour}
-          onNavigate={(date) => {
-            setCurrentDate(date);
-          }}
+          onNavigate={setSelectedDate}
           onSelectEvent={(event) => {
             setSelectedEvent(event);
             setOpenSheet(true);
           }}
+          onView={(view) => {
+            if (view === "month") setSelectedDate(new Date());
+            setSelectedView(view as TView);
+          }}
           slotPropGetter={slotPropGetter}
           startAccessor="startDate"
           style={{ height: 700 }}
+          view={selectedView}
           views={["month", "week", "day"]}
         />
       </div>
