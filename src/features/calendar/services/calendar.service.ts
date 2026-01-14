@@ -31,7 +31,17 @@ class CalendarModuleService {
 
   public async findOne(id: string): Promise<IApiResponse<ICalendarEvent>> {
     const response = await apiClient.get(`/events/${id}`);
-    return response.data;
+    const data = response.data;
+    if (!data.data) return data;
+
+    return {
+      ...data,
+      data: {
+        ...data.data,
+        startDate: new Date(data.data.startDate),
+        endDate: new Date(data.data.endDate),
+      },
+    };
   }
 
   public async update(id: string, data: z.infer<typeof eventSchema>): Promise<IApiResponse<ICalendarEvent>> {
