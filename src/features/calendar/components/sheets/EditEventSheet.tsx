@@ -31,7 +31,7 @@ const config = {
 
 interface IProps {
   event: ICalendarEvent | null;
-  onCreateEvent: () => void;
+  onUpdateEvent: () => void;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
@@ -47,7 +47,7 @@ function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> 
   };
 }
 
-export function EditEventSheet({ event, onCreateEvent, open, setOpen }: IProps) {
+export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const closeRef = useRef<HTMLButtonElement>(null);
   const { isLoading: isUpdating, tryCatch: tryCatchUpdateEvent } = useTryCatch();
@@ -90,7 +90,7 @@ export function EditEventSheet({ event, onCreateEvent, open, setOpen }: IProps) 
     if (response && response.statusCode === 200) {
       toast.success("Turno actualizado exitosamente");
       setOpen(false);
-      onCreateEvent();
+      onUpdateEvent();
     }
   }
 
