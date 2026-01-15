@@ -12,8 +12,10 @@ import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@core/auth/components/Protected";
 
+import { es } from "date-fns/locale";
+import { format } from "date-fns";
 import { toast } from "sonner";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router";
 
@@ -28,6 +30,7 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 export default function ViewRole() {
   const [role, setRole] = useState<IRole | undefined>(undefined);
   const admin = useAuthStore((state) => state.admin);
+  const usersInRole = useMemo(() => [...(role?.users ?? []), ...(role?.admins ?? [])], [role?.users, role?.admins]);
   const hasPermissions = usePermission(["roles-delete", "roles-delete-hard", "roles-restore", "roles-update"], "some");
   const navigate = useNavigate();
   const { id } = useParams();
@@ -116,10 +119,18 @@ export default function ViewRole() {
   }
 
   function translate(content: string) {
-    if (content === "admin") return "Administradores";
-    if (content === "permissions") return "Permisos";
-    if (content === "settings") return "Configuraciones";
-    return content.charAt(0).toUpperCase() + content.slice(1);
+    const dictionary: Record<string, string> = {
+      admin: "Administradores",
+      calendar: "Agenda",
+      events: "Eventos",
+      patient: "Pacientes",
+      permissions: "Permisos",
+      professional: "Profesionales",
+      roles: "Roles",
+      settings: "Configuraciones",
+    };
+
+    return dictionary[content] || content;
   }
 
   return (
@@ -185,15 +196,15 @@ export default function ViewRole() {
                   </div>
                   <div className="dark:bg-background flex flex-col items-start rounded-lg border bg-neutral-50 p-3">
                     <span className="font-semibold">Usando este rol:</span>
-                    {role?.admins?.length && role.admins.length > 0 ? (
+                    {usersInRole.length > 0 ? (
                       <ul className="flex flex-col gap-2 pt-2 pl-4">
-                        {role?.admins.map((item, idx) => (
+                        {usersInRole.map((item, idx) => (
                           <li className="flex items-center gap-3 text-sm" key={`admins-${item.id}`}>
                             <Badge className="min-w-[29px] text-xs" size="small" variant="ic">
                               {idx + 1}
                             </Badge>
                             <Button className="text-foreground h-fit p-0 font-normal" variant="link" asChild>
-                              <Link to={`/admin/view/${item.id}`}>
+                              <Link to={`/users/view/${item.id}`} state={{ role: item.role }}>
                                 {item.firstName} {item.lastName}
                               </Link>
                             </Button>
@@ -207,9 +218,7 @@ export default function ViewRole() {
                   </div>
                 </div>
               </ul>
-              <CreatedAt>
-                {`Creado el ${role && new Date(role.createdAt.split("T")[0]).toLocaleDateString()}`}
-              </CreatedAt>
+              <CreatedAt>{`Rol creado el ${role && format(role.createdAt, "dd/MM/yyyy", { locale: es })}`}</CreatedAt>
             </CardContent>
             <Activity mode={hasPermissions ? "visible" : "hidden"}>
               <CardFooter className="justify-end gap-3 px-0">
