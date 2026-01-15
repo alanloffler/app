@@ -250,10 +250,10 @@ export default function Users() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title={role === "patient" ? "Pacientes" : "Profesionales"}
-        subtitle={`Gestioná los ${role === "patient" ? "pacientes" : "profesionales"} del sistema`}
+        title={role === "patient" ? "Pacientes" : role === "admin" ? "Administradores" : "Profesionales"}
+        subtitle={`Gestioná los ${role === "patient" ? "pacientes" : role === "admin" ? "administradores" : "profesionales"} del sistema`}
       >
-        <Protected requiredPermission="patient-create">
+        <Protected requiredPermission={["admin-create", "patient-create", "professional-create"]} mode="some">
           <Button variant="default" size="lg" asChild>
             <Link to="/users/create">
               <Plus />
