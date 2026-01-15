@@ -51,19 +51,19 @@ const data = {
       items: [
         {
           title: "Administradores (s)",
-          url: "/users/admin",
+          url: "/users/role/admin",
           icon: FileUser,
           permission: "admin-view" as TPermission,
         },
         {
           title: "Pacientes",
-          url: "/users/patient",
+          url: "/users/role/patient",
           icon: Patients,
           permission: "patient-view" as TPermission,
         },
         {
           title: "Profesionales",
-          url: "/users/professional",
+          url: "/users/role/professional",
           icon: Briefcase,
           permission: "professional-view" as TPermission,
         },
@@ -79,7 +79,7 @@ const data = {
     },
     {
       title: "Pacientes",
-      url: "/users/patient",
+      url: "/users/role/patient",
       icon: Patients,
       permission: "patient-view" as TPermission,
       role: "professional",
@@ -103,19 +103,19 @@ const data = {
       items: [
         {
           title: "Aplicación",
-          url: "/app-settings",
+          url: "/settings/app",
           icon: Package,
           permission: "*" as TPermission,
         },
         {
           title: "Notificaciones",
-          url: "/notifications-settings",
+          url: "/settings/notifications",
           icon: Megaphone,
           permission: "*" as TPermission,
         },
         {
           title: "Tablero",
-          url: "/dashboard-settings",
+          url: "/settings/dashboard",
           icon: LayoutDashboard,
           permission: "*" as TPermission,
         },
