@@ -12,6 +12,8 @@ import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
 
+import { es } from "date-fns/locale";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -144,7 +146,7 @@ export default function ViewUser() {
                 </li>
               </ul>
               <CreatedAt>
-                {user && `${user.role.name} desde el ${new Date(user.createdAt.split("T")[0]).toLocaleDateString()}`}
+                {user && `${user.role.name} desde el ${format(user.createdAt, "dd/MM/yyyy", { locale: es })}`}
               </CreatedAt>
             </CardContent>
             <Activity mode={hasPermissions ? "visible" : "hidden"}>
