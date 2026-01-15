@@ -124,7 +124,7 @@ export default function ViewUser() {
             <BackButton />
             <CardHeader>
               <CardTitle className="text-xl">{`${user?.firstName} ${user?.lastName}`}</CardTitle>
-              <CardDescription className="text-base">{user?.role.name}</CardDescription>
+              <CardDescription className="text-base">{user?.role?.name}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 space-y-6 px-0">
               <ul className="space-y-2">
@@ -146,7 +146,7 @@ export default function ViewUser() {
                 </li>
               </ul>
               <CreatedAt>
-                {user && `${user.role.name} desde el ${format(user.createdAt, "dd/MM/yyyy", { locale: es })}`}
+                {`${user?.role?.name} creado el ${user && format(user?.createdAt, "dd/MM/yyyy", { locale: es })}`}
               </CreatedAt>
             </CardContent>
             <Activity mode={hasPermissions ? "visible" : "hidden"}>
