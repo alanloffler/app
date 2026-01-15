@@ -138,7 +138,7 @@ export default function Roles() {
                   </Link>
                 </Button>
               </Protected>
-              {row.original.value !== ERoles.SUPER && (
+              {row.original.value !== ERoles.SUPER && row.original.value !== ERoles.ADMIN && (
                 <>
                   <Protected requiredPermission="roles-delete">
                     <HoldButton
@@ -173,7 +173,7 @@ export default function Roles() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Roles" subtitle="Gestioná los roles de los administradores del sistema">
-        <Protected requiredPermission="roles-create" variant="disabled">
+        <Protected requiredPermission="roles-create">
           <Button variant="default" size="lg" asChild>
             <Link to="/roles/create">
               <Plus />
