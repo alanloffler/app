@@ -1,4 +1,5 @@
 import {
+  Briefcase,
   Calendar,
   GalleryVerticalEnd,
   KeyRound,
@@ -11,6 +12,7 @@ import {
   ShieldPlus,
   User2,
   UserPlus2,
+  Users2,
 } from "lucide-react";
 import { KeyRoundPlus } from "@components/icons/KeyRoundPlus";
 import { Patients } from "@components/icons/Patients";
@@ -42,16 +44,38 @@ const data = {
       permission: "calendar-view" as TPermission,
     },
     {
-      title: "Pacientes",
-      url: "/users",
-      icon: Patients,
-      permission: "users-view" as TPermission,
+      title: "Usuarios",
+      url: "#",
+      icon: Users2,
+      items: [
+        {
+          title: "Profesionales",
+          url: "/users/professional",
+          icon: Briefcase,
+          permission: "professional-view" as TPermission,
+        },
+        {
+          title: "Pacientes",
+          url: "/users/patient",
+          icon: Patients,
+          permission: "patient-view" as TPermission,
+        },
+        {
+          title: "Administradores",
+          url: "/admin?role=admin",
+          icon: User2,
+          permission: "*" as TPermission,
+        },
+      ],
+      permission: "*" as TPermission,
+      role: "superadmin",
     },
     {
-      title: "Administradores",
-      url: "/admin",
-      icon: User2,
-      permission: "admin-view" as TPermission,
+      title: "Pacientes",
+      url: "/users/patient",
+      icon: Patients,
+      permission: "patients-view" as TPermission,
+      role: "professional",
     },
     {
       title: "Roles",
@@ -74,16 +98,19 @@ const data = {
           title: "Aplicación",
           url: "/app-settings",
           icon: Package,
+          permission: "*" as TPermission,
         },
         {
           title: "Notificaciones",
           url: "/notifications-settings",
           icon: Megaphone,
+          permission: "*" as TPermission,
         },
         {
           title: "Tablero",
           url: "/dashboard-settings",
           icon: LayoutDashboard,
+          permission: "*" as TPermission,
         },
       ],
       permission: "settings-view" as TPermission,
