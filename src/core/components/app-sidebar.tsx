@@ -1,7 +1,6 @@
 import {
   Briefcase,
   Calendar,
-  FileUser,
   GalleryVerticalEnd,
   KeyRound,
   LayoutDashboard,
@@ -50,9 +49,9 @@ const data = {
       icon: Users2,
       items: [
         {
-          title: "Administradores (s)",
+          title: "Administradores",
           url: "/users/role/admin",
-          icon: FileUser,
+          icon: User2,
           permission: "admin-view" as TPermission,
         },
         {
@@ -66,12 +65,6 @@ const data = {
           url: "/users/role/professional",
           icon: Briefcase,
           permission: "professional-view" as TPermission,
-        },
-        {
-          title: "Administradores",
-          url: "/admin?role=admin",
-          icon: User2,
-          permission: "*" as TPermission,
         },
       ],
       permission: "*" as TPermission,
