@@ -15,7 +15,7 @@ export interface IRole {
 }
 
 export interface IRolePermissions {
-  roleId: string;
-  permissionId: string;
   permission: IPermission | null;
+  permissionId: string;
+  roleId: string;
 }
