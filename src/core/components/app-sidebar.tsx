@@ -75,13 +75,13 @@ const data = {
         },
       ],
       permission: "*" as TPermission,
-      role: "superadmin",
+      role: ["superadmin", "admin"],
     },
     {
       title: "Pacientes",
       url: "/users/patient",
       icon: Patients,
-      permission: "patients-view" as TPermission,
+      permission: "patient-view" as TPermission,
       role: "professional",
     },
     {
