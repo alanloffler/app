@@ -125,10 +125,10 @@ const data = {
   ],
   navActions: [
     {
-      name: "Crear administrador",
-      url: "/admin/create",
+      name: "Crear usuario",
+      url: "/users/create",
       icon: UserPlus2,
-      permission: "admin-create" as TPermission,
+      permission: ["admin-create", "patient-create", "professional-create"] as TPermission[],
     },
     {
       name: "Crear rol",
