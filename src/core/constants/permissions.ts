@@ -29,6 +29,20 @@ export const PERMISSIONS = [
     ],
   },
   {
+    name: "Pacientes",
+    value: "patients",
+    actions: [
+      { name: "Crear", value: "patient-create" },
+      { name: "Editar", value: "patient-update" },
+      { name: "Editar contraseña", value: "patient-update-password" },
+      { name: "Eliminar", value: "patient-delete" },
+      { name: "Eliminar permanente", value: "patient-delete-hard" },
+      { name: "Restaurar", value: "patient-restore" },
+      { name: "Ver", value: "patient-view" },
+      { name: "Ver todos", value: "patient-view" },
+    ],
+  },
+  {
     name: "Permisos",
     value: "permissions",
     actions: [
@@ -39,6 +53,19 @@ export const PERMISSIONS = [
       { name: "Estadisticas", value: "permissions-stats" },
       { name: "Restaurar", value: "permissions-restore" },
       { name: "Ver", value: "permissions-view" },
+    ],
+  },
+  {
+    name: "Profesionales",
+    value: "professionals",
+    actions: [
+      { name: "Crear", value: "professional-create" },
+      { name: "Editar", value: "professional-update" },
+      { name: "Editar contraseña", value: "professional-update-password" },
+      { name: "Eliminar", value: "professional-delete" },
+      { name: "Eliminar permanente", value: "professional-delete-hard" },
+      { name: "Restaurar", value: "professional-restore" },
+      { name: "Ver", value: "professional-view" },
     ],
   },
   {
@@ -75,6 +102,7 @@ export const PERMISSIONS = [
       { name: "Eliminar permanente", value: "users-delete-hard" },
       { name: "Restaurar", value: "users-restore" },
       { name: "Ver", value: "users-view" },
+      { name: "Ver todos", value: "users-view-all" },
     ],
   },
 ];
