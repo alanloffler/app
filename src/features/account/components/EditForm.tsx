@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { IAdmin } from "@admin/interfaces/admin.interface";
 import { AccountService } from "@account/services/profile.service";
-import { AdminService } from "@admin/services/admin.service";
+import { UsersService } from "@users/services/users.service";
 import { profileSchema } from "@account/schemas/profile.schema";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useDebounce } from "@core/hooks/useDebounce";
@@ -57,7 +57,7 @@ export function EditForm() {
       if (!debouncedUsername || debouncedUsername.length <= 3) return;
       if (debouncedUsername === adminToUpdate?.userName) return;
 
-      const response = await AdminService.checkUsernameAvailability(debouncedUsername);
+      const response = await UsersService.checkUsernameAvailability(debouncedUsername);
       if (response.data === false) {
         const message = "Nombre de usuario ya registrado";
         setUsernameError(message);
@@ -72,7 +72,7 @@ export function EditForm() {
     async function findOneWithCredentials(): Promise<void> {
       if (!ownAdmin) return;
 
-      const [admin, adminError] = await tryCatchAdmin(AdminService.findOneWithCredentials(ownAdmin.id));
+      const [admin, adminError] = await tryCatchAdmin(UsersService.findOneWithCredentials(ownAdmin.id));
 
       if (adminError) {
         toast.error(adminError.message);
@@ -121,7 +121,7 @@ export function EditForm() {
 
     // Check again for race condition: before first check another admin use same ic
     if (data.email !== adminToUpdate?.email) {
-      const emailAvailableResponse = await AdminService.checkEmailAvailability(data.email);
+      const emailAvailableResponse = await UsersService.checkEmailAvailability(data.email);
 
       if (emailAvailableResponse.data === false) {
         const errorMsg = "Email ya registrado";
@@ -133,7 +133,7 @@ export function EditForm() {
 
     // Check again for race condition: before first check another admin use same ic
     if (data.ic !== adminToUpdate?.ic) {
-      const icAvailableResponse = await AdminService.checkIcAvailability(data.ic);
+      const icAvailableResponse = await UsersService.checkIcAvailability(data.ic);
 
       if (icAvailableResponse.data === false) {
         const errorMsg = "DNI ya registrado";
@@ -145,7 +145,7 @@ export function EditForm() {
 
     // Check again for race condition: before first check another admin use same username
     if (data.userName !== adminToUpdate?.userName) {
-      const usernameAvailableResponse = await AdminService.checkUsernameAvailability(data.userName);
+      const usernameAvailableResponse = await UsersService.checkUsernameAvailability(data.userName);
 
       if (usernameAvailableResponse.data === false) {
         const errorMsg = "Nombre de usuario ya registrado";
@@ -209,7 +209,7 @@ export function EditForm() {
                       form.clearErrors("ic");
 
                       if (value.length > 7 && value !== adminToUpdate?.ic) {
-                        const response = await AdminService.checkIcAvailability(value);
+                        const response = await UsersService.checkIcAvailability(value);
                         if (response.data === false) {
                           const errorMsg = "DNI ya registrado";
                           setIcError(errorMsg);
@@ -329,7 +329,7 @@ export function EditForm() {
                       const emailValidation = z.email().safeParse(emailValue);
 
                       if (emailValidation.success && emailValue !== adminToUpdate?.email) {
-                        const response = await AdminService.checkEmailAvailability(emailValue);
+                        const response = await UsersService.checkEmailAvailability(emailValue);
                         if (response.data === false) {
                           const errorMsg = "Email ya registrado";
                           setEmailError(errorMsg);
