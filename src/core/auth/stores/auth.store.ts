@@ -33,7 +33,7 @@ export const useAuthStore = create(
 
         try {
           set({ loadingAdmin: true });
-          const response = await AccountService.get(currentAdmin?.role.value);
+          const response = await AccountService.get();
 
           if (response?.statusCode === 200 && response.data) {
             set({ admin: response.data, loadingAdmin: false });
