@@ -387,7 +387,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission={["users-view", "users-update"]}>
+            <ProtectedRoute requiredPermission={["admin-update", "patient-update", "professional-update"]} mode="some">
               <EditUser />
             </ProtectedRoute>
           </Suspense>
