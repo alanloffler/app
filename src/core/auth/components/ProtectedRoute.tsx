@@ -12,7 +12,7 @@ interface IProps {
   requiredPermission?: TPermission | TPermission[];
 }
 
-export function ProtectedRoute({ children, mode = "every", redirectTo = "/", requiredPermission }: IProps) {
+export function ProtectedRoute({ children, mode = "some", redirectTo = "/", requiredPermission }: IProps) {
   const admin = useAuthStore((state) => state.admin);
 
   if (!admin) {
