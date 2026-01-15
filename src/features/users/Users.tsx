@@ -206,7 +206,7 @@ export default function Users() {
           {!row.original.deletedAt && (
             <Protected requiredPermission={`${role}-update` as TPermission}>
               <Button className="px-5! hover:text-green-500" variant="outline" asChild>
-                <Link to={`/users/edit/${row.original.id}`}>
+                <Link to={`/users/edit/${row.original.id}`} state={{ role: row.original.role }}>
                   <FilePenLine className="h-4 w-4" />
                 </Link>
               </Button>
