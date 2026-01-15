@@ -30,7 +30,7 @@ interface IProps {
     isActive?: boolean;
     items?: IItem[];
     permission: TPermission;
-    role?: string;
+    role?: string | string[];
     title: string;
     url: string;
   }[];
@@ -52,9 +52,14 @@ export function NavMain({ items }: IProps) {
   const showMenuIcons = appSettings.find((s) => s.key === "showMenuIcons")?.value === "true";
   const showMenuTooltips = appSettings.find((s) => s.key === "showMenuTooltips")?.value === "true";
 
-  const hasRoleAccess = (itemRole?: string) => {
+  const hasRoleAccess = (itemRole?: string | string[]) => {
     if (!itemRole) return true;
-    return admin?.role.value === itemRole;
+    if (admin) {
+      if (typeof itemRole === "string") return admin.role.value === itemRole;
+      if (Array.isArray(itemRole)) return itemRole.includes(admin.role.value);
+    }
+
+    return false;
   };
 
   return (
