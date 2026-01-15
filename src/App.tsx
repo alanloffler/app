@@ -284,7 +284,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "app-settings",
+        path: "settings/app",
         element: (
           <Suspense
             fallback={
@@ -300,7 +300,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard-settings",
+        path: "settings/dashboard",
         element: (
           <Suspense
             fallback={
@@ -316,7 +316,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "notifications-settings",
+        path: "settings/notifications",
         element: (
           <Suspense
             fallback={
