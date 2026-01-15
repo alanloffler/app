@@ -76,9 +76,8 @@ export function EditForm({ userId }: IProps) {
       return;
     }
 
-    if (roles && roles.statusCode === 200) {
-      const filteredRoles = roles.data?.filter((role) => role.value !== "superadmin");
-      setRoles(filteredRoles);
+    if (roles && roles.statusCode === 200 && roles.data) {
+      setRoles(roles.data);
     }
   }, [form.control, tryCatchRoles]);
 
