@@ -138,8 +138,7 @@ export function CreateForm() {
       }
 
       if (roles && roles.statusCode === 200 && roles.data) {
-        const filteredRoles = roles.data.filter((role) => role.value !== "superadmin");
-        setRoles(filteredRoles);
+        setRoles(roles.data);
       }
     }
 
