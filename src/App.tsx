@@ -346,7 +346,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "users",
+        path: "users/:role",
         element: (
           <Suspense
             fallback={
@@ -355,7 +355,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission="users-view">
+            <ProtectedRoute requiredPermission={["patient-view", "professional-view"]} mode="some">
               <Users />
             </ProtectedRoute>
           </Suspense>
@@ -371,7 +371,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission={["users-view", "users-create"]}>
+            <ProtectedRoute requiredPermission={["patient-create", "professional-create"]} mode="some">
               <CreateUser />
             </ProtectedRoute>
           </Suspense>
