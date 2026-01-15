@@ -21,6 +21,7 @@ import type { ComponentType, SVGProps } from "react";
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { cn } from "@lib/utils";
 import { useActiveRoute } from "@core/hooks/useActiveRoute";
+import { useAuthStore } from "@auth/stores/auth.store";
 import { useSettingsStore } from "@settings/stores/settings.store";
 
 interface IProps {
@@ -29,6 +30,7 @@ interface IProps {
     isActive?: boolean;
     items?: IItem[];
     permission: TPermission;
+    role?: string;
     title: string;
     url: string;
   }[];
@@ -36,11 +38,13 @@ interface IProps {
 
 interface IItem {
   icon?: LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
+  permission: TPermission;
   title: string;
   url: string;
 }
 
 export function NavMain({ items }: IProps) {
+  const admin = useAuthStore((state) => state.admin);
   const { appSettings } = useSettingsStore();
   const { isActive, isParentActive } = useActiveRoute();
   const { state } = useSidebar();
@@ -48,12 +52,17 @@ export function NavMain({ items }: IProps) {
   const showMenuIcons = appSettings.find((s) => s.key === "showMenuIcons")?.value === "true";
   const showMenuTooltips = appSettings.find((s) => s.key === "showMenuTooltips")?.value === "true";
 
+  const hasRoleAccess = (itemRole?: string) => {
+    if (!itemRole) return true;
+    return admin?.role.value === itemRole;
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Aplicación</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) =>
-          item.items ? (
+          hasRoleAccess(item.role) && item.items ? (
             state === "collapsed" ? (
               // Menu with subitems
               <SidebarMenuItem key={item.title}>
@@ -74,19 +83,20 @@ export function NavMain({ items }: IProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="right" align="start" className="min-w-48">
                       {item.items.map((subItem) => (
-                        <DropdownMenuItem
-                          asChild
-                          className={cn(
-                            "text-sm",
-                            isActive(subItem.url) && "bg-sidebar-accent text-sidebar-accent-foreground",
-                          )}
-                          key={subItem.title}
-                        >
-                          <Link to={subItem.url}>
-                            {showMenuIcons && subItem.icon && <subItem.icon />}
-                            {subItem.title}
-                          </Link>
-                        </DropdownMenuItem>
+                        <Protected requiredPermission={subItem.permission} key={subItem.title}>
+                          <DropdownMenuItem
+                            asChild
+                            className={cn(
+                              "text-sm",
+                              isActive(subItem.url) && "bg-sidebar-accent text-sidebar-accent-foreground",
+                            )}
+                          >
+                            <Link to={subItem.url}>
+                              {showMenuIcons && subItem.icon && <subItem.icon />}
+                              {subItem.title}
+                            </Link>
+                          </DropdownMenuItem>
+                        </Protected>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -117,21 +127,23 @@ export function NavMain({ items }: IProps) {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild isActive={isActive(subItem.url)}>
-                            <Link to={subItem.url}>
-                              {showMenuIcons && subItem.icon && <subItem.icon />}
-                              <span className={isActive(subItem.url) ? "font-medium" : ""}>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
+                        <Protected requiredPermission={subItem.permission} key={subItem.title}>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton asChild isActive={isActive(subItem.url)}>
+                              <Link to={subItem.url}>
+                                {showMenuIcons && subItem.icon && <subItem.icon />}
+                                <span className={isActive(subItem.url) ? "font-medium" : ""}>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </Protected>
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
             )
-          ) : (
+          ) : hasRoleAccess(item.role) ? (
             <SidebarMenuItem key={item.title}>
               <Protected requiredPermission={item.permission}>
                 <SidebarMenuButton
@@ -147,7 +159,7 @@ export function NavMain({ items }: IProps) {
                 </SidebarMenuButton>
               </Protected>
             </SidebarMenuItem>
-          ),
+          ) : null,
         )}
       </SidebarMenu>
     </SidebarGroup>
