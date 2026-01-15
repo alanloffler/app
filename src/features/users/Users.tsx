@@ -12,8 +12,10 @@ import { SortableHeader } from "@components/data-table/SortableHeader";
 import type { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
+import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
@@ -22,15 +24,17 @@ import { useSidebar } from "@components/ui/sidebar";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Users() {
-  const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean> | undefined>(undefined);
+  const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const admin = useAuthStore((state) => state.admin);
   const { isLoading: isLoadingUsers, tryCatch: tryCatchAdmins } = useTryCatch();
   const { open: sidebarIsOpen } = useSidebar();
+  const { role } = useParams();
 
   const fetchUsers = useCallback(async () => {
+    const $role = role ? role : "";
     const isSuperAdmin = admin?.role.value === ERoles.SUPER;
-    const serviceByRole = isSuperAdmin ? UsersService.findAllSoftRemoved() : UsersService.findAll();
+    const serviceByRole = isSuperAdmin ? UsersService.findAllSoftRemoved($role) : UsersService.findAll($role);
 
     const [response, error] = await tryCatchAdmins(serviceByRole);
 
@@ -42,7 +46,7 @@ export default function Users() {
     if (response && response.statusCode === 200) {
       setUsers(response.data);
     }
-  }, [admin?.role.value, tryCatchAdmins]);
+  }, [admin?.role.value, role, tryCatchAdmins]);
 
   useEffect(() => {
     fetchUsers();
@@ -200,7 +204,7 @@ export default function Users() {
             </Link>
           </Button>
           {!row.original.deletedAt && (
-            <Protected requiredPermission="users-update">
+            <Protected requiredPermission={`${role}-update` as TPermission}>
               <Button className="px-5! hover:text-green-500" variant="outline" asChild>
                 <Link to={`/users/edit/${row.original.id}`}>
                   <FilePenLine className="h-4 w-4" />
@@ -209,21 +213,21 @@ export default function Users() {
             </Protected>
           )}
           {row.original.deletedAt ? (
-            <Protected requiredPermission="users-restore">
+            <Protected requiredPermission={`${role}-restore` as TPermission}>
               <HoldButton callback={() => restoreUser(row.original.id)} size="icon" type="restore" variant="outline">
                 <RotateCcw className="h-4 w-4" />
               </HoldButton>
             </Protected>
           ) : (
             <>
-              <Protected requiredPermission="users-delete">
+              <Protected requiredPermission={`${role}-delete` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
                   <HoldButton callback={() => removeUser(row.original.id)} size="icon" type="delete" variant="outline">
                     <Trash2 className="h-4 w-4" />
                   </HoldButton>
                 )}
               </Protected>
-              <Protected requiredPermission="users-delete-hard">
+              <Protected requiredPermission={`${role}-delete-hard` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
                   <HoldButton
                     callback={() => hardRemoveUser(row.original.id)}
@@ -245,12 +249,15 @@ export default function Users() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Pacientes" subtitle="Gestioná los pacientes del sistema">
-        <Protected requiredPermission="users-create">
+      <PageHeader
+        title={role === "patient" ? "Pacientes" : "Profesionales"}
+        subtitle={`Gestioná los ${role === "patient" ? "pacientes" : "profesionales"} del sistema`}
+      >
+        <Protected requiredPermission="patient-create">
           <Button variant="default" size="lg" asChild>
             <Link to="/users/create">
               <Plus />
-              Crear paciente
+              Crear usuario
             </Link>
           </Button>
         </Protected>
