@@ -81,8 +81,8 @@ const routes = [
     name: "Configuraciones de notificaciones",
   },
   {
-    path: "/users",
-    name: "Pacientes",
+    path: "/users/:role",
+    name: "Usuarios",
   },
   {
     path: "/users/view/:id",
