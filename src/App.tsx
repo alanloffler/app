@@ -346,22 +346,6 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "users/:role",
-        element: (
-          <Suspense
-            fallback={
-              <div className="relative h-full w-full">
-                <PageLoader className="-mt-8" />
-              </div>
-            }
-          >
-            <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
-              <Users />
-            </ProtectedRoute>
-          </Suspense>
-        ),
-      },
-      {
         path: "users/create",
         element: (
           <Suspense
@@ -373,6 +357,22 @@ const router = createBrowserRouter([
           >
             <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
               <CreateUser />
+            </ProtectedRoute>
+          </Suspense>
+        ),
+      },
+      {
+        path: "users/role/:role",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
+              <Users />
             </ProtectedRoute>
           </Suspense>
         ),
