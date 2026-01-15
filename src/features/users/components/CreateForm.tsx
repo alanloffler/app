@@ -106,9 +106,9 @@ export function CreateForm() {
       return;
     }
 
-    if (create?.statusCode === 201) {
+    if (create && create.data && create.statusCode === 201) {
       toast.success(create.message);
-      navigate("/users");
+      navigate(`/users/${create.data.role.value}`);
     }
   }
 
@@ -138,7 +138,9 @@ export function CreateForm() {
       }
 
       if (roles?.statusCode === 200) {
-        const filteredRoles = roles.data?.filter((role) => role.value === "user");
+        const filteredRoles = roles.data
+          ?.filter((role) => role.value !== "superadmin")
+          .sort((a, b) => a.name.localeCompare(b.name));
         setRoles(filteredRoles);
       }
     }
@@ -148,7 +150,7 @@ export function CreateForm() {
 
   function resetForm(): void {
     form.reset();
-    navigate("/users");
+    navigate(-1);
   }
 
   return (
