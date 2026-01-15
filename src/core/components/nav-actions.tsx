@@ -33,7 +33,7 @@ interface IProps {
 interface INavAction {
   icon: LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
   name: string;
-  permission: TPermission;
+  permission: TPermission | TPermission[];
   url: string;
 }
 
