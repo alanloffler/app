@@ -13,22 +13,14 @@ class AccountModuleService {
     return AccountModuleService.instance;
   }
 
-  public async get(userRole?: string): Promise<IApiResponse<IAdmin>> {
-    let path: string = "/users/profile";
-
-    if (userRole === "superadmin") {
-      path = "/admin/profile";
-    }
-
-    const response = await apiClient.get(path);
+  public async get(): Promise<IApiResponse<IAdmin>> {
+    const response = await apiClient.get("/users/profile");
     return response.data;
   }
 
   public async update(data: Partial<IAdmin>): Promise<IApiResponse<IAdmin>> {
-    console.log(data);
-
-    // const response = await apiClient.patch("/admin/profile", data);
-    // return response.data;
+    const response = await apiClient.patch("/users/profile", data);
+    return response.data;
   }
 }
 
