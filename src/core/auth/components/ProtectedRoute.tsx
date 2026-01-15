@@ -7,11 +7,12 @@ import { useAuthStore } from "@auth/stores/auth.store";
 
 interface IProps {
   children: ReactNode;
+  mode?: "some" | "every";
   redirectTo?: string;
   requiredPermission?: TPermission | TPermission[];
 }
 
-export function ProtectedRoute({ children, redirectTo = "/", requiredPermission }: IProps) {
+export function ProtectedRoute({ children, mode = "every", redirectTo = "/", requiredPermission }: IProps) {
   const admin = useAuthStore((state) => state.admin);
 
   if (!admin) {
@@ -26,9 +27,10 @@ export function ProtectedRoute({ children, redirectTo = "/", requiredPermission 
       ? [requiredPermission]
       : [];
 
-  const hasAllPermissions = required.every((r) => adminPermissions.some((p) => p.permission?.actionKey === r));
+  const hasPermission = (r: TPermission) => adminPermissions.some((p) => p.permission?.actionKey === r);
+  const hasRequiredPermissions = mode === "every" ? required.every(hasPermission) : required.some(hasPermission);
 
-  if (required.length > 0 && !hasAllPermissions) {
+  if (required.length > 0 && !hasRequiredPermissions) {
     return <Navigate to={redirectTo} replace />;
   }
 
