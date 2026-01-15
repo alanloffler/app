@@ -14,10 +14,10 @@ import { Protected } from "@auth/components/Protected";
 
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
+import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
@@ -28,10 +28,21 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 export default function ViewUser() {
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
-  const hasPermissions = usePermission(["users-delete", "users-delete-hard", "users-restore", "users-update"], "some");
+  const location = useLocation();
   const navigate = useNavigate();
+  const userRole = location.state.role;
   const { id } = useParams();
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
+
+  const hasPermissions = usePermission(
+    [
+      `${userRole.value}-delete`,
+      `${userRole.value}-delete-hard`,
+      `${userRole.value}-restore`,
+      `${userRole.value}-update`,
+    ] as TPermission[],
+    "some",
+  );
 
   const findOneUser = useCallback(
     async function (id: string) {
@@ -100,11 +111,11 @@ export default function ViewUser() {
 
   return (
     <section className="flex flex-col gap-6">
-      <PageHeader title="Detalles del paciente" />
+      <PageHeader title={`Detalles del ${userRole.name.toLowerCase()}`} />
       <Card className="relative w-full p-6 text-center md:max-w-100 md:p-10">
         {isLoadingUser ? (
           <div className="flex justify-center">
-            <Loader size={20} text="Cargando paciente" />
+            <Loader size={20} text={`Cargando ${userRole.name.toLowerCase()}`} />
           </div>
         ) : (
           <>
@@ -116,7 +127,7 @@ export default function ViewUser() {
             <CardContent className="flex-1 space-y-6 px-0">
               <ul className="space-y-2">
                 <li className="flex justify-between">
-                  <span className="font-semibold">Paciente</span>
+                  <span className="font-semibold">Usuario</span>
                   <span>{user?.userName}</span>
                 </li>
                 <li className="flex justify-between">
@@ -132,7 +143,9 @@ export default function ViewUser() {
                   <span>{user?.phoneNumber}</span>
                 </li>
               </ul>
-              <CreatedAt>{`Paciente desde el ${user && new Date(user.createdAt.split("T")[0]).toLocaleDateString()}`}</CreatedAt>
+              <CreatedAt>
+                {user && `${user.role.name} desde el ${new Date(user.createdAt.split("T")[0]).toLocaleDateString()}`}
+              </CreatedAt>
             </CardContent>
             <Activity mode={hasPermissions ? "visible" : "hidden"}>
               <CardFooter className="justify-end gap-3 px-0">
@@ -141,7 +154,7 @@ export default function ViewUser() {
                     <Badge size="small" variant="red">
                       Eliminado
                     </Badge>
-                    <Protected requiredPermission="users-restore">
+                    <Protected requiredPermission={`${userRole.value}-restore` as TPermission}>
                       <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
                         <RotateCcw className="h-4 w-4" />
                       </HoldButton>
@@ -149,19 +162,19 @@ export default function ViewUser() {
                   </div>
                 ) : (
                   <>
-                    <Protected requiredPermission="users-update">
+                    <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
                       <Button className="px-5! hover:text-green-500" variant="outline" asChild>
                         <Link to={`/users/edit/${id}`}>
                           <FilePenLine className="h-4 w-4" />
                         </Link>
                       </Button>
                     </Protected>
-                    <Protected requiredPermission="users-delete">
+                    <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
                       <HoldButton callback={() => id && removeUser(id)} size="icon" type="delete" variant="outline">
                         <Trash2 className="h-4 w-4" />
                       </HoldButton>
                     </Protected>
-                    <Protected requiredPermission="users-delete-hard">
+                    <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
                       <HoldButton
                         callback={() => id && hardRemoveUser(id)}
                         size="icon"
