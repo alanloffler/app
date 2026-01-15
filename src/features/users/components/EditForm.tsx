@@ -419,13 +419,14 @@ export function EditForm({ userId }: IProps) {
                 <Field data-invalid={fieldState.invalid} className="col-span-1">
                   <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
                   <Input
-                    aria-invalid={fieldState.invalid}
                     {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="phone"
+                    maxLength={11}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
                       field.onChange(value);
                     }}
-                    id="phone"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
