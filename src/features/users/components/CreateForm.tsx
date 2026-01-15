@@ -137,10 +137,8 @@ export function CreateForm() {
         return;
       }
 
-      if (roles?.statusCode === 200) {
-        const filteredRoles = roles.data
-          ?.filter((role) => role.value !== "superadmin")
-          .sort((a, b) => a.name.localeCompare(b.name));
+      if (roles && roles.statusCode === 200 && roles.data) {
+        const filteredRoles = roles.data.filter((role) => role.value !== "superadmin");
         setRoles(filteredRoles);
       }
     }
