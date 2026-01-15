@@ -18,13 +18,13 @@ class UsersModuleService {
     return response.data;
   }
 
-  public async findAll(): Promise<IApiResponse<IUser[]>> {
-    const response = await apiClient.get("/users");
+  public async findAll(role: string): Promise<IApiResponse<IUser[]>> {
+    const response = await apiClient.get(`/users/${role}`);
     return response.data;
   }
 
-  public async findAllSoftRemoved(): Promise<IApiResponse<IUser[]>> {
-    const response = await apiClient.get("/users/soft-removed");
+  public async findAllSoftRemoved(role: string): Promise<IApiResponse<IUser[]>> {
+    const response = await apiClient.get(`/users/soft-removed/${role}`);
     return response.data;
   }
 
