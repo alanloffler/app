@@ -19,12 +19,12 @@ class UsersModuleService {
   }
 
   public async findAll(role: string): Promise<IApiResponse<IUser[]>> {
-    const response = await apiClient.get(`/users/${role}`);
+    const response = await apiClient.get(`/users/role/${role}`);
     return response.data;
   }
 
   public async findAllSoftRemoved(role: string): Promise<IApiResponse<IUser[]>> {
-    const response = await apiClient.get(`/users/soft-removed/${role}`);
+    const response = await apiClient.get(`/users/all-soft-remove/${role}`);
     return response.data;
   }
 
@@ -34,12 +34,12 @@ class UsersModuleService {
   }
 
   public async findOneSoftRemoved(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.get(`/users/${id}/soft-removed`);
+    const response = await apiClient.get(`/users/soft-remove/${id}`);
     return response.data;
   }
 
   public async findOneWithCredentials(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.get(`/users/${id}/credentials`);
+    const response = await apiClient.get(`/users/credential/${id}`);
     return response.data;
   }
 
@@ -64,17 +64,17 @@ class UsersModuleService {
   }
 
   public async checkEmailAvailability(email: string): Promise<IApiResponse<boolean>> {
-    const response = await apiClient.get(`/users/email-availability/${email}`);
+    const response = await apiClient.get(`/users/check/email/${email}`);
     return response.data;
   }
 
   public async checkIcAvailability(id: string): Promise<IApiResponse<boolean>> {
-    const response = await apiClient.get(`/users/ic-availability/${id}`);
+    const response = await apiClient.get(`/users/check/ic/${id}`);
     return response.data;
   }
 
   public async checkUsernameAvailability(username: string): Promise<IApiResponse<boolean>> {
-    const response = await apiClient.get(`/users/username-availability/${username}`);
+    const response = await apiClient.get(`/users/check/username/${username}`);
     return response.data;
   }
 }
