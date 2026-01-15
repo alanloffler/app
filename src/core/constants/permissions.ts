@@ -30,7 +30,7 @@ export const PERMISSIONS = [
   },
   {
     name: "Pacientes",
-    value: "patients",
+    value: "patient",
     actions: [
       { name: "Crear", value: "patient-create" },
       { name: "Editar", value: "patient-update" },
@@ -39,7 +39,6 @@ export const PERMISSIONS = [
       { name: "Eliminar permanente", value: "patient-delete-hard" },
       { name: "Restaurar", value: "patient-restore" },
       { name: "Ver", value: "patient-view" },
-      { name: "Ver todos", value: "patient-view" },
     ],
   },
   {
@@ -57,7 +56,7 @@ export const PERMISSIONS = [
   },
   {
     name: "Profesionales",
-    value: "professionals",
+    value: "professional",
     actions: [
       { name: "Crear", value: "professional-create" },
       { name: "Editar", value: "professional-update" },
