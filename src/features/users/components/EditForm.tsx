@@ -13,11 +13,12 @@ import z from "zod";
 import { toast } from "sonner";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { IRole } from "@roles/interfaces/role.interface";
 import type { IUser } from "@users/interfaces/user.interface";
+import type { TPermission } from "@permissions/interfaces/permission.type";
 import { RolesService } from "@roles/services/roles.service";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
@@ -40,14 +41,17 @@ export function EditForm({ userId }: IProps) {
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const admin = useAuthStore((state) => state.admin);
-  const canUpdatePassword = usePermission("users-update-password");
+  const location = useLocation();
   const navigate = useNavigate();
   const refreshAdmin = useAuthStore((state) => state.refreshAdmin);
-  const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
+  const userRole = location.state.role;
   const { isLoading: isLoadingRoles, tryCatch: tryCatchRoles } = useTryCatch();
+  const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isSaving, tryCatch: tryCatchSubmit } = useTryCatch();
 
   const debouncedUsername = useDebounce(username, 500);
+
+  const canUpdatePassword = usePermission(`${userRole.value}-update-password` as TPermission);
 
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
@@ -73,7 +77,7 @@ export function EditForm({ userId }: IProps) {
     }
 
     if (roles && roles.statusCode === 200) {
-      const filteredRoles = roles.data?.filter((role) => role.value === "user");
+      const filteredRoles = roles.data?.filter((role) => role.value !== "superadmin");
       setRoles(filteredRoles);
     }
   }, [form.control, tryCatchRoles]);
@@ -217,8 +221,8 @@ export function EditForm({ userId }: IProps) {
     <Card className="relative">
       <BackButton />
       <CardHeader>
-        <CardTitle>Editar Paciente</CardTitle>
-        <CardDescription>Actualizá los datos del paciente</CardDescription>
+        <CardTitle>{`Editar ${userRole.name}`}</CardTitle>
+        <CardDescription>{`Actualizá los datos del ${userRole.name.toLowerCase()}`}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <form className="grid grid-cols-1 gap-6" id="edit-form" onSubmit={form.handleSubmit(onSubmit)}>
