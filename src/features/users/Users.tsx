@@ -199,7 +199,7 @@ export default function Users() {
       cell: ({ row }) => (
         <div className="flex justify-end gap-2">
           <Button className="px-5! hover:text-sky-500" variant="outline" asChild>
-            <Link to={`/users/view/${row.original.id}`}>
+            <Link to={`/users/view/${row.original.id}`} state={{ role: row.original.role }}>
               <Eye className="h-4 w-4" />
             </Link>
           </Button>
