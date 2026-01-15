@@ -355,7 +355,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission={["patient-view", "professional-view"]} mode="some">
+            <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
               <Users />
             </ProtectedRoute>
           </Suspense>
@@ -371,7 +371,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission={["patient-create", "professional-create"]} mode="some">
+            <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
               <CreateUser />
             </ProtectedRoute>
           </Suspense>
@@ -403,7 +403,7 @@ const router = createBrowserRouter([
               </div>
             }
           >
-            <ProtectedRoute requiredPermission="users-view">
+            <ProtectedRoute requiredPermission={["admin-view", "patient-view", "professional-view"]} mode="some">
               <ViewUser />
             </ProtectedRoute>
           </Suspense>
