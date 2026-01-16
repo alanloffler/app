@@ -5,6 +5,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field"
 import { HourGrid } from "@calendar/components/HourGrid";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
+import { ScrollArea } from "@components/ui/scroll-area";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@components/ui/sheet";
 import { UserCombobox } from "@calendar/components/UserCombobox";
 
@@ -108,111 +109,117 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
           <SheetDescription className="text-base">Formulario para la edición del turno seleccionado</SheetDescription>
           <SheetClose ref={closeRef} />
         </SheetHeader>
-        <form className="flex min-h-0 flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className="grid grid-cols-3 gap-6">
-            <Controller
-              name="title"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="col-span-2">
-                  <FieldLabel htmlFor="title">Título del turno</FieldLabel>
-                  <Input aria-invalid={fieldState.invalid} id="title" {...field} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid grid-cols-3 gap-6">
-            <Controller
-              name="userId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="col-span-3" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="userId">Usuario</FieldLabel>
-                  <UserCombobox
-                    aria-invalid={fieldState.invalid}
-                    id="userId"
-                    onChange={field.onChange}
-                    value={field.value}
-                    width="w-[240px]!"
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup>
-            <Controller
-              name="startDate"
-              control={form.control}
-              render={({ field, fieldState }) => {
-                const hasDate = Boolean(field.value);
-                const hasValidHour =
-                  hasDate &&
-                  (() => {
-                    const date = new Date(field.value);
-                    return date.getHours() !== 0 || date.getMinutes() !== 0;
-                  })();
-                const isDateInvalid = fieldState.invalid && !hasDate;
-                const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
+        <ScrollArea
+          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 min-h-0 flex-1"
+          color="blue"
+          type="auto"
+        >
+          <form className="flex min-h-0 flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup className="grid grid-cols-3 gap-6">
+              <Controller
+                name="title"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid} className="col-span-2">
+                    <FieldLabel htmlFor="title">Título del turno</FieldLabel>
+                    <Input aria-invalid={fieldState.invalid} id="title" {...field} />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup className="grid grid-cols-3 gap-6">
+              <Controller
+                name="userId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-3" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="userId">Usuario</FieldLabel>
+                    <UserCombobox
+                      aria-invalid={fieldState.invalid}
+                      id="userId"
+                      onChange={field.onChange}
+                      value={field.value}
+                      width="w-[240px]!"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <Controller
+                name="startDate"
+                control={form.control}
+                render={({ field, fieldState }) => {
+                  const hasDate = Boolean(field.value);
+                  const hasValidHour =
+                    hasDate &&
+                    (() => {
+                      const date = new Date(field.value);
+                      return date.getHours() !== 0 || date.getMinutes() !== 0;
+                    })();
+                  const isDateInvalid = fieldState.invalid && !hasDate;
+                  const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
 
-                return (
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:grid-rows-1">
-                    <Field
-                      className="md:col-span-3"
-                      data-invalid={isDateInvalid}
-                      style={{ position: "relative", zIndex: 2 }}
-                    >
-                      <FieldLabel htmlFor="date">Fecha</FieldLabel>
-                      <div className="flex-1">
-                        <Calendar
-                          aria-invalid={isDateInvalid}
-                          className="aspect-square h-fit w-full"
-                          disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
-                          id="date"
-                          locale={es}
-                          mode="single"
-                          month={month}
-                          onMonthChange={setMonth}
-                          onSelect={(date) => {
-                            field.onChange(date ? format(date, "yyyy-MM-dd'T'00:00:00XXX") : "");
-                          }}
-                          selected={field.value ? parseISO(field.value) : undefined}
-                        />
-                        {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
-                      </div>
-                    </Field>
-                    <Field
-                      className="md:col-span-2"
-                      data-invalid={isHourInvalid}
-                      style={{ position: "relative", zIndex: 1 }}
-                    >
-                      <FieldLabel>Horario</FieldLabel>
-                      <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
-                      {isHourInvalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  </div>
-                );
-              }}
-            />
-          </FieldGroup>
-          <div className="flex justify-end gap-4 pt-8">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                form.clearErrors();
-                if (event) form.reset(getEventFormValues(event));
-                setOpen(false);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
-              {isUpdating ? <Loader color="white" text="Guardando" /> : "Guardar"}
-            </Button>
-          </div>
-        </form>
+                  return (
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:grid-rows-1">
+                      <Field
+                        className="md:col-span-3"
+                        data-invalid={isDateInvalid}
+                        style={{ position: "relative", zIndex: 2 }}
+                      >
+                        <FieldLabel htmlFor="date">Fecha</FieldLabel>
+                        <div className="flex-1">
+                          <Calendar
+                            aria-invalid={isDateInvalid}
+                            className="aspect-square h-fit w-full"
+                            disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                            id="date"
+                            locale={es}
+                            mode="single"
+                            month={month}
+                            onMonthChange={setMonth}
+                            onSelect={(date) => {
+                              field.onChange(date ? format(date, "yyyy-MM-dd'T'00:00:00XXX") : "");
+                            }}
+                            selected={field.value ? parseISO(field.value) : undefined}
+                          />
+                          {isDateInvalid && <FieldError errors={[{ message: "Debe seleccionar una fecha" }]} />}
+                        </div>
+                      </Field>
+                      <Field
+                        className="md:col-span-2"
+                        data-invalid={isHourInvalid}
+                        style={{ position: "relative", zIndex: 1 }}
+                      >
+                        <FieldLabel>Horario</FieldLabel>
+                        <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
+                        {isHourInvalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    </div>
+                  );
+                }}
+              />
+            </FieldGroup>
+            <div className="flex justify-end gap-4 pt-8">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  form.clearErrors();
+                  if (event) form.reset(getEventFormValues(event));
+                  setOpen(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
+                {isUpdating ? <Loader color="white" text="Guardando" /> : "Guardar"}
+              </Button>
+            </div>
+          </form>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
