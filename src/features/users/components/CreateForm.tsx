@@ -108,7 +108,7 @@ export function CreateForm() {
 
     if (create && create.data && create.statusCode === 201) {
       toast.success(create.message);
-      navigate(`/users/${create.data.role.value}`);
+      navigate(`/users/role/${create.data.role.value}`);
     }
   }
 
