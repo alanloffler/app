@@ -96,7 +96,7 @@ export function EditForm() {
     }
 
     findOneWithCredentials();
-  }, [form, ownAdmin, tryCatchAdmin]);
+  }, [form, navigate, ownAdmin, tryCatchAdmin]);
 
   function togglePasswordField(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
@@ -168,6 +168,7 @@ export function EditForm() {
     if (update?.statusCode === 200) {
       toast.success("Perfil actualizado");
       await refreshAdmin();
+      navigate("/");
     }
   }
 
@@ -351,13 +352,14 @@ export function EditForm() {
                 <Field data-invalid={fieldState.invalid} className="col-span-5 md:col-span-2">
                   <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
                   <Input
-                    aria-invalid={fieldState.invalid}
                     {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="phone"
+                    maxLength={11}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
                       field.onChange(value);
                     }}
-                    id="phone"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
