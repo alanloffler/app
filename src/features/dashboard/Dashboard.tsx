@@ -1,10 +1,13 @@
 import { KeyRound, LayoutDashboard, Package, Shield, ShieldPlus, UserRoundPlus, UsersRound } from "lucide-react";
 
 import { ActionCard } from "@dashboard/components/ActionCard";
+import { Button } from "@components/ui/button";
 import { Card } from "@components/ui/card";
 import { ConfigButton } from "@dashboard/components/ConfigButton";
 import { KeyRoundPlus } from "@components/icons/KeyRoundPlus";
+import { Link } from "react-router";
 import { PageHeader } from "@components/pages/PageHeader";
+import { Protected } from "@auth/components/Protected";
 
 import { useAuthStore } from "@auth/stores/auth.store";
 import { usePermission } from "@permissions/hooks/usePermission";
@@ -34,20 +37,39 @@ export default function Dashboard() {
       <PageHeader title="Panel de control" subtitle="Administra tu aplicación" />
       <div className="flex flex-col gap-8">
         {showAdmin && (
-          <div className="grid grid-cols-4 gap-8 lg:grid-cols-6 xl:grid-cols-8">
+          <div className="grid grid-cols-4 items-center gap-8 lg:grid-cols-6 xl:grid-cols-8">
             <ActionCard
               asCard={showLinksAsCard}
               icon={UsersRound}
-              permission="admin-view"
-              text="Administradores"
-              url="/admin"
-            />
+              permission={["admin-view", "patient-view", "professional-view"]}
+              permissionMode="some"
+              text="Usuarios"
+            >
+              <div className={showLinksAsCard ? "grid grid-cols-2 gap-3" : "flex flex-col gap-0"}>
+                <Protected requiredPermission="admin-view">
+                  <Button asChild size="xs" variant={showLinksAsCard ? "outline" : "link"}>
+                    <Link to="/users/role/admin">Administradores</Link>
+                  </Button>
+                </Protected>
+                <Protected requiredPermission="patient-view">
+                  <Button asChild size="xs" variant={showLinksAsCard ? "outline" : "link"}>
+                    <Link to="/users/role/patient">Pacientes</Link>
+                  </Button>
+                </Protected>
+                <Protected requiredPermission="professional-view">
+                  <Button asChild size="xs" variant={showLinksAsCard ? "outline" : "link"}>
+                    <Link to="/users/role/professional">Profesionales</Link>
+                  </Button>
+                </Protected>
+              </div>
+            </ActionCard>
             <ActionCard
               asCard={showLinksAsCard}
               icon={UserRoundPlus}
-              permission="admin-create"
-              text="Crear Administrador"
-              url="/admin/create"
+              permission={["admin-create", "patient-create", "professional-create"]}
+              permissionMode="some"
+              text="Crear usuario"
+              url="/users/create"
             />
           </div>
         )}
@@ -81,15 +103,18 @@ export default function Dashboard() {
             />
           </div>
         )}
-        {showConfigButtons && showPermissions && (
+        {showConfigButtons && (
           <div className="flex flex-col gap-3">
             <h1 className="font-semibold">Configuraciones</h1>
             <ul className="flex gap-3 pl-5">
               <li>
-                <ConfigButton icon={Package} text="Aplicación" url="/app-settings" />
+                <ConfigButton icon={Package} text="Aplicación" url="/settings/app" />
               </li>
               <li>
-                <ConfigButton icon={LayoutDashboard} text="Tablero" url="/dashboard-settings" />
+                <ConfigButton icon={LayoutDashboard} text="Notificaciones" url="/settings/notifications" />
+              </li>
+              <li>
+                <ConfigButton icon={LayoutDashboard} text="Tablero" url="/settings/dashboard" />
               </li>
             </ul>
           </div>
