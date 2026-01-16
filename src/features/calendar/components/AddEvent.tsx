@@ -90,17 +90,17 @@ export function AddEvent({ onCreateEvent }: IProps) {
         </SheetTrigger>
       </Protected>
       <SheetContent className="sm:min-w-[620px]">
+        <SheetHeader className="pt-8">
+          <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
+          <SheetDescription className="text-base">
+            Completá el formulario para agregar un turno a la agenda
+          </SheetDescription>
+        </SheetHeader>
         <ScrollArea
-          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 h-dvh sm:h-full sm:w-full"
+          className="**:data-[slot='scroll-area-thumb']:bg-primary **:data-[slot='scroll-area-scrollbar']:bg-primary/20 min-h-0 flex-1"
           color="blue"
           type="auto"
         >
-          <SheetHeader className="shrink-0 pt-8">
-            <SheetTitle className="text-lg">Agregar turno a la agenda</SheetTitle>
-            <SheetDescription className="text-base">
-              Completá el formulario para agregar un turno a la agenda
-            </SheetDescription>
-          </SheetHeader>
           <form className="flex min-h-0 flex-col gap-6 p-4" id="create-event" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="grid grid-cols-3 gap-6">
               <Controller
