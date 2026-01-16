@@ -26,7 +26,7 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
   const { isLoading, tryCatch } = useTryCatch();
 
   const findUsers = useCallback(async () => {
-    const [response, error] = await tryCatch(UsersService.findAll());
+    const [response, error] = await tryCatch(UsersService.findAll("patient"));
 
     if (error) {
       setError("Error");
