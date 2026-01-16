@@ -207,7 +207,7 @@ export function EditForm({ userId }: IProps) {
         refreshAdmin();
       }
       toast.success(update.message);
-      navigate("/users");
+      navigate(`/users/role/${userRole.value}`);
     }
   }
 
