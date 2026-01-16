@@ -5,7 +5,6 @@ import {
   KeyRound,
   LayoutDashboard,
   Megaphone,
-  OctagonAlert,
   Package,
   Settings,
   Shield,
@@ -134,12 +133,6 @@ const data = {
       url: "/permissions/create",
       icon: KeyRoundPlus,
       permission: "permissions-create" as TPermission,
-    },
-    {
-      name: "404",
-      url: "/404",
-      icon: OctagonAlert,
-      permission: "*" as TPermission,
     },
   ],
 };
