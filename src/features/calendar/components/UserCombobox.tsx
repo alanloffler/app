@@ -70,9 +70,13 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("p-0", width ? width : "w-full")}>
+      <PopoverContent
+        className={cn("p-0", width ? width : "w-full")}
+        onTouchMove={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
         <Command>
-          <CommandInput placeholder="" className="h-9" />
+          <CommandInput className="h-9" />
           <CommandList>
             <CommandEmpty>Sin resultados</CommandEmpty>
             <CommandGroup>
