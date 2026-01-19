@@ -9,6 +9,7 @@ import {
   Settings,
   Shield,
   ShieldPlus,
+  Store,
   User2,
   UserPlus2,
   Users2,
@@ -87,6 +88,13 @@ const data = {
       url: "/permissions",
       icon: KeyRound,
       permission: "permissions-view" as TPermission,
+    },
+    // TODO: set permission
+    {
+      title: "Tu negocio",
+      url: "/business",
+      icon: Store,
+      permission: "*" as TPermission,
     },
     {
       title: "Configuraciones",
