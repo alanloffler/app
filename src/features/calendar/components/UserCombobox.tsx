@@ -13,20 +13,28 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
   "aria-invalid"?: boolean;
-  width?: string;
   id?: string;
   onChange?: (value: string) => void;
+  userType?: "patient" | "professional";
   value?: string;
+  width?: string;
 }
 
-export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange, value = "" }: IProps) {
+export function UserCombobox({
+  "aria-invalid": ariaInvalid,
+  id,
+  onChange,
+  userType = "patient",
+  value = "",
+  width,
+}: IProps) {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const { isLoading, tryCatch } = useTryCatch();
 
   const findUsers = useCallback(async () => {
-    const [response, error] = await tryCatch(UsersService.findAll("patient"));
+    const [response, error] = await tryCatch(UsersService.findAll(userType));
 
     if (error) {
       setError("Error");
@@ -35,7 +43,7 @@ export function UserCombobox({ "aria-invalid": ariaInvalid, width, id, onChange,
     if (response && response?.statusCode === 200) {
       setUsers(response?.data);
     }
-  }, [tryCatch]);
+  }, [tryCatch, userType]);
 
   function getSelectedUser(value: string): string {
     const user = users?.find((user) => user.id === value);
