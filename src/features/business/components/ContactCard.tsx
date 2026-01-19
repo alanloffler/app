@@ -1,0 +1,56 @@
+import { Download } from "lucide-react";
+
+import { Button } from "@components/ui/button";
+import { Card, CardContent } from "@components/ui/card";
+
+import type { IBusiness } from "@business/interfaces/business.interface";
+
+interface IProps {
+  business: IBusiness;
+  className?: string;
+}
+
+export function ContactCard({ business, className }: IProps) {
+  return (
+    <Card className={className}>
+      <CardContent className="flex flex-1 flex-col gap-4">
+        <h1 className="text-lg font-semibold">Contacto</h1>
+        <div className="flex">
+          <ul className="flex flex-col gap-1">
+            <li className="flex justify-start gap-3">
+              <h3 className="font-medium">Email:</h3>
+              <span>{business.email}</span>
+            </li>
+            <li className="flex justify-start gap-3">
+              <h3 className="font-medium">Teléfono:</h3>
+              <span>{business.phoneNumber}</span>
+            </li>
+            {business.whatsAppNumber && (
+              <li className="flex justify-start gap-3">
+                <h3 className="font-medium">WhatsApp:</h3>
+                <span>{business.whatsAppNumber}</span>
+              </li>
+            )}
+            <li className="flex justify-start gap-3">
+              <h3 className="font-medium">Dirección:</h3>
+              <span>{`${business.street}, ${business.city}, ${business.province}, ${business.zipCode}`}</span>
+            </li>
+            {business.website && (
+              <li className="flex justify-start gap-3">
+                <h3 className="font-medium">Página web:</h3>
+                <span>{business.website}</span>
+              </li>
+            )}
+          </ul>
+          <div className="flex flex-1 flex-col items-center justify-center gap-2">
+            <div className="flex size-30 items-center justify-center bg-gray-100">QR Code</div>
+            <Button size="sm" variant="outline">
+              <Download />
+              Descargar
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
