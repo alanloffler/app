@@ -44,6 +44,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
+      professionalId: "",
       startDate: format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"),
       title: "",
       userId: "",
@@ -57,8 +58,6 @@ export function AddEvent({ onCreateEvent }: IProps) {
     const transformedData = {
       ...data,
       endDate: format(endDate, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-      // TODO: handle professional with entity (todo at backend)
-      professionalId: "d501e1ec-3861-449b-8a5e-55ad03e33053",
     };
 
     const [response, error] = await tryCatchCreateEvent(CalendarService.create(transformedData));
@@ -107,7 +106,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                 name="title"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="col-span-2">
+                  <Field data-invalid={fieldState.invalid} className="col-span-3 md:col-span-2">
                     <FieldLabel htmlFor="title">Título del turno</FieldLabel>
                     <Input aria-invalid={fieldState.invalid} id="title" {...field} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -115,19 +114,37 @@ export function AddEvent({ onCreateEvent }: IProps) {
                 )}
               />
             </FieldGroup>
-            <FieldGroup className="grid grid-cols-3 gap-6">
+            <FieldGroup className="grid grid-cols-6 gap-6">
+              <Controller
+                name="professionalId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="professionalId">Profesional</FieldLabel>
+                    <UserCombobox
+                      aria-invalid={fieldState.invalid}
+                      id="professionalId"
+                      onChange={field.onChange}
+                      userType="professional"
+                      value={field.value}
+                      width="w-full md:w-60!"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
               <Controller
                 name="userId"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field className="col-span-3" data-invalid={fieldState.invalid}>
+                  <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="userId">Usuario</FieldLabel>
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
                       onChange={field.onChange}
                       value={field.value}
-                      width="w-[240px]!"
+                      width="w-full md:w-60!"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
