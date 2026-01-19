@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const eventSchema = z.object({
+  professionalId: z.uuid("Formato de UUID inválido").nonempty("El profesional es obligatorio"),
   startDate: z
     .string()
     .nonempty("La fecha y horario son obligatorios")
