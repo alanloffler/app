@@ -22,6 +22,7 @@ export default defineConfig({
       "@account": path.resolve(__dirname, "./src/features/account"),
       "@admin": path.resolve(__dirname, "./src/features/admin"),
       "@auth": path.resolve(__dirname, "./src/core/auth"),
+      "@business": path.resolve(__dirname, "./src/features/business"),
       "@calendar": path.resolve(__dirname, "./src/features/calendar"),
       "@components": path.resolve(__dirname, "./src/core/components"),
       "@dashboard": path.resolve(__dirname, "./src/features/dashboard"),
