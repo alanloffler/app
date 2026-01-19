@@ -12,6 +12,7 @@ import { UserLogin } from "@login/UserLogin";
 
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard"));
 
+const Business = lazy(() => import("./features/business/Business"));
 const Calendar = lazy(() => import("./features/calendar/Calendar"));
 
 const Admin = lazy(() => import("./features/admin/Admin"));
@@ -63,6 +64,20 @@ const router = createBrowserRouter([
     path: "/",
     element: <ProtectedLayout />,
     children: [
+      {
+        path: "business",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            <Business />
+          </Suspense>
+        ),
+      },
       {
         path: "dashboard",
         element: (
