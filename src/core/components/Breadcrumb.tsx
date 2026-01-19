@@ -36,6 +36,13 @@ interface ResolvedCrumb {
 
 const BREADCRUMB_ROUTES: BreadcrumbRoute[] = [
   {
+    path: "/business",
+    paths: [
+      { label: "Inicio", url: "/dashboard" },
+      { label: "Tu negocio", url: null },
+    ],
+  },
+  {
     path: "/dashboard",
     paths: [{ label: "Inicio", url: null }],
   },
