@@ -15,6 +15,7 @@
       "@account/*": ["./src/features/account/*"],
       "@admin/*": ["./src/features/admin/*"],
       "@auth/*": ["./src/core/auth/*"],
+      "@business/*": ["./src/features/business/*"],
       "@calendar/*": ["./src/features/calendar/*"],
       "@components/*": ["./src/core/components/*"],
       "@core/*": ["./src/core/*"],
