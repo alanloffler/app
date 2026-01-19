@@ -39,6 +39,7 @@ interface IProps {
 
 function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> {
   return {
+    professionalId: event.professionalId,
     startDate: format(
       typeof event.startDate === "string" ? parseISO(event.startDate) : event.startDate,
       "yyyy-MM-dd'T'HH:mm:ssXXX",
@@ -56,6 +57,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
+      professionalId: "",
       startDate: "",
       title: "",
       userId: "",
@@ -77,8 +79,6 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
     const transformedData = {
       ...data,
       endDate: format(endDate, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-      // TODO: handle professional with entity (todo at backend)
-      professionalId: "d501e1ec-3861-449b-8a5e-55ad03e33053",
     };
 
     const [response, error] = await tryCatchUpdateEvent(CalendarService.update(event.id, transformedData));
@@ -128,7 +128,25 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                 )}
               />
             </FieldGroup>
-            <FieldGroup className="grid grid-cols-3 gap-6">
+            <FieldGroup className="grid grid-cols-6 gap-6">
+              <Controller
+                name="professionalId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="professionalId">Profesional</FieldLabel>
+                    <UserCombobox
+                      aria-invalid={fieldState.invalid}
+                      id="professionalId"
+                      onChange={field.onChange}
+                      userType="professional"
+                      value={field.value}
+                      width="w-full md:w-60!"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
               <Controller
                 name="userId"
                 control={form.control}
@@ -140,7 +158,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                       id="userId"
                       onChange={field.onChange}
                       value={field.value}
-                      width="w-[240px]!"
+                      width="w-full md:w-60!"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
