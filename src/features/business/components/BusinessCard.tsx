@@ -18,7 +18,7 @@ export function BusinessCard({ business, className }: IProps) {
             <span>{business.companyName}</span>
           </li>
           <li className="flex justify-start gap-3">
-            <h3 className="font-medium">CUIT</h3>
+            <h3 className="font-medium">CUIT:</h3>
             <span>{business.taxId}</span>
           </li>
           <li className="flex justify-start gap-3">
