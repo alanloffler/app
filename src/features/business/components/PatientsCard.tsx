@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
+import { useNavigate } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
 
@@ -14,6 +15,8 @@ interface IProps {
 }
 
 export function PatientsCard({ patients, className }: IProps) {
+  const navigate = useNavigate();
+
   return (
     <Card className={className}>
       <CardContent className="flex flex-1 flex-col gap-4">
@@ -34,7 +37,11 @@ export function PatientsCard({ patients, className }: IProps) {
           </TableHeader>
           <TableBody>
             {patients.map((patient) => (
-              <TableRow key={patient.id}>
+              <TableRow
+                className="cursor-pointer hover:bg-gray-50"
+                key={patient.id}
+                onClick={() => navigate(`/users/view/${patient.id}`, { state: { role: patient.role } })}
+              >
                 <TableCell className="font-medium">{patient.id.slice(0, 4)}</TableCell>
                 <TableCell>{`${patient.firstName} ${patient.lastName}`}</TableCell>
                 <TableCell>{patient.email}</TableCell>
