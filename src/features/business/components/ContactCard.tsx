@@ -4,6 +4,7 @@ import { Button } from "@components/ui/button";
 import { Card, CardContent } from "@components/ui/card";
 
 import type { IBusiness } from "@business/interfaces/business.interface";
+import { formatPhone } from "@core/formatters/phone.formatter";
 
 interface IProps {
   business: IBusiness;
@@ -23,12 +24,12 @@ export function ContactCard({ business, className }: IProps) {
             </li>
             <li className="flex justify-start gap-3">
               <h3 className="font-medium">Teléfono:</h3>
-              <span>{business.phoneNumber}</span>
+              <span>{formatPhone(business.phoneNumber)}</span>
             </li>
             {business.whatsAppNumber && (
               <li className="flex justify-start gap-3">
                 <h3 className="font-medium">WhatsApp:</h3>
-                <span>{business.whatsAppNumber}</span>
+                <span>{formatPhone(business.whatsAppNumber)}</span>
               </li>
             )}
             <li className="flex justify-start gap-3">
