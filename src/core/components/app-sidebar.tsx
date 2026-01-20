@@ -102,6 +102,12 @@ const data = {
       icon: Settings,
       items: [
         {
+          title: "Tu negocio",
+          url: "/settings/business",
+          icon: Store,
+          permission: "*" as TPermission,
+        },
+        {
           title: "Aplicación",
           url: "/settings/app",
           icon: Package,
