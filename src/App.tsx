@@ -31,6 +31,7 @@ const EditPermission = lazy(() => import("./features/permissions/views/EditPermi
 const ViewPermission = lazy(() => import("./features/permissions/views/ViewPermission"));
 
 const AppSettings = lazy(() => import("./features/settings/AppSettings"));
+const BusinessSettings = lazy(() => import("./features/settings/BusinessSettings"));
 const DashboardSettings = lazy(() => import("./features/settings/DashboardSettings"));
 const NotificationsSettings = lazy(() => import("./features/settings/NotificationsSettings"));
 
@@ -295,6 +296,23 @@ const router = createBrowserRouter([
             <ProtectedRoute requiredPermission="permissions-view">
               <ViewPermission />
             </ProtectedRoute>
+          </Suspense>
+        ),
+      },
+      {
+        path: "settings/business",
+        element: (
+          <Suspense
+            fallback={
+              <div className="relative h-full w-full">
+                <PageLoader className="-mt-8" />
+              </div>
+            }
+          >
+            {/* TODO: set permissions */}
+            {/* <ProtectedRoute requiredPermission=""> */}
+            <BusinessSettings />
+            {/* </ProtectedRoute> */}
           </Suspense>
         ),
       },
