@@ -15,7 +15,7 @@ export function ContactCard({ business, className }: IProps) {
     <Card className={className}>
       <CardContent className="flex flex-1 flex-col gap-4">
         <h1 className="text-lg font-semibold">Contacto</h1>
-        <div className="flex">
+        <div className="flex gap-4">
           <ul className="flex flex-col gap-1">
             <li className="flex justify-start gap-3">
               <h3 className="font-medium">Email:</h3>
