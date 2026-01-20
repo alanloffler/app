@@ -19,7 +19,7 @@ export default function Business() {
   const { tryCatch: tryCatchBusiness } = useTryCatch();
 
   const fetchBusiness = useCallback(async () => {
-    const [response, error] = await tryCatchBusiness(BusinessService.findOne("b964cfeb-d53a-4965-a412-fbf104b24f2c"));
+    const [response, error] = await tryCatchBusiness(BusinessService.findOne());
 
     if (error) {
       toast.error(error.message);
@@ -28,7 +28,6 @@ export default function Business() {
 
     if (response && response.statusCode === 200 && response.data) {
       setBusiness(response.data);
-      console.log(response.data);
     }
   }, [tryCatchBusiness]);
 
