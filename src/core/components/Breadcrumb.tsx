@@ -164,6 +164,14 @@ const BREADCRUMB_ROUTES: BreadcrumbRoute[] = [
     ],
   },
   {
+    path: "/settings/business",
+    paths: [
+      { label: "Inicio", url: "/dashboard" },
+      { label: "Configuraciones", url: null },
+      { label: "Tu negocio", url: null },
+    ],
+  },
+  {
     path: "/settings/notifications",
     paths: [
       { label: "Inicio", url: "/dashboard" },
