@@ -41,10 +41,7 @@ export default function Business() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader
-        title="Tu negocio"
-        subtitle="Administrá la información de tu negocio para que se refleje en los comprobantes y documentos oficiales."
-      />
+      <PageHeader title="Tu negocio" subtitle="Toda la información de tu negocio" />
       <div className={cn("grid grid-cols-1 gap-8", sidebarIsOpen ? "md:grid-cols-1 lg:grid-cols-8" : "md:grid-cols-8")}>
         <BusinessCard
           className={cn("col-span-1", sidebarIsOpen ? "md:col-span-1 lg:col-span-4" : "md:col-span-4")}
