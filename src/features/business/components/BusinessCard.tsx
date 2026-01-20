@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@components/ui/card";
 
 import type { IBusiness } from "@business/interfaces/business.interface";
+import { formatTaxId } from "@core/formatters/tax-id.formatter";
 
 interface IProps {
   business: IBusiness;
@@ -19,7 +20,7 @@ export function BusinessCard({ business, className }: IProps) {
           </li>
           <li className="flex justify-start gap-3">
             <h3 className="font-medium">CUIT:</h3>
-            <span>{business.taxId}</span>
+            <span>{formatTaxId(business.taxId)}</span>
           </li>
           <li className="flex justify-start gap-3">
             <h3 className="font-medium">Descripción:</h3>
