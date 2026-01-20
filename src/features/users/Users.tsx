@@ -18,6 +18,7 @@ import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
+import { formatIc } from "@core/formatters/ic.formatter";
 import { tryCatch } from "@core/utils/try-catch";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useSidebar } from "@components/ui/sidebar";
@@ -148,7 +149,7 @@ export default function Users() {
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Badge size="small" variant="ic">
-            {row.original.ic}
+            {formatIc(row.original.ic)}
           </Badge>
         </div>
       ),
