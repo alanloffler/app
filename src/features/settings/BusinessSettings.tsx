@@ -93,8 +93,8 @@ export default function BusinessSettings() {
     }
 
     if (response && response.statusCode === 200 && response.data) {
-      toast.success("Configuración actualizada");
-      navigate(-1);
+      toast.success("Configuración de tu negocio actualizada");
+      // navigate(-1);
     }
   }
 
