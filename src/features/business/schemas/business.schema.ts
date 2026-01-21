@@ -2,7 +2,7 @@ import z from "zod";
 
 export const businessSchema = z.object({
   slug: z.string().nonempty("El slug es obligatorio").min(3, "El slug debe tener al menos 3 caracteres"),
-  taxId: z.string().nonempty("El CUIT no puede estar vacío").length(10, "El CUIT debe tener 10 dígitos"),
+  taxId: z.string().nonempty("El CUIT no puede estar vacío").length(11, "El CUIT debe tener 11 dígitos"),
   companyName: z.string().nonempty("La razón social es obligatoria"),
   tradeName: z.string().nonempty("El nombre comercial es obligatorio"),
   description: z.string().nonempty("La descripción es obligatoria"),
