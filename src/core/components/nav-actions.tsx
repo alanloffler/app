@@ -34,6 +34,7 @@ interface INavAction {
   icon: LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
   name: string;
   permission: TPermission | TPermission[];
+  state?: { [key: string]: string };
   url: string;
 }
 
@@ -52,7 +53,7 @@ export function NavActions({ items }: IProps) {
           <SidebarMenuItem key={item.name}>
             <Protected requiredPermission={item.permission}>
               <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                <Link to={item.url}>
+                <Link to={item.url} state={item.state}>
                   {showMenuIcons && <item.icon />}
                   <span>{item.name}</span>
                 </Link>
