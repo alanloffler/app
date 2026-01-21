@@ -38,7 +38,7 @@ export default function ViewRole() {
 
   const findOneRole = useCallback(
     async function (id: string) {
-      const isSuperAdmin = admin?.role.value === ERoles.SUPER;
+      const isSuperAdmin = admin?.role.value === ERoles.super;
       const serviceByRole = isSuperAdmin ? RolesService.findOneSoftRemoved(id) : RolesService.findOne(id);
       const [response, responseError] = await tryCatchRole(serviceByRole);
 
@@ -235,7 +235,7 @@ export default function ViewRole() {
                   </div>
                 ) : (
                   <>
-                    {role?.value !== ERoles.SUPER ? (
+                    {role?.value !== ERoles.super ? (
                       <>
                         <Protected requiredPermission="roles-update">
                           <Button className="px-5! hover:text-green-500" variant="outline" asChild>
@@ -262,7 +262,7 @@ export default function ViewRole() {
                         </Protected>
                       </>
                     ) : (
-                      admin?.role.value === ERoles.SUPER && (
+                      admin?.role.value === ERoles.super && (
                         <Protected requiredPermission="roles-update">
                           <Button className="px-5! hover:text-green-500" variant="outline" asChild>
                             <Link to={`/roles/edit/${id}`}>
