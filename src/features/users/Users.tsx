@@ -34,7 +34,7 @@ export default function Users() {
 
   const fetchUsers = useCallback(async () => {
     const $role = role ? role : "";
-    const isSuperAdmin = admin?.role.value === ERoles.SUPER;
+    const isSuperAdmin = admin?.role.value === ERoles.super;
     const serviceByRole = isSuperAdmin ? UsersService.findAllSoftRemoved($role) : UsersService.findAll($role);
 
     const [response, error] = await tryCatchAdmins(serviceByRole);
@@ -248,6 +248,8 @@ export default function Users() {
     },
   ];
 
+  if (!role) return null;
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -257,8 +259,7 @@ export default function Users() {
         <Protected requiredPermission={["admin-create", "patient-create", "professional-create"]} mode="some">
           <Button variant="default" size="lg" asChild>
             <Link to="/users/create">
-              <Plus />
-              Crear usuario
+              <Plus /> Crear {ERoles[role as keyof typeof ERoles]}
             </Link>
           </Button>
         </Protected>
