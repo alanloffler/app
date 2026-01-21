@@ -126,7 +126,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="tradeName">Nombre comercial</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="tradeName" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="tradeName" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -141,8 +141,9 @@ export default function BusinessSettings() {
                     >
                       <FieldLabel htmlFor="slug">Subdominio</FieldLabel>
                       <Input
-                        className={cn("col-span-1", open ? "md:col-span-12 lg:col-span-6" : "md:col-span-6")}
                         aria-invalid={fieldState.invalid}
+                        className="disabled:opacity-100"
+                        disabled
                         id="slug"
                         {...field}
                       />
@@ -159,7 +160,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="companyName">Razón social</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="companyName" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="companyName" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -173,7 +174,16 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="taxId">CUIT</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="taxId" {...field} />
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="taxId"
+                        maxLength={12}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -186,8 +196,8 @@ export default function BusinessSettings() {
                       className={cn("col-span-1", open ? "md:col-span-12 lg:col-span-12" : "md:col-span-12")}
                       data-invalid={fieldState.invalid}
                     >
-                      <FieldLabel htmlFor="street">Descripción</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="description" {...field} />
+                      <FieldLabel htmlFor="description">Descripción</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="description" maxLength={201} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -211,7 +221,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="street">Calle</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="street" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="street" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -225,7 +235,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="city">Ciudad</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="city" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="city" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -239,7 +249,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="province">Provincia</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="province" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="province" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -253,7 +263,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="country">País</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="country" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="country" maxLength={51} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -267,7 +277,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="zipCode">Código postal</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="zipCode" {...field} />
+                      <Input aria-invalid={fieldState.invalid} id="zipCode" maxLength={7} {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -305,7 +315,16 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="phoneNumber">Número de teléfono</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="phoneNumber" {...field} />
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="phoneNumber"
+                        maxLength={11}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -319,7 +338,16 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="whatsAppNumber">Número de WhatsApp</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="whatsAppNumber" {...field} />
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="whatsAppNumber"
+                        maxLength={11}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
