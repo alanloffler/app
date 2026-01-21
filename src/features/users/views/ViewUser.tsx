@@ -48,7 +48,7 @@ export default function ViewUser() {
 
   const findOneUser = useCallback(
     async function (id: string) {
-      const isSuperAdmin = adminAuth?.role.value === ERoles.SUPER;
+      const isSuperAdmin = adminAuth?.role.value === ERoles.super;
       const serviceByRole = isSuperAdmin ? UsersService.findOneSoftRemoved(id) : UsersService.findOne(id);
 
       const [response, responseError] = await tryCatchUser(serviceByRole);
