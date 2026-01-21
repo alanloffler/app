@@ -8,7 +8,7 @@ import { PageHeader } from "@components/pages/PageHeader";
 
 import type z from "zod";
 import { toast } from "sonner";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,9 +20,11 @@ import { useSidebar } from "@components/ui/sidebar";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function BusinessSettings() {
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isLoading: isLoadingBusiness, tryCatch: tryCatchBusiness } = useTryCatch();
+  const { isLoading: isSaving, tryCatch: tryCatchSaveBusiness } = useTryCatch();
   const { open } = useSidebar();
-  const { isLoading: isSaving, tryCatch: tryCatchBusiness } = useTryCatch();
 
   const form = useForm<z.infer<typeof businessSchema>>({
     resolver: zodResolver(businessSchema),
@@ -54,6 +56,7 @@ export default function BusinessSettings() {
 
     if (response && response.statusCode === 200 && response.data) {
       if (response.data) {
+        setBusinessId(response.data.id);
         const r = response.data;
 
         form.reset({
@@ -79,8 +82,20 @@ export default function BusinessSettings() {
     fetchBusiness();
   }, [fetchBusiness]);
 
-  function onSubmit(data: z.infer<typeof businessSchema>): void {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof businessSchema>): Promise<void> {
+    if (!businessId) return;
+
+    const [response, error] = await tryCatchSaveBusiness(BusinessService.update(businessId, data));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200 && response.data) {
+      toast.success("Configuración actualizada");
+      navigate(-1);
+    }
   }
 
   function handleCancel(): void {
@@ -111,14 +126,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="tradeName">Nombre comercial</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="tradeName"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="tradeName" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -137,9 +145,6 @@ export default function BusinessSettings() {
                         aria-invalid={fieldState.invalid}
                         id="slug"
                         {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
                       />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
@@ -154,14 +159,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="companyName">Razón social</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="companyName"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="companyName" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -175,14 +173,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="taxId">CUIT</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="taxId"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="taxId" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -196,14 +187,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="street">Descripción</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="description"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="description" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -227,14 +211,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="street">Calle</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="street"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="street" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -248,14 +225,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="city">Ciudad</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="city"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="city" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -269,14 +239,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="province">Provincia</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="province"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="province" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -290,14 +253,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="country">País</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="country"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="country" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -311,14 +267,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="zipCode">Código postal</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="zipCode"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="zipCode" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -342,14 +291,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="email">Email</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="email"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="email" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -363,14 +305,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="phoneNumber">Número de teléfono</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="phoneNumber"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="phoneNumber" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -384,14 +319,7 @@ export default function BusinessSettings() {
                       data-invalid={fieldState.invalid}
                     >
                       <FieldLabel htmlFor="whatsAppNumber">Número de WhatsApp</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="whatsAppNumber"
-                        {...field}
-                        onChange={async (e) => {
-                          console.log(e);
-                        }}
-                      />
+                      <Input aria-invalid={fieldState.invalid} id="whatsAppNumber" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -401,10 +329,7 @@ export default function BusinessSettings() {
           </form>
         </CardContent>
         <CardFooter className="flex items-center justify-between pt-4">
-          <div>
-            {/* {isLoadingAdmin && <Loader className="text-sm" size={18} text="Cargando administrador" />} */}
-            {/* {isLoadingRoles && <Loader className="text-sm" size={18} text="Cargando roles" />} */}
-          </div>
+          <div>{isLoadingBusiness && <Loader className="text-sm" size={18} text="Cargando administrador" />}</div>
           <div className="flex gap-4">
             <Button variant="ghost" onClick={handleCancel}>
               Cancelar
