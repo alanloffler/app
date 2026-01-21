@@ -105,7 +105,9 @@ export default function BusinessSettings() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Configuraciones de tu negocio" />
+      <PageHeader title="Configuraciones de tu negocio">
+        {isLoadingBusiness && <Loader className="text-sm" size={18} text="Cargando tu negocio" />}
+      </PageHeader>
       <Card className="w-full 2xl:max-w-[1100px]">
         <CardContent className="flex flex-col gap-6">
           <form className="grid grid-cols-1 gap-6 xl:grid-cols-2" id="edit-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -356,8 +358,7 @@ export default function BusinessSettings() {
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex items-center justify-between pt-4">
-          <div>{isLoadingBusiness && <Loader className="text-sm" size={18} text="Cargando administrador" />}</div>
+        <CardFooter className="flex items-center justify-end pt-4">
           <div className="flex gap-4">
             <Button variant="ghost" onClick={handleCancel}>
               Cancelar
