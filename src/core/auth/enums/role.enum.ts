@@ -1,7 +1,8 @@
 export const ERoles = {
-  ADMIN: "admin",
-  SUPER: "superadmin",
-  TEACHER: "teacher",
+  admin: "administrador",
+  patient: "paciente",
+  professional: "profesional",
+  super: "superadmin",
 } as const;
 
 export type TRole = (typeof ERoles)[keyof typeof ERoles];
