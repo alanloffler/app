@@ -206,7 +206,7 @@ export function EditForm() {
                                 render={({ field }) => {
                                   const isViewPermission = action.key.endsWith("-view");
                                   const isDeleted = !!action.deletedAt;
-                                  const isSuperAdmin = roleValue === ERoles.SUPER;
+                                  const isSuperAdmin = roleValue === ERoles.super;
                                   const isCriticalPermission = CRITICAL_PERMISSIONS_FOR_SUPERADMIN.includes(action.key);
                                   const isLockedForSuperAdmin = isSuperAdmin && isCriticalPermission;
 
