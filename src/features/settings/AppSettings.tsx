@@ -33,7 +33,7 @@ export default function AppSettings() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Configuraciones de la aplicación">
-        {admin?.role.value === ERoles.SUPER && (
+        {admin?.role.value === ERoles.super && (
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium">
               Actualizar en {syncMode === "remote" ? "base de datos" : "local"}
