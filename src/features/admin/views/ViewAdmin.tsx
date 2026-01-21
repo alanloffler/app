@@ -34,7 +34,7 @@ export default function ViewAdmin() {
 
   const findOneAdmin = useCallback(
     async function (id: string) {
-      const isSuperAdmin = adminAuth?.role.value === ERoles.SUPER;
+      const isSuperAdmin = adminAuth?.role.value === ERoles.super;
       const serviceByRole = isSuperAdmin ? AdminService.findOneSoftRemoved(id) : AdminService.findOne(id);
 
       const [response, responseError] = await tryCatchAdmin(serviceByRole);
