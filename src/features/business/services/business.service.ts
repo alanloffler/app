@@ -19,7 +19,7 @@ class BusinessModuleService {
   }
 
   public async update(id: string, data: Partial<IBusiness>): Promise<IApiResponse<IBusiness>> {
-    const response = await apiClient.patch(`/business/update/${id}`, data);
+    const response = await apiClient.patch(`/business/${id}`, data);
     return response.data;
   }
 }
