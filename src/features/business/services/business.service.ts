@@ -17,6 +17,11 @@ class BusinessModuleService {
     const response = await apiClient.get(`/business/find-one`);
     return response.data;
   }
+
+  public async update(id: string, data: Partial<IBusiness>): Promise<IApiResponse<IBusiness>> {
+    const response = await apiClient.patch(`/business/update/${id}`, data);
+    return response.data;
+  }
 }
 
 export const BusinessService = BusinessModuleService.getInstance();
