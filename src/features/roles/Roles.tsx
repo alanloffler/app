@@ -26,7 +26,7 @@ export default function Roles() {
   const { isLoading: isLoadingRoles, tryCatch: tryCatchRoles } = useTryCatch();
 
   const fetchRoles = useCallback(async () => {
-    const isSuperAdmin = admin?.role.value === ERoles.SUPER;
+    const isSuperAdmin = admin?.role.value === ERoles.super;
     const serviceByRole = isSuperAdmin ? RolesService.findAllSoftRemoved() : RolesService.findAll();
 
     const [response, error] = await tryCatchRoles(serviceByRole);
@@ -138,7 +138,7 @@ export default function Roles() {
                   </Link>
                 </Button>
               </Protected>
-              {row.original.value !== ERoles.SUPER && row.original.value !== ERoles.ADMIN && (
+              {row.original.value !== ERoles.super && row.original.value !== ERoles.admin && (
                 <>
                   <Protected requiredPermission="roles-delete">
                     <HoldButton
