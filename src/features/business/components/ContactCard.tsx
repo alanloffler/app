@@ -17,7 +17,7 @@ export function ContactCard({ business, className }: IProps) {
       <CardContent className="flex flex-1 flex-col gap-4">
         <h1 className="text-lg font-semibold">Contacto</h1>
         <div className="flex gap-4">
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-1 flex-col gap-1">
             <li className="flex justify-start gap-3">
               <h3 className="font-medium">Email:</h3>
               <span>{business.email}</span>
@@ -32,10 +32,6 @@ export function ContactCard({ business, className }: IProps) {
                 <span>{formatPhone(business.whatsAppNumber)}</span>
               </li>
             )}
-            <li className="flex justify-start gap-3">
-              <h3 className="font-medium">Dirección:</h3>
-              <span>{`${business.street}, ${business.city}, ${business.province}, ${business.zipCode}`}</span>
-            </li>
             {business.website && (
               <li className="flex justify-start gap-3">
                 <h3 className="font-medium">Página web:</h3>
@@ -43,8 +39,8 @@ export function ContactCard({ business, className }: IProps) {
               </li>
             )}
           </ul>
-          <div className="flex flex-1 flex-col items-center justify-center gap-2">
-            <div className="flex size-30 items-center justify-center bg-gray-100">QR Code</div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="flex size-36 items-center justify-center bg-gray-100">QR Code</div>
             <Button size="sm" variant="outline">
               <Download />
               Descargar
