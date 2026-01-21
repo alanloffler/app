@@ -111,7 +111,7 @@ export default function BusinessSettings() {
       <Card className="w-full 2xl:max-w-[1100px]">
         <CardContent className="flex flex-col gap-6">
           <form className="grid grid-cols-1 gap-6 xl:grid-cols-2" id="edit-form" onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 border-b pb-8">
               <div className="flex flex-col">
                 <h2 className="text-lg font-semibold">Datos comerciales</h2>
                 <span className="text-muted-foreground text-sm">Actualiza la información comercial de tu negocio</span>
@@ -206,7 +206,7 @@ export default function BusinessSettings() {
                 />
               </FieldGroup>
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 border-b pb-8">
               <div className="flex flex-col">
                 <h2 className="text-lg font-semibold">Dirección</h2>
                 <span className="text-muted-foreground text-sm">Actualizá la dirección de tu negocio</span>
