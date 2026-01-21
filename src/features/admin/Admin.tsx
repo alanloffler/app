@@ -29,7 +29,7 @@ export default function Admin() {
   const { open: sidebarIsOpen } = useSidebar();
 
   const fetchAdmins = useCallback(async () => {
-    const isSuperAdmin = admin?.role.value === ERoles.SUPER;
+    const isSuperAdmin = admin?.role.value === ERoles.super;
     const serviceByRole = isSuperAdmin ? AdminService.findAllSoftRemoved() : AdminService.findAll();
 
     const [response, error] = await tryCatchAdmins(serviceByRole);
