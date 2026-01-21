@@ -6,12 +6,12 @@ import {
   LayoutDashboard,
   Megaphone,
   Package,
+  Plus,
   Settings,
   Shield,
   ShieldPlus,
   Store,
   User2,
-  UserPlus2,
   Users2,
 } from "lucide-react";
 import { KeyRoundPlus } from "@components/icons/KeyRoundPlus";
@@ -131,10 +131,11 @@ const data = {
   ],
   navActions: [
     {
-      name: "Crear usuario",
+      name: "Crear paciente",
       url: "/users/create",
-      icon: UserPlus2,
-      permission: ["admin-create", "patient-create", "professional-create"] as TPermission[],
+      icon: Plus,
+      permission: "patient-create" as TPermission,
+      state: { role: "patient" },
     },
     {
       name: "Crear rol",
