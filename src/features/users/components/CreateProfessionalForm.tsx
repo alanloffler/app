@@ -5,6 +5,7 @@ import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
+import { WorkingDays } from "@components/WorkingDays";
 
 import z from "zod";
 import { toast } from "sonner";
@@ -13,15 +14,15 @@ import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import type { TUserRole } from "@roles/interfaces/user-role.type";
+import { ERoles } from "@auth/enums/role.enum";
 import { RolesService } from "@roles/services/roles.service";
 import { UsersService } from "@users/services/users.service";
-import { createUserSchema } from "@users/schemas/create-user.schema";
+import { createProfessionalSchema } from "@users/schemas/create-professional.schema";
 import { tryCatch } from "@core/utils/try-catch";
+import { uppercaseFirst } from "@core/formatters/uppercase-first.formatter";
 import { useDebounce } from "@core/hooks/useDebounce";
 import { useTryCatch } from "@core/hooks/useTryCatch";
-import { uppercaseFirst } from "@/core/formatters/uppercase-first.formatter";
-import { ERoles } from "@/core/auth/enums/role.enum";
-import type { TUserRole } from "@/features/roles/interfaces/user-role.type";
 
 export function CreateProfessionalForm() {
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -37,22 +38,27 @@ export function CreateProfessionalForm() {
 
   const debouncedUsername = useDebounce(username, 500);
 
-  const form = useForm<z.infer<typeof createUserSchema>>({
-    resolver: zodResolver(createUserSchema),
+  const form = useForm<z.infer<typeof createProfessionalSchema>>({
+    resolver: zodResolver(createProfessionalSchema),
     defaultValues: {
       email: "",
       firstName: "",
       ic: "",
       lastName: "",
+      licenseId: "",
       password: "",
       phoneNumber: "",
+      professionalPrefix: "",
       roleId: "",
+      specialty: "",
       userName: "@",
+      workingDays: [],
     },
   });
 
-  async function onSubmit(data: z.infer<typeof createUserSchema>) {
+  async function onSubmit(data: z.infer<typeof createProfessionalSchema>) {
     console.log(data);
+
     if (emailError) {
       form.setError("email", { message: emailError });
       return;
@@ -159,178 +165,248 @@ export function CreateProfessionalForm() {
   }
 
   return (
-    <Card className="relative">
+    <Card className="relative w-full">
       <BackButton />
       <CardHeader>
         <CardTitle>{`${uppercaseFirst(roleTranslated)} nuevo`}</CardTitle>
         <CardDescription>{`Creá un usuario ${roleTranslated} para el sistema`}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
-        <form className="grid grid-cols-1 gap-6" id="create-user" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <Controller
-              name="ic"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid || !!icError}>
-                  <FieldLabel htmlFor="ic">DNI</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid || !!icError}
-                    id="ic"
-                    maxLength={9}
-                    {...field}
-                    onChange={async (e) => {
-                      const value = e.target.value.replace(/\D/g, "");
-                      field.onChange(value);
-
-                      setIcError(null);
-                      form.clearErrors("ic");
-
-                      if (value.length > 7) {
-                        const [response, error] = await tryCatch(UsersService.checkIcAvailability(value));
-                        if (response?.data === false || error) {
-                          const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado";
-                          setIcError(errorMsg);
-                          form.setError("ic", { message: errorMsg });
-                        }
-                      }
-                    }}
-                  />
-                  {(fieldState.invalid || icError) && (
-                    <FieldError errors={icError ? [{ message: icError }] : [fieldState.error]} />
+      <CardContent>
+        <form className="grid grid-cols-1 gap-6 md:grid-cols-2" id="create-user" onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <h2 className="text-muted-foreground text-base font-medium">Datos personales</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Controller
+                  name="firstName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="firstName">Nombre</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="firstName" {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
                   )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <Controller
-              name="userName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid || !!usernameError}>
-                  <FieldLabel htmlFor="userName">Usuario</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid || !!usernameError}
-                    id="userName"
-                    {...field}
-                    onChange={(e) => {
-                      setUsernameError(null);
-                      form.clearErrors("userName");
-
-                      const rawValue = e.target.value.toLowerCase();
-                      const noAtSigns = rawValue.replace(/@/g, "");
-                      const sanitizedContent = noAtSigns.replace(/[^a-z0-9.\-_]/g, "");
-                      const finalValue = `@${sanitizedContent}`;
-
-                      form.setValue("userName", finalValue, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-
-                      setUsername(finalValue);
-                    }}
-                  />
-                  {(fieldState.invalid || usernameError) && (
-                    <FieldError errors={usernameError ? [{ message: usernameError }] : [fieldState.error]} />
+                />
+                <Controller
+                  name="lastName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="lastName">Apellido</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="lastName" {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
                   )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                  <Input aria-invalid={fieldState.invalid} id="password" {...field} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <Controller
-              name="firstName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="firstName">Nombre</FieldLabel>
-                  <Input aria-invalid={fieldState.invalid} id="firstName" {...field} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="lastName">Apellido</FieldLabel>
-                  <Input aria-invalid={fieldState.invalid} id="lastName" {...field} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid grid-cols-5 gap-6">
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid || !!emailError} className="col-span-5 md:col-span-3">
-                  <FieldLabel htmlFor="email">E-mail</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid || !!emailError}
-                    id="email"
-                    {...field}
-                    onChange={async (e) => {
-                      field.onChange(e);
-                      setEmailError(null);
-                      form.clearErrors("email");
+                />
+                <Controller
+                  name="userName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid || !!usernameError}>
+                      <FieldLabel htmlFor="userName">Usuario</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid || !!usernameError}
+                        id="userName"
+                        {...field}
+                        onChange={(e) => {
+                          setUsernameError(null);
+                          form.clearErrors("userName");
 
-                      const emailValue = e.target.value;
-                      const emailValidation = z.email().safeParse(emailValue);
+                          const rawValue = e.target.value.toLowerCase();
+                          const noAtSigns = rawValue.replace(/@/g, "");
+                          const sanitizedContent = noAtSigns.replace(/[^a-z0-9.\-_]/g, "");
+                          const finalValue = `@${sanitizedContent}`;
 
-                      if (emailValidation.success) {
-                        const [response, error] = await tryCatch(UsersService.checkEmailAvailability(emailValue));
-                        if (response?.data === false || error) {
-                          const errorMsg = error ? "Error al comprobar email" : "Email ya registrado";
-                          setEmailError(errorMsg);
-                          form.setError("email", { message: errorMsg });
-                        }
-                      }
-                    }}
-                  />
-                  {(fieldState.invalid || emailError) && (
-                    <FieldError errors={emailError ? [{ message: emailError }] : [fieldState.error]} />
+                          form.setValue("userName", finalValue, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+
+                          setUsername(finalValue);
+                        }}
+                      />
+                      {(fieldState.invalid || usernameError) && (
+                        <FieldError errors={usernameError ? [{ message: usernameError }] : [fieldState.error]} />
+                      )}
+                    </Field>
                   )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <Controller
-              name="phoneNumber"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="col-span-1">
-                  <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    id="phone"
-                    maxLength={11}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "");
-                      field.onChange(value);
-                    }}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
+                />
+                <Controller
+                  name="ic"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid || !!icError}>
+                      <FieldLabel htmlFor="ic">DNI</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid || !!icError}
+                        id="ic"
+                        maxLength={9}
+                        {...field}
+                        onChange={async (e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+
+                          setIcError(null);
+                          form.clearErrors("ic");
+
+                          if (value.length > 7) {
+                            const [response, error] = await tryCatch(UsersService.checkIcAvailability(value));
+                            if (response?.data === false || error) {
+                              const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado";
+                              setIcError(errorMsg);
+                              form.setError("ic", { message: errorMsg });
+                            }
+                          }
+                        }}
+                      />
+                      {(fieldState.invalid || icError) && (
+                        <FieldError errors={icError ? [{ message: icError }] : [fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <h2 className="text-muted-foreground text-base font-medium">Datos profesionales</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Controller
+                  name="licenseId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="licenseId">Nº de Matrícula</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="licenseId" maxLength={21} {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="specialty"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="specialty">Especialidad</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="specialty" maxLength={21} {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="professionalPrefix"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="professionalPrefix">Prefijo profesional</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="professionalPrefix"
+                        maxLength={21}
+                        placeholder="Ej. Dr."
+                        {...field}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <h2 className="text-muted-foreground text-base font-medium">Medios de contacto</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid || !!emailError}>
+                      <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid || !!emailError}
+                        id="email"
+                        {...field}
+                        onChange={async (e) => {
+                          field.onChange(e);
+                          setEmailError(null);
+                          form.clearErrors("email");
+
+                          const emailValue = e.target.value;
+                          const emailValidation = z.email().safeParse(emailValue);
+
+                          if (emailValidation.success) {
+                            const [response, error] = await tryCatch(UsersService.checkEmailAvailability(emailValue));
+                            if (response?.data === false || error) {
+                              const errorMsg = error ? "Error al comprobar email" : "Email ya registrado";
+                              setEmailError(errorMsg);
+                              form.setError("email", { message: errorMsg });
+                            }
+                          }
+                        }}
+                      />
+                      {(fieldState.invalid || emailError) && (
+                        <FieldError errors={emailError ? [{ message: emailError }] : [fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="phoneNumber"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} className="col-span-1">
+                      <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="phone"
+                        maxLength={11}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <h2 className="text-muted-foreground text-base font-medium">Seguridad</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="password" {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <h2 className="text-muted-foreground text-base font-medium">Configuración de la agenda</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Controller
+                  name="workingDays"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="workingDays">Dias laborales</FieldLabel>
+                      <WorkingDays {...field} />
+                      {/* <Input aria-invalid={fieldState.invalid} id="workingDays" {...field} /> */}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+          </div>
         </form>
       </CardContent>
       <CardFooter className="flex items-center justify-between pt-4">
