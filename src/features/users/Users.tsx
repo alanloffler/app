@@ -16,10 +16,13 @@ import { useParams } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
+import type { TUserRole } from "@roles/interfaces/user-role.type";
+import { ERolePlural } from "@roles/enums/role-plural.enum";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
 import { formatIc } from "@core/formatters/ic.formatter";
 import { tryCatch } from "@core/utils/try-catch";
+import { uppercaseFirst } from "@core/formatters/uppercase-first.formatter";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useSidebar } from "@components/ui/sidebar";
 import { useTryCatch } from "@core/hooks/useTryCatch";
@@ -253,12 +256,12 @@ export default function Users() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title={role === "patient" ? "Pacientes" : role === "admin" ? "Administradores" : "Profesionales"}
-        subtitle={`Gestioná los ${role === "patient" ? "pacientes" : role === "admin" ? "administradores" : "profesionales"} del sistema`}
+        title={uppercaseFirst(ERolePlural[role as TUserRole])}
+        subtitle={`Gestioná los ${ERolePlural[role as TUserRole]} del sistema`}
       >
         <Protected requiredPermission={["admin-create", "patient-create", "professional-create"]} mode="some">
           <Button variant="default" size="lg" asChild>
-            <Link to="/users/create">
+            <Link to="/users/create" state={{ role }}>
               <Plus /> Crear {ERoles[role as keyof typeof ERoles]}
             </Link>
           </Button>
