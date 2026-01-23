@@ -9,7 +9,7 @@ export default function CreateUser() {
   const userRole = state.role;
 
   return (
-    <div className="flex w-full flex-col gap-10 lg:w-[80%] xl:w-[80%]">
+    <div className="flex w-full max-w-7xl flex-col gap-10 md:w-full xl:w-[80%]">
       {userRole === EUserRole["admin"] && <div>Mostrar formulario de creacion de admin</div>}
       {userRole === EUserRole["patient"] && <div>Mostrar formulario de creacion de paciente</div>}
       {userRole === EUserRole["professional"] && <CreateProfessionalForm />}
