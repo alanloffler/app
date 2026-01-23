@@ -4,6 +4,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Calendar as Schedule } from "react-big-calendar";
 import { ErrorNotification } from "@components/notifications/ErrorNotification";
 import { PageLoader } from "@components/PageLoader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 import { Toolbar } from "@calendar/components/Toolbar";
 import { ViewEvent } from "@calendar/components/ViewEvent";
 
@@ -15,17 +16,20 @@ import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
+import type { IUser } from "@users/interfaces/user.interface";
 import type { TView } from "@calendar/interfaces/calendar-view.type";
 import { CalendarService } from "@calendar/services/calendar.service";
+import { UsersService } from "@users/services/users.service";
 import { cn } from "@lib/utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
+import { Loader } from "@/core/components/Loader";
 
 // TODO: get config from backend
 const config = {
-  startHour: "07:00",
-  endHour: "20:00",
+  // startHour: "07:00",
+  // endHour: "20:00",
   exceptions: { from: "12:00", to: "15:00" },
   slotDuration: "30",
 };
@@ -56,11 +60,11 @@ const messages = {
   showMore: (total: number) => `${total} más`,
 };
 
-const maxHour = new Date();
-maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
+// const maxHour = new Date();
+// maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
 
-const minHour = new Date();
-minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
+// const minHour = new Date();
+// minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
 
 function isLunchTime(date: Date): boolean {
   const from = parse(config.exceptions.from, "HH:mm", new Date());
@@ -80,11 +84,79 @@ export default function Calendar() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
+  const [maxHour, setMaxHour] = useState<Date | undefined>(undefined);
+  const [minHour, setMinHour] = useState<Date | undefined>(undefined);
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [professionals, setProfessionals] = useState<IUser[] | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
+  const [selectedProfessional, setSelectedProfessional] = useState<IUser | undefined>(undefined);
   const canViewEvent = usePermission("events-view");
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
+  const { isLoading: isLoadingProfessional, tryCatch: tryCatchProfessional } = useTryCatch();
+  const { isLoading: isLoadingProfessionals, tryCatch: tryCatchProfessionals } = useTryCatch();
   const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
+
+  const fetchProfessionals = useCallback(async () => {
+    const [response, error] = await tryCatchProfessionals(UsersService.findAll("professional"));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200 && response.data) {
+      setProfessionals(response.data);
+    }
+  }, [tryCatchProfessionals]);
+
+  useEffect(() => {
+    fetchProfessionals();
+  }, [fetchProfessionals]);
+
+  const getProfessional = useCallback(
+    async (id: string): Promise<void> => {
+      const [response, error] = await tryCatchProfessional(UsersService.findOne(id));
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (response && response.statusCode === 200 && response.data) {
+        setErrorNotification(false);
+
+        if (!response.data.professionalProfile) {
+          const errMsg = "El profesional no tiene un perfil profesional";
+          setErrorMessage(errMsg);
+          setErrorNotification(true);
+          return;
+        }
+
+        setSelectedProfessional(response.data);
+
+        if (response.data.professionalProfile) {
+          const maxHour = new Date();
+          maxHour.setHours(
+            parseInt(response.data.professionalProfile.endHour.slice(0, 2), 10),
+            parseInt(response.data.professionalProfile.endHour.slice(3, 5), 10),
+            0,
+            0,
+          );
+          setMaxHour(maxHour);
+
+          const minHour = new Date();
+          minHour.setHours(
+            parseInt(response.data.professionalProfile.startHour.slice(0, 2), 10),
+            parseInt(response.data.professionalProfile.startHour.slice(3, 5), 10),
+            0,
+            0,
+          );
+          setMinHour(minHour);
+        }
+      }
+    },
+    [tryCatchProfessional],
+  );
 
   const refreshEvents = useCallback(async () => {
     const [response, error] = await tryCatchEvents(CalendarService.findAll());
@@ -123,39 +195,63 @@ export default function Calendar() {
   return (
     <>
       <div className="flex flex-col gap-8">
-        {errorNotification && <ErrorNotification message={errorMessage} />}
-        <Schedule
-          className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
-          components={{
-            toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-              <Toolbar
-                {...props}
-                calendarView={props.view as TView}
-                currentDate={selectedDate}
-                onCreateEvent={refreshEvents}
-              />
-            ),
-          }}
-          culture="es-AR"
-          date={selectedDate}
-          endAccessor="endDate"
-          events={events}
-          formats={{
-            eventTimeRangeFormat: (range) => format(range.start, "HH:mm"),
-          }}
-          localizer={localizer}
-          max={maxHour}
-          messages={messages}
-          min={minHour}
-          onNavigate={setSelectedDate}
-          onSelectEvent={onSelectEvent}
-          onView={onView}
-          slotPropGetter={slotPropGetter}
-          startAccessor="startDate"
-          style={{ height: 700 }}
-          view={selectedView}
-          views={["month", "week", "day"]}
-        />
+        <div className="flex items-center gap-4">
+          <Select
+            disabled={!professionals}
+            onValueChange={(professionalId) => {
+              getProfessional(professionalId);
+            }}
+          >
+            <SelectTrigger id="professionals">
+              <SelectValue placeholder={isLoadingProfessionals ? "Cargando profesionales" : "Seleccione profesional"} />
+            </SelectTrigger>
+            <SelectContent>
+              {professionals?.map((professional) => (
+                <SelectItem key={professional.id} value={professional.id}>
+                  {professional.firstName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {isLoadingProfessional && <Loader text="Cargando profesional" />}
+          {isLoadingProfessionals && <Loader text="Cargando profesionales" />}
+        </div>
+        {errorNotification && <ErrorNotification message={errorMessage} tryAgain={false} />}
+        {selectedProfessional && !errorNotification && (
+          <Schedule
+            className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
+            components={{
+              toolbar: (props: ToolbarProps<ICalendarEvent>) => (
+                <Toolbar
+                  {...props}
+                  calendarView={props.view as TView}
+                  currentDate={selectedDate}
+                  onCreateEvent={refreshEvents}
+                />
+              ),
+            }}
+            culture="es-AR"
+            date={selectedDate}
+            endAccessor="endDate"
+            events={events}
+            formats={{
+              eventTimeRangeFormat: (range) => format(range.start, "HH:mm"),
+            }}
+            key={selectedProfessional.id}
+            localizer={localizer}
+            max={maxHour}
+            messages={messages}
+            min={minHour}
+            onNavigate={setSelectedDate}
+            onSelectEvent={onSelectEvent}
+            onView={onView}
+            slotPropGetter={slotPropGetter}
+            startAccessor="startDate"
+            style={{ height: 700 }}
+            view={selectedView}
+            views={["month", "week", "day"]}
+          />
+        )}
       </div>
       <ViewEvent event={selectedEvent} onRefresh={refreshEvents} openSheet={openSheet} setOpenSheet={setOpenSheet} />
     </>
