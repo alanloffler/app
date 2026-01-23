@@ -30,7 +30,12 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
   }
 
   return (
-    <div className={cn("flex justify-start gap-3 rounded-md p-1", ariaInvalid && "ring-destructive ring-2")}>
+    <div
+      className={cn(
+        "flex justify-between gap-3 rounded-md p-1 md:justify-start",
+        ariaInvalid && "ring-destructive ring-2",
+      )}
+    >
       {weekdays.map((dayLabel, index) => (
         <div key={index} className="flex flex-col items-center gap-1">
           <Checkbox
