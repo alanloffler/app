@@ -212,6 +212,10 @@ export default function ViewUser() {
                           ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`
                           : `${user.professionalProfile?.startHour} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`}
                       </li>
+                      <li className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold">Duración del turno:</span>
+                        <span>{user.professionalProfile?.slotDuration} min.</span>
+                      </li>
                     </ul>
                   </div>
                 </Activity>
