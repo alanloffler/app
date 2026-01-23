@@ -21,6 +21,7 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
+import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
 import { useAuthStore } from "@auth/stores/auth.store";
@@ -111,10 +112,12 @@ export default function ViewUser() {
     findOneUser(id!);
   }, [id, findOneUser]);
 
+  if (!user) return null;
+
   return (
     <section className="flex flex-col gap-6">
       <PageHeader title={`Detalles del ${userRole.name.toLowerCase()}`} />
-      <Card className="relative w-full p-6 text-center md:max-w-100 md:p-10">
+      <Card className="relative w-full p-6 text-center md:w-[70%]">
         {isLoadingUser ? (
           <div className="flex justify-center">
             <Loader size={20} text={`Cargando ${userRole.name.toLowerCase()}`} />
@@ -123,30 +126,87 @@ export default function ViewUser() {
           <>
             <BackButton />
             <CardHeader>
-              <CardTitle className="text-xl">{`${user?.firstName} ${user?.lastName}`}</CardTitle>
-              <CardDescription className="text-base">{user?.role?.name}</CardDescription>
+              <CardTitle className="text-xl">
+                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                  {`${user.professionalProfile?.professionalPrefix ?? ""} `}
+                </Activity>
+                {`${user.firstName} ${user.lastName}`}
+              </CardTitle>
+              <CardDescription className="text-base">{user.role?.name}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 space-y-6 px-0">
-              <ul className="space-y-2">
-                <li className="flex justify-between">
-                  <span className="font-semibold">Usuario</span>
-                  <span>{user?.userName}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="font-semibold">DNI</span>
-                  <span>{user?.ic}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="font-semibold">E-mail</span>
-                  <span>{user?.email}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="font-semibold">Teléfono</span>
-                  <span>{user?.phoneNumber}</span>
-                </li>
-              </ul>
+            <CardContent className="flex flex-col gap-8 px-0">
+              <div className="columns-1 space-y-6 space-x-6 md:columns-2">
+                <div className="flex break-inside-avoid flex-col items-start gap-3">
+                  <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                    Datos personales
+                  </h2>
+                  <ul className="flex flex-col gap-2 text-sm">
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">Nombre:</span>
+                      <span>{user.firstName}</span>
+                    </li>
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">Apellido:</span>
+                      <span>{user.lastName}</span>
+                    </li>
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">Usuario:</span>
+                      <span>{user.userName}</span>
+                    </li>
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">DNI:</span>
+                      <span>{user.ic}</span>
+                    </li>
+                  </ul>
+                </div>
+                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                  <div className="flex break-inside-avoid flex-col items-start gap-3">
+                    <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                      Datos profesionales
+                    </h2>
+                    <ul className="flex flex-col gap-2 text-sm">
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">Nº de matrícula:</span>
+                        <span>{user.professionalProfile?.licenseId}</span>
+                      </li>
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">Especialidad:</span>
+                        <span>{user.professionalProfile?.specialty}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </Activity>
+                <div className="flex break-inside-avoid flex-col items-start gap-3">
+                  <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                    Medios de contacto
+                  </h2>
+                  <ul className="flex flex-col gap-2 text-sm">
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">E-mail:</span>
+                      <span>{user.email}</span>
+                    </li>
+                    <li className="flex justify-start gap-2">
+                      <span className="font-semibold">Teléfono:</span>
+                      <span>{user.phoneNumber}</span>
+                    </li>
+                  </ul>
+                </div>
+                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                  <div className="flex break-inside-avoid flex-col items-start gap-3">
+                    <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                      Configuración de la agenda
+                    </h2>
+                    <ul className="flex flex-col gap-2 text-sm">
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">Días laborales:</span>
+                        <span>{user.professionalProfile?.workingDays}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </Activity>
+              </div>
               <CreatedAt>
-                {`${user?.role?.name} creado el ${user && format(user?.createdAt, "dd/MM/yyyy", { locale: es })}`}
+                {`${user.role.name} creado el ${user && format(user.createdAt, "dd/MM/yyyy", { locale: es })}`}
               </CreatedAt>
             </CardContent>
             <Activity mode={hasPermissions ? "visible" : "hidden"}>
