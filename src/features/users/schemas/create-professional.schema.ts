@@ -1,5 +1,8 @@
 import z from "zod";
-import { userSchema } from "./users.schema";
+
+import { userSchema } from "@users/schemas/users.schema";
+
+const hourSchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Formato inválido");
 
 export const createProfessionalSchema = userSchema.extend({
   password: z
@@ -36,5 +39,21 @@ export const createProfessionalSchema = userSchema.extend({
             .refine((val) => val <= 6, { message: "El día máximo es 6 (Sábado)" }),
         )
         .nonempty("Debes agregar al menos un día laboral"),
+    ),
+  maxHour: hourSchema,
+  minHour: hourSchema,
+  dailyExceptionStart: hourSchema,
+  dailyExceptionEnd: hourSchema,
+  slotDuration: z
+    .string()
+    .regex(/^\d+$/, "Debe ser un número")
+    .refine(
+      (v) => {
+        const n = Number(v);
+        return n >= 5 && n <= 120;
+      },
+      {
+        message: "Entre 5 y 120",
+      },
     ),
 });
