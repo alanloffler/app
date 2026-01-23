@@ -53,6 +53,11 @@ export function CreateProfessionalForm() {
       specialty: "",
       userName: "@",
       workingDays: [],
+      minHour: "",
+      maxHour: "",
+      dailyExceptionStart: "",
+      dailyExceptionEnd: "",
+      slotDuration: "",
     },
   });
 
@@ -391,15 +396,119 @@ export function CreateProfessionalForm() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3 border-t pt-4">
               <h2 className="text-muted-foreground text-base font-medium">Configuración de la agenda</h2>
-              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 <Controller
                   name="workingDays"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
+                    <Field className="col-span-12" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="workingDays">Dias laborales</FieldLabel>
                       <WorkingDays {...field} />
-                      {/* <Input aria-invalid={fieldState.invalid} id="workingDays" {...field} /> */}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="minHour"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="minHour">Horario de inicio:</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="minHour"
+                        maxLength={5}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9:]/g, "");
+                          field.onChange(value);
+                        }}
+                        placeholder="07:00"
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="maxHour"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="maxHour">Horario de fin:</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="maxHour"
+                        maxLength={5}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9:]/g, "");
+                          field.onChange(value);
+                        }}
+                        placeholder="20:00"
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="dailyExceptionStart"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="dailyExceptionStart">Excepción desde (opcional):</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="dailyExceptionStart"
+                        maxLength={5}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9:]/g, "");
+                          field.onChange(value);
+                        }}
+                        placeholder="12:00"
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="dailyExceptionEnd"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="dailyExceptionEnd">Excepción hasta (opcional):</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="dailyExceptionEnd"
+                        maxLength={5}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9:]/g, "");
+                          field.onChange(value);
+                        }}
+                        placeholder="13:00"
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="slotDuration"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-4" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="slotDuration">Duración:</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="slotDuration"
+                        maxLength={3}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                        placeholder="60"
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
