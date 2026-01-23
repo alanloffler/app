@@ -14,7 +14,7 @@ export const useCalendarStore = create(
   persist<CalendarState>(
     (set) => ({
       selectedDate: new Date(),
-      selectedView: "month",
+      selectedView: "week",
       setSelectedDate: (date) => set({ selectedDate: date }),
       setSelectedView: (view) => set({ selectedView: view }),
     }),
@@ -24,10 +24,9 @@ export const useCalendarStore = create(
       merge: (persistedState, currentState) => ({
         ...currentState,
         ...(persistedState as CalendarState),
-        selectedDate:
-          (persistedState as CalendarState)?.selectedDate
-            ? new Date((persistedState as CalendarState).selectedDate)
-            : currentState.selectedDate,
+        selectedDate: (persistedState as CalendarState)?.selectedDate
+          ? new Date((persistedState as CalendarState).selectedDate)
+          : currentState.selectedDate,
       }),
     },
   ),
