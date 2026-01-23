@@ -17,7 +17,7 @@ export default function EditUser() {
     <div className="flex w-full flex-col gap-10 lg:w-[80%] xl:w-[80%]">
       {userRole === EUserRole["admin"] && <div>Mostrar formulario de edición de admin</div>}
       {userRole === EUserRole["patient"] && <div>Mostrar formulario de edición de paciente</div>}
-      {userRole === EUserRole["professional"] && <EditProfessionalForm id={id} />}
+      {userRole === EUserRole["professional"] && <EditProfessionalForm userId={id} />}
     </div>
   );
 }
