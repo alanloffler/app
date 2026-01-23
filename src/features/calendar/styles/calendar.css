@@ -8,7 +8,7 @@
   --color-event-hover: #d1fae5; /* emerald-100 */
   --color-event: #059669; /* emerald-600 */
   --color-label: #717880; /* gray-500 */
-  --color-off-range: #fbfbfb;
+  --color-off-range: #f7f7f7;
 
   font-size: 13px;
   min-height: 80vh;
