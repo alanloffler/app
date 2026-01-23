@@ -4,6 +4,8 @@ import { userSchema } from "@users/schemas/users.schema";
 
 const hourSchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Formato inválido");
 
+const optionalHourSchema = z.preprocess((v) => (v === "" ? undefined : v), hourSchema.optional());
+
 export const createProfessionalSchema = userSchema.extend({
   password: z
     .string()
@@ -40,10 +42,10 @@ export const createProfessionalSchema = userSchema.extend({
         )
         .nonempty("Debes agregar al menos un día laboral"),
     ),
-  maxHour: hourSchema,
-  minHour: hourSchema,
-  dailyExceptionStart: hourSchema,
-  dailyExceptionEnd: hourSchema,
+  startHour: hourSchema,
+  endHour: hourSchema,
+  dailyExceptionStart: optionalHourSchema,
+  dailyExceptionEnd: optionalHourSchema,
   slotDuration: z
     .string()
     .regex(/^\d+$/, "Debe ser un número")
