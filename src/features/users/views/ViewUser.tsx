@@ -13,8 +13,8 @@ import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
 
-import { addMinutes, format, parse } from "date-fns";
 import { es } from "date-fns/locale";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -209,8 +209,8 @@ export default function ViewUser() {
                       <li className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold">Horario:</span>
                         {user.professionalProfile?.dailyExceptionStart && user.professionalProfile?.dailyExceptionEnd
-                          ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`
-                          : `${user.professionalProfile?.startHour} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`}
+                          ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${user.professionalProfile?.endHour} hs.`
+                          : `${user.professionalProfile?.startHour} - ${user.professionalProfile?.endHour} hs.`}
                       </li>
                       <li className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold">Duración del turno:</span>
