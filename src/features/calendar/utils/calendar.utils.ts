@@ -4,11 +4,11 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 
 export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarConfig {
-  const maxHour = new Date();
-  maxHour.setHours(parseInt(profile.endHour.slice(0, 2), 10), parseInt(profile.endHour.slice(3, 5), 10), 0, 0);
+  const endHour = new Date();
+  endHour.setHours(parseInt(profile.endHour.slice(0, 2), 10), parseInt(profile.endHour.slice(3, 5), 10), 0, 0);
 
-  const minHour = new Date();
-  minHour.setHours(parseInt(profile.startHour.slice(0, 2), 10), parseInt(profile.startHour.slice(3, 5), 10), 0, 0);
+  const startHour = new Date();
+  startHour.setHours(parseInt(profile.startHour.slice(0, 2), 10), parseInt(profile.startHour.slice(3, 5), 10), 0, 0);
 
   const step = Math.ceil(Number(profile.slotDuration));
   const timeSlots = Math.ceil(60 / step);
@@ -16,8 +16,8 @@ export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarCon
   return {
     dailyExceptionStart: profile.dailyExceptionStart,
     dailyExceptionEnd: profile.dailyExceptionEnd,
-    maxHour,
-    minHour,
+    endHour,
+    startHour,
     step,
     timeSlots,
   };
@@ -35,7 +35,11 @@ export function createSlotPropGetter(calendarConfig: ICalendarConfig | undefined
   return (date: Date) => {
     if (!calendarConfig) return {};
 
-    if (dailyExceptionRange(date, calendarConfig.dailyExceptionStart, calendarConfig.dailyExceptionEnd)) {
+    if (
+      calendarConfig.dailyExceptionStart &&
+      calendarConfig.dailyExceptionEnd &&
+      dailyExceptionRange(date, calendarConfig.dailyExceptionStart, calendarConfig.dailyExceptionEnd)
+    ) {
       return { className: "rbc-slot-lunch" };
     }
 
