@@ -3,6 +3,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { Calendar as Schedule } from "react-big-calendar";
 import { ErrorNotification } from "@components/notifications/ErrorNotification";
+import { Loader } from "@components/Loader";
 import { PageLoader } from "@components/PageLoader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 import { Toolbar } from "@calendar/components/Toolbar";
@@ -15,6 +16,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
+import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TView } from "@calendar/interfaces/calendar-view.type";
@@ -24,14 +26,13 @@ import { cn } from "@lib/utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
-import { Loader } from "@/core/components/Loader";
 
 // TODO: get config from backend
 const config = {
   // startHour: "07:00",
   // endHour: "20:00",
   exceptions: { from: "12:00", to: "15:00" },
-  slotDuration: "30",
+  // slotDuration: "30",
 };
 
 const locales = { "es-AR": es };
@@ -60,12 +61,6 @@ const messages = {
   showMore: (total: number) => `${total} más`,
 };
 
-// const maxHour = new Date();
-// maxHour.setHours(parseInt(config.endHour.slice(0, 2), 10), parseInt(config.endHour.slice(3, 5), 10), 0, 0);
-
-// const minHour = new Date();
-// minHour.setHours(parseInt(config.startHour.slice(0, 2), 10), parseInt(config.startHour.slice(3, 5), 10), 0, 0);
-
 function isLunchTime(date: Date): boolean {
   const from = parse(config.exceptions.from, "HH:mm", new Date());
   const to = parse(config.exceptions.to, "HH:mm", new Date());
@@ -81,11 +76,10 @@ function slotPropGetter(date: Date) {
 }
 
 export default function Calendar() {
+  const [calendarConfig, setCalendarConfig] = useState<ICalendarConfig | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
-  const [maxHour, setMaxHour] = useState<Date | undefined>(undefined);
-  const [minHour, setMinHour] = useState<Date | undefined>(undefined);
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [professionals, setProfessionals] = useState<IUser[] | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
@@ -142,7 +136,6 @@ export default function Calendar() {
             0,
             0,
           );
-          setMaxHour(maxHour);
 
           const minHour = new Date();
           minHour.setHours(
@@ -151,7 +144,16 @@ export default function Calendar() {
             0,
             0,
           );
-          setMinHour(minHour);
+
+          const step = Math.ceil(Number(response.data.professionalProfile.slotDuration));
+          const timeSlots = Math.ceil(60 / step);
+
+          setCalendarConfig({
+            maxHour,
+            minHour,
+            step,
+            timeSlots,
+          });
         }
       }
     },
@@ -239,15 +241,17 @@ export default function Calendar() {
             }}
             key={selectedProfessional.id}
             localizer={localizer}
-            max={maxHour}
+            max={calendarConfig?.maxHour}
             messages={messages}
-            min={minHour}
+            min={calendarConfig?.minHour}
             onNavigate={setSelectedDate}
             onSelectEvent={onSelectEvent}
             onView={onView}
             slotPropGetter={slotPropGetter}
             startAccessor="startDate"
+            step={calendarConfig?.step}
             style={{ height: 700 }}
+            timeslots={calendarConfig?.timeSlots}
             view={selectedView}
             views={["month", "week", "day"]}
           />
