@@ -1,3 +1,4 @@
+import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 import type { IRole } from "@roles/interfaces/role.interface";
 
 export interface IUser {
@@ -8,8 +9,9 @@ export interface IUser {
   ic: string;
   id: string;
   lastName: string;
-  password: string;
+  password?: string;
   phoneNumber: string;
+  professionalProfile?: IProfessionalProfile;
   role: IRole;
   roleId: string;
   updatedAt: string;
