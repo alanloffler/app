@@ -37,6 +37,7 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
             aria-invalid={ariaInvalid}
             checked={value.includes(index)}
             disabled={disabled}
+            id="workingDays"
             onCheckedChange={(checked) => handleChecked(index, checked)}
           />
           <span className="text-xs font-normal uppercase">{dayLabel}</span>
