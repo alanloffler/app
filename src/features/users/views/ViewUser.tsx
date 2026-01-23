@@ -241,7 +241,7 @@ export default function ViewUser() {
                   <>
                     <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
                       <Button className="px-5! hover:text-green-500" variant="outline" asChild>
-                        <Link to={`/users/edit/${id}`} state={{ role: userRole }}>
+                        <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
                           <FilePenLine className="h-4 w-4" />
                         </Link>
                       </Button>
