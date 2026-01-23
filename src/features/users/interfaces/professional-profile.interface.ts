@@ -1,5 +1,7 @@
 export interface IProfessionalProfile {
   createdAt: string;
+  dailyExceptionEnd: string;
+  dailyExceptionStart: string;
   endHour: string;
   id: string;
   licenseId: string;
