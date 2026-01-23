@@ -14,7 +14,7 @@ import { dateFnsLocalizer } from "react-big-calendar";
 import { es } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { toast } from "sonner";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
@@ -23,17 +23,10 @@ import type { TView } from "@calendar/interfaces/calendar-view.type";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { UsersService } from "@users/services/users.service";
 import { cn } from "@lib/utils";
+import { createSlotPropGetter, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
-
-// TODO: get config from backend
-const config = {
-  // startHour: "07:00",
-  // endHour: "20:00",
-  exceptions: { from: "12:00", to: "15:00" },
-  // slotDuration: "30",
-};
 
 const locales = { "es-AR": es };
 
@@ -61,20 +54,6 @@ const messages = {
   showMore: (total: number) => `${total} más`,
 };
 
-function isLunchTime(date: Date): boolean {
-  const from = parse(config.exceptions.from, "HH:mm", new Date());
-  const to = parse(config.exceptions.to, "HH:mm", new Date());
-  const hour = date.getHours();
-  return hour >= from.getHours() && hour < to.getHours();
-}
-
-function slotPropGetter(date: Date) {
-  if (isLunchTime(date)) {
-    return { className: "rbc-slot-lunch" };
-  }
-  return {};
-}
-
 export default function Calendar() {
   const [calendarConfig, setCalendarConfig] = useState<ICalendarConfig | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -90,6 +69,8 @@ export default function Calendar() {
   const { isLoading: isLoadingProfessionals, tryCatch: tryCatchProfessionals } = useTryCatch();
   const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
 
+  const slotPropGetter = useMemo(() => createSlotPropGetter(calendarConfig), [calendarConfig]);
+
   const fetchProfessionals = useCallback(async () => {
     const [response, error] = await tryCatchProfessionals(UsersService.findAll("professional"));
 
@@ -102,10 +83,6 @@ export default function Calendar() {
       setProfessionals(response.data);
     }
   }, [tryCatchProfessionals]);
-
-  useEffect(() => {
-    fetchProfessionals();
-  }, [fetchProfessionals]);
 
   const getProfessional = useCallback(
     async (id: string): Promise<void> => {
@@ -127,34 +104,7 @@ export default function Calendar() {
         }
 
         setSelectedProfessional(response.data);
-
-        if (response.data.professionalProfile) {
-          const maxHour = new Date();
-          maxHour.setHours(
-            parseInt(response.data.professionalProfile.endHour.slice(0, 2), 10),
-            parseInt(response.data.professionalProfile.endHour.slice(3, 5), 10),
-            0,
-            0,
-          );
-
-          const minHour = new Date();
-          minHour.setHours(
-            parseInt(response.data.professionalProfile.startHour.slice(0, 2), 10),
-            parseInt(response.data.professionalProfile.startHour.slice(3, 5), 10),
-            0,
-            0,
-          );
-
-          const step = Math.ceil(Number(response.data.professionalProfile.slotDuration));
-          const timeSlots = Math.ceil(60 / step);
-
-          setCalendarConfig({
-            maxHour,
-            minHour,
-            step,
-            timeSlots,
-          });
-        }
+        setCalendarConfig(parseCalendarConfig(response.data.professionalProfile));
       }
     },
     [tryCatchProfessional],
@@ -175,10 +125,6 @@ export default function Calendar() {
     }
   }, [tryCatchEvents]);
 
-  useEffect(() => {
-    refreshEvents();
-  }, [refreshEvents]);
-
   const onView = useCallback(
     (view: View) => {
       if (view === "month") setSelectedDate(new Date());
@@ -191,6 +137,14 @@ export default function Calendar() {
     setSelectedEvent(event as ICalendarEvent);
     setOpenSheet(true);
   }, []);
+
+  useEffect(() => {
+    fetchProfessionals();
+  }, [fetchProfessionals]);
+
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
 
   if (isLoadingEvents) return <PageLoader text="Cargando agenda" />;
 
