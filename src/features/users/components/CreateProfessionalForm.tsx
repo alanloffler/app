@@ -53,8 +53,8 @@ export function CreateProfessionalForm() {
       specialty: "",
       userName: "@",
       workingDays: [],
-      minHour: "",
-      maxHour: "",
+      startHour: "",
+      endHour: "",
       dailyExceptionStart: "",
       dailyExceptionEnd: "",
       slotDuration: "",
@@ -114,7 +114,7 @@ export function CreateProfessionalForm() {
       return;
     }
 
-    const [create, createError] = await tryCatchUser(UsersService.create(data));
+    const [create, createError] = await tryCatchUser(UsersService.createProfessional(data));
 
     if (createError) {
       toast.error(createError.message);
@@ -319,12 +319,12 @@ export function CreateProfessionalForm() {
             </div>
             <div className="flex flex-col gap-3 border-t pt-4">
               <h2 className="text-muted-foreground text-base font-medium">Medios de contacto</h2>
-              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 <Controller
                   name="email"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid || !!emailError}>
+                    <Field className="col-span-6" data-invalid={fieldState.invalid || !!emailError}>
                       <FieldLabel htmlFor="email">E-mail</FieldLabel>
                       <Input
                         aria-invalid={fieldState.invalid || !!emailError}
@@ -358,7 +358,7 @@ export function CreateProfessionalForm() {
                   name="phoneNumber"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="col-span-1">
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
                       <Input
                         {...field}
@@ -378,12 +378,12 @@ export function CreateProfessionalForm() {
             </div>
             <div className="flex flex-col gap-3 border-t pt-4">
               <h2 className="text-muted-foreground text-base font-medium">Seguridad</h2>
-              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 <Controller
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
+                    <Field className="col-span-8" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="password">Contraseña</FieldLabel>
                       <Input aria-invalid={fieldState.invalid} id="password" {...field} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -409,15 +409,15 @@ export function CreateProfessionalForm() {
                   )}
                 />
                 <Controller
-                  name="minHour"
+                  name="startHour"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="minHour">Horario de inicio:</FieldLabel>
+                    <Field className="col-span-12 md:col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="startHour">Horario de inicio:</FieldLabel>
                       <Input
                         {...field}
                         aria-invalid={fieldState.invalid}
-                        id="minHour"
+                        id="startHour"
                         maxLength={5}
                         onChange={(e) => {
                           const value = e.target.value.replace(/[^0-9:]/g, "");
@@ -430,15 +430,15 @@ export function CreateProfessionalForm() {
                   )}
                 />
                 <Controller
-                  name="maxHour"
+                  name="endHour"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="maxHour">Horario de fin:</FieldLabel>
+                    <Field className="col-span-12 md:col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="endHour">Horario de fin:</FieldLabel>
                       <Input
                         {...field}
                         aria-invalid={fieldState.invalid}
-                        id="maxHour"
+                        id="endHour"
                         maxLength={5}
                         onChange={(e) => {
                           const value = e.target.value.replace(/[^0-9:]/g, "");
@@ -454,7 +454,7 @@ export function CreateProfessionalForm() {
                   name="dailyExceptionStart"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                    <Field className="col-span-12 md:col-span-6" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="dailyExceptionStart">Excepción desde (opcional):</FieldLabel>
                       <Input
                         {...field}
@@ -475,7 +475,7 @@ export function CreateProfessionalForm() {
                   name="dailyExceptionEnd"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                    <Field className="col-span-12 md:col-span-6" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="dailyExceptionEnd">Excepción hasta (opcional):</FieldLabel>
                       <Input
                         {...field}
@@ -496,7 +496,7 @@ export function CreateProfessionalForm() {
                   name="slotDuration"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="col-span-4" data-invalid={fieldState.invalid}>
+                    <Field className="col-span-12 md:col-span-4" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="slotDuration">Duración:</FieldLabel>
                       <Input
                         {...field}
