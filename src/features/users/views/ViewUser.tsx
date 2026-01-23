@@ -13,8 +13,8 @@ import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
 
+import { addMinutes, format, parse } from "date-fns";
 import { es } from "date-fns/locale";
-import { format } from "date-fns";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -192,7 +192,11 @@ export default function ViewUser() {
                     </li>
                   </ul>
                 </div>
-                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                <Activity
+                  mode={
+                    user.role.value === EUserRole["professional"] && user.professionalProfile ? "visible" : "hidden"
+                  }
+                >
                   <div className="flex break-inside-avoid flex-col items-start gap-3">
                     <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
                       Configuración de la agenda
@@ -201,6 +205,12 @@ export default function ViewUser() {
                       <li className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold">Días laborales:</span>
                         <DisplayWorkingDays days={user.professionalProfile?.workingDays} />
+                      </li>
+                      <li className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold">Horario:</span>
+                        {user.professionalProfile?.dailyExceptionStart && user.professionalProfile?.dailyExceptionEnd
+                          ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`
+                          : `${user.professionalProfile?.startHour} - ${format(addMinutes(parse(user.professionalProfile?.endHour ?? "00:00", "HH:mm", new Date()), Number(user.professionalProfile?.slotDuration)), "HH:mm")} hs.`}
                       </li>
                     </ul>
                   </div>
