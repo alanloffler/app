@@ -195,9 +195,9 @@ export default function Calendar() {
             }}
             key={selectedProfessional.id}
             localizer={localizer}
-            max={calendarConfig?.maxHour}
+            max={calendarConfig?.endHour}
             messages={messages}
-            min={calendarConfig?.minHour}
+            min={calendarConfig?.startHour}
             onNavigate={setSelectedDate}
             onSelectEvent={onSelectEvent}
             onView={onView}
