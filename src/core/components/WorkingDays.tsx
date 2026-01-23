@@ -32,7 +32,7 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
   return (
     <div
       className={cn(
-        "flex justify-between gap-3 rounded-md p-1 md:justify-start",
+        "flex justify-between gap-3 rounded-md p-1 md:justify-start lg:gap-5",
         ariaInvalid && "ring-destructive ring-2",
       )}
     >
