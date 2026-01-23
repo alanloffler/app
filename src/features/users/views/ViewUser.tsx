@@ -6,6 +6,7 @@ import { Button } from "@components/ui/button";
 import { Badge } from "@components/Badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
 import { CreatedAt } from "@components/CreatedAt";
+import { DisplayWorkingDays } from "@components/DisplayWorkingDays";
 import { HoldButton } from "@components/ui/HoldButton";
 import { Link } from "react-router";
 import { Loader } from "@components/Loader";
@@ -197,9 +198,9 @@ export default function ViewUser() {
                       Configuración de la agenda
                     </h2>
                     <ul className="flex flex-col gap-2 text-sm">
-                      <li className="flex justify-start gap-2">
+                      <li className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold">Días laborales:</span>
-                        <span>{user.professionalProfile?.workingDays}</span>
+                        <DisplayWorkingDays days={user.professionalProfile?.workingDays} />
                       </li>
                     </ul>
                   </div>
