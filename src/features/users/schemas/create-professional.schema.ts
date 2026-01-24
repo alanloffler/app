@@ -4,7 +4,9 @@ import { userSchema } from "@users/schemas/users.schema";
 
 const hourSchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Formato inválido");
 
-const optionalHourSchema = z.preprocess((v) => (v === "" ? undefined : v), hourSchema.optional());
+const optionalHourSchema = z
+  .string()
+  .refine((v) => v === "" || /^([01]\d|2[0-3]):([0-5]\d)$/.test(v), "Formato inválido");
 
 export const createProfessionalSchema = userSchema.extend({
   password: z
