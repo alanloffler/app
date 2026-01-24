@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CalendarService } from "@calendar/services/calendar.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
+import { isExcludedDay } from "@calendar/utils/calendar.utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
@@ -72,8 +73,14 @@ export function AddEvent({ onCreateEvent }: IProps) {
   }
 
   useEffect(() => {
-    if (openSheet === false) form.reset();
-  }, [openSheet, form]);
+    if (openSheet === false) {
+      form.reset();
+    } else {
+      // TODO: Check also with custom days like one specific day
+      const isTodayExcluded = isExcludedDay(new Date(), selectedProfessionalConfig?.excludedDays);
+      if (isTodayExcluded) form.setValue("startDate", "");
+    }
+  }, [openSheet, form, selectedProfessionalConfig]);
 
   return (
     <Sheet open={openSheet} onOpenChange={setOpenSheet}>
@@ -136,8 +143,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="userId">Usuario</FieldLabel>
-                    {/* TODO: FORMAT INVALID CONTENT */}
+                    <FieldLabel htmlFor="userId">Paciente</FieldLabel>
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
@@ -163,7 +169,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                       return date.getHours() !== 0 || date.getMinutes() !== 0;
                     })();
                   const isDateInvalid = fieldState.invalid && !hasDate;
-                  const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
+                  const isHourInvalid = fieldState.invalid && !hasValidHour;
 
                   return (
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:grid-rows-1">
@@ -174,15 +180,10 @@ export function AddEvent({ onCreateEvent }: IProps) {
                       >
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
                         <div className="flex-1">
-                          {/* disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]} */}
-                          {/* TODO: set to not selected day if the today day is not included in the working days */}
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
-                            disabled={[
-                              { dayOfWeek: selectedProfessionalConfig?.excludedDays as any },
-                              { from: new Date() },
-                            ]}
+                            disabled={[{ dayOfWeek: selectedProfessionalConfig?.excludedDays as number[] }]}
                             id="date"
                             locale={es}
                             mode="single"
