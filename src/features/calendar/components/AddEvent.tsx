@@ -20,18 +20,16 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
-  calendarConfig: ICalendarConfig;
   onCreateEvent: () => void;
 }
 
-export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
+export function AddEvent({ onCreateEvent }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
@@ -49,8 +47,10 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
   });
 
   async function onSubmit(data: z.infer<typeof eventSchema>): Promise<void> {
+    if (!selectedProfessionalConfig) return;
+
     const startDate = parseISO(data.startDate);
-    const endDate = addMinutes(startDate, calendarConfig.step);
+    const endDate = addMinutes(startDate, selectedProfessionalConfig?.step);
 
     const transformedData = {
       ...data,
@@ -202,7 +202,7 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
                         style={{ position: "relative", zIndex: 1 }}
                       >
                         <FieldLabel>Horario</FieldLabel>
-                        <HourGrid form={form} config={calendarConfig} isInvalid={isHourInvalid} />
+                        {selectedProfessionalConfig && <HourGrid form={form} isInvalid={isHourInvalid} />}
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     </div>
