@@ -5,16 +5,12 @@ import type { UseFormReturn } from "react-hook-form";
 import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 
+import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { eventSchema } from "@calendar/schemas/event.schema";
 import { cn } from "@lib/utils";
 
 interface IProps {
-  config: {
-    startHour: string;
-    endHour: string;
-    exceptions?: { from: string; to: string };
-    slotDuration: string;
-  };
+  config: ICalendarConfig;
   isInvalid?: boolean;
   form: UseFormReturn<z.infer<typeof eventSchema>>;
 }
@@ -24,9 +20,8 @@ function parseTime(time: string): { hours: number; minutes: number } {
   return { hours, minutes };
 }
 
-function timeToMinutes(time: string): number {
-  const { hours, minutes } = parseTime(time);
-  return hours * 60 + minutes;
+function timeToMinutesDate(time: Date): number {
+  return time.getHours() * 60 + time.getMinutes();
 }
 
 export function HourGrid({ config, form, isInvalid }: IProps) {
@@ -51,15 +46,15 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
     }
   }, [dateValue]);
 
-  const { startHour, endHour, exceptions, slotDuration } = config;
+  const { startHour, endHour, step, dailyExceptionStart, dailyExceptionEnd } = config;
 
   const { slots, separatorIndex } = useMemo(() => {
-    if (!startHour || !endHour || !slotDuration) return { slots: [], separatorIndex: -1 };
+    if (!startHour || !endHour || !step) return { slots: [], separatorIndex: -1 };
 
-    const duration = parseInt(slotDuration, 10) || 30;
-    const startMinutes = timeToMinutes(startHour);
-    const endMinutes = timeToMinutes(endHour);
-    const hasExceptions = exceptions?.from && exceptions?.to;
+    const duration = step;
+    const startMinutes = timeToMinutesDate(startHour);
+    const endMinutes = timeToMinutesDate(endHour);
+    const hasExceptions = dailyExceptionStart && dailyExceptionEnd;
 
     const formatSlot = (mins: number): string => {
       const h = Math.floor(mins / 60);
@@ -75,8 +70,8 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
       return { slots: allSlots, separatorIndex: -1 };
     }
 
-    const exceptionFromMinutes = timeToMinutes(exceptions.from);
-    const exceptionToMinutes = timeToMinutes(exceptions.to);
+    const exceptionFromMinutes = timeToMinutesDate(dailyExceptionStart!);
+    const exceptionToMinutes = timeToMinutesDate(dailyExceptionEnd!);
 
     const morningSlots: string[] = [];
     for (let mins = startMinutes; mins < exceptionFromMinutes; mins += duration) {
@@ -92,7 +87,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
       slots: [...morningSlots, ...afternoonSlots],
       separatorIndex: morningSlots.length,
     };
-  }, [startHour, endHour, exceptions, slotDuration]);
+  }, [startHour, endHour, dailyExceptionEnd, dailyExceptionStart, step]);
 
   function handleHourClick(hour: string) {
     const currentDate = form.getValues("startDate");
