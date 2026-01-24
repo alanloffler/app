@@ -19,13 +19,17 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
     end: addDays(firstDayOfCurrentWeek, 6),
   }).map((day) => format(day, "EE", { locale: es }));
 
+  const indexToDayValue = (index: number): number => (index + 1) % 7;
+
   function handleChecked(index: number, checked: "indeterminate" | boolean) {
     if (!onChange) return;
 
+    const dayValue = indexToDayValue(index);
+
     if (checked === true) {
-      onChange([...value, index].sort((a, b) => a - b));
+      onChange([...value, dayValue].sort((a, b) => a - b));
     } else {
-      onChange(value.filter((day) => day !== index));
+      onChange(value.filter((day) => day !== dayValue));
     }
   }
 
@@ -40,7 +44,7 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
         <div key={index} className="flex flex-col items-center gap-1">
           <Checkbox
             aria-invalid={ariaInvalid}
-            checked={value.includes(index)}
+            checked={value.includes(indexToDayValue(index))}
             disabled={disabled}
             id="workingDays"
             onCheckedChange={(checked) => handleChecked(index, checked)}
