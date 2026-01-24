@@ -5,4 +5,5 @@ export interface ICalendarConfig {
   startHour: Date;
   step: number;
   timeSlots: number;
+  excludedDays: number[];
 }
