@@ -10,11 +10,11 @@ import type { IUser } from "@users/interfaces/user.interface";
 import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
 import { cn } from "@lib/utils";
-import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
   "aria-invalid"?: boolean;
+  defaultSelected?: string;
   id?: string;
   onChange?: (value: string) => void;
   userType?: "patient" | "professional";
@@ -24,6 +24,7 @@ interface IProps {
 
 export function UserCombobox({
   "aria-invalid": ariaInvalid,
+  defaultSelected,
   id,
   onChange,
   userType = "patient",
@@ -34,7 +35,6 @@ export function UserCombobox({
   const [open, setOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const { isLoading, tryCatch } = useTryCatch();
-  const { selectedProfessional } = useCalendarStore();
 
   const findUsers = useCallback(async () => {
     const [response, error] = await tryCatch(UsersService.findAll(userType));
@@ -45,9 +45,9 @@ export function UserCombobox({
 
     if (response && response?.statusCode === 200) {
       setUsers(response?.data);
-      if (selectedProfessional) onChange?.(selectedProfessional.id);
+      if (defaultSelected) onChange?.(defaultSelected);
     }
-  }, [tryCatch, userType, onChange, selectedProfessional]);
+  }, [defaultSelected, tryCatch, userType, onChange]);
 
   function getSelectedUser(value: string): string {
     const user = users?.find((user) => user.id === value);
