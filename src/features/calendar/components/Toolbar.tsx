@@ -4,14 +4,12 @@ import { Navigation } from "@calendar/components/Navigation";
 
 import type { ToolbarProps } from "react-big-calendar";
 
-import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import type { TView } from "@calendar/interfaces/calendar-view.type";
 import { cn } from "@lib/utils";
 import { useSidebar } from "@components/ui/sidebar";
 
 interface IProps extends ToolbarProps<ICalendarEvent> {
-  calendarConfig?: ICalendarConfig;
   calendarView: TView;
   currentDate: Date;
   onCreateEvent: () => void;
@@ -19,8 +17,6 @@ interface IProps extends ToolbarProps<ICalendarEvent> {
 
 export function Toolbar(props: IProps) {
   const { open } = useSidebar();
-
-  if (!props.calendarConfig) return null;
 
   return (
     <div
@@ -32,7 +28,7 @@ export function Toolbar(props: IProps) {
       <DateHeader calendarView={props.calendarView} currentDate={props.currentDate} />
       <div className="flex flex-col items-center gap-3 md:flex-row">
         <Navigation {...props} />
-        <AddEvent calendarConfig={props.calendarConfig} onCreateEvent={props.onCreateEvent} />
+        <AddEvent onCreateEvent={props.onCreateEvent} />
       </div>
     </div>
   );
