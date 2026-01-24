@@ -111,7 +111,9 @@ export default function Calendar() {
   );
 
   const refreshEvents = useCallback(async () => {
-    const [response, error] = await tryCatchEvents(CalendarService.findAll());
+    if (!selectedProfessional) return;
+
+    const [response, error] = await tryCatchEvents(CalendarService.findAll(selectedProfessional.id));
 
     if (error) {
       toast.error(error.message);
@@ -123,7 +125,7 @@ export default function Calendar() {
     if (response && response?.statusCode === 200) {
       setEvents(response.data);
     }
-  }, [tryCatchEvents]);
+  }, [selectedProfessional, tryCatchEvents]);
 
   const onView = useCallback(
     (view: View) => {
