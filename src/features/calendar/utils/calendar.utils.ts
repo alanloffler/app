@@ -2,21 +2,26 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 
 export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarConfig {
-  const dailyExceptionStart = new Date();
-  dailyExceptionStart.setHours(
-    parseInt(profile.dailyExceptionStart.slice(0, 2), 10),
-    parseInt(profile.dailyExceptionStart.slice(3, 5), 10),
-    0,
-    0,
-  );
+  let dailyExceptionStart = undefined;
+  let dailyExceptionEnd = undefined;
 
-  const dailyExceptionEnd = new Date();
-  dailyExceptionEnd.setHours(
-    parseInt(profile.dailyExceptionEnd.slice(0, 2), 10),
-    parseInt(profile.dailyExceptionEnd.slice(3, 5), 10),
-    0,
-    0,
-  );
+  if (profile.dailyExceptionStart && profile.dailyExceptionEnd) {
+    dailyExceptionStart = new Date();
+    dailyExceptionStart.setHours(
+      parseInt(profile.dailyExceptionStart.slice(0, 2), 10),
+      parseInt(profile.dailyExceptionStart.slice(3, 5), 10),
+      0,
+      0,
+    );
+
+    dailyExceptionEnd = new Date();
+    dailyExceptionEnd.setHours(
+      parseInt(profile.dailyExceptionEnd.slice(0, 2), 10),
+      parseInt(profile.dailyExceptionEnd.slice(3, 5), 10),
+      0,
+      0,
+    );
+  }
 
   const startHour = new Date();
   startHour.setHours(parseInt(profile.startHour.slice(0, 2), 10), parseInt(profile.startHour.slice(3, 5), 10), 0, 0);
