@@ -1,6 +1,6 @@
 export interface ICalendarConfig {
-  dailyExceptionEnd?: string;
-  dailyExceptionStart?: string;
+  dailyExceptionEnd?: Date;
+  dailyExceptionStart?: Date;
   endHour: Date;
   startHour: Date;
   step: number;
