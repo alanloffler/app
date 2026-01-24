@@ -185,7 +185,6 @@ export default function Calendar() {
               toolbar: (props: ToolbarProps<ICalendarEvent>) => (
                 <Toolbar
                   {...props}
-                  calendarConfig={selectedProfessionalConfig}
                   calendarView={props.view as TView}
                   currentDate={selectedDate}
                   onCreateEvent={refreshEvents}
