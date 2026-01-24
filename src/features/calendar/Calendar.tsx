@@ -62,12 +62,12 @@ export default function Calendar() {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [professionals, setProfessionals] = useState<IUser[] | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = useState<ICalendarEvent | null>(null);
-  const [selectedProfessional, setSelectedProfessional] = useState<IUser | undefined>(undefined);
   const canViewEvent = usePermission("events-view");
   const { isLoading: isLoadingEvents, tryCatch: tryCatchEvents } = useTryCatch();
   const { isLoading: isLoadingProfessional, tryCatch: tryCatchProfessional } = useTryCatch();
   const { isLoading: isLoadingProfessionals, tryCatch: tryCatchProfessionals } = useTryCatch();
   const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
+  const { selectedProfessional, setSelectedProfessional } = useCalendarStore();
 
   const slotPropGetter = useMemo(() => createSlotPropGetter(calendarConfig), [calendarConfig]);
 
@@ -94,7 +94,7 @@ export default function Calendar() {
         setCalendarConfig(parseCalendarConfig(response.data.professionalProfile));
       }
     },
-    [tryCatchProfessional],
+    [setSelectedProfessional, tryCatchProfessional],
   );
 
   const fetchProfessionals = useCallback(async () => {
@@ -110,7 +110,7 @@ export default function Calendar() {
       setSelectedProfessional(response.data[0]);
       getProfessional(response.data[0].id);
     }
-  }, [tryCatchProfessionals, getProfessional]);
+  }, [getProfessional, setSelectedProfessional, tryCatchProfessionals]);
 
   const refreshEvents = useCallback(async () => {
     if (!selectedProfessional) return;
@@ -191,7 +191,6 @@ export default function Calendar() {
                   calendarView={props.view as TView}
                   currentDate={selectedDate}
                   onCreateEvent={refreshEvents}
-                  selectedId={selectedProfessional.id}
                 />
               ),
             }}
