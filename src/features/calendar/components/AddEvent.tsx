@@ -28,9 +28,10 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 interface IProps {
   calendarConfig: ICalendarConfig;
   onCreateEvent: () => void;
+  selectedId?: string;
 }
 
-export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
+export function AddEvent({ calendarConfig, onCreateEvent, selectedId }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
@@ -116,6 +117,7 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
                   <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="professionalId">Profesional</FieldLabel>
                     <UserCombobox
+                      selectedId={selectedId}
                       aria-invalid={fieldState.invalid}
                       id="professionalId"
                       onChange={field.onChange}
