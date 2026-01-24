@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const eventSchema = z.object({
-  professionalId: z.uuid("Formato de UUID inválido").nonempty("El profesional es obligatorio"),
+  professionalId: z.uuid("El profesional es obligatorio").nonempty("El profesional es obligatorio"),
   startDate: z
     .string()
     .nonempty("La fecha y horario son obligatorios")
@@ -16,5 +16,5 @@ export const eventSchema = z.object({
       { message: "Debe seleccionar un horario" },
     ),
   title: z.string().nonempty("El título es obligatorio").min(3, "El título debe tener al menos 3 caracteres"),
-  userId: z.uuid("Formato de UUID inválido").nonempty("El paciente es obligatorio"),
+  userId: z.uuid("El paciente es obligatorio").nonempty("El paciente es obligatorio"),
 });
