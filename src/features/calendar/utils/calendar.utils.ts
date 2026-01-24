@@ -52,7 +52,7 @@ export function dailyExceptionRange(date: Date, dailyExceptionStart: Date, daily
   return hour >= dailyExceptionStart.getHours() && hour < dailyExceptionEnd.getHours();
 }
 
-export function createSlotPropGetter(calendarConfig: ICalendarConfig | undefined) {
+export function createSlotPropGetter(calendarConfig: ICalendarConfig | null) {
   return (date: Date) => {
     if (!calendarConfig) return {};
 
