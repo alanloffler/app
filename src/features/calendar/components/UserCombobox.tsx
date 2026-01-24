@@ -7,15 +7,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover"
 import { useCallback, useEffect, useState } from "react";
 
 import type { IUser } from "@users/interfaces/user.interface";
+import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
 import { cn } from "@lib/utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
-import { EUserRole } from "@/features/roles/enums/user-role.enum";
 
 interface IProps {
   "aria-invalid"?: boolean;
   id?: string;
   onChange?: (value: string) => void;
+  selectedId?: string;
   userType?: "patient" | "professional";
   value?: string;
   width?: string;
@@ -25,6 +26,7 @@ export function UserCombobox({
   "aria-invalid": ariaInvalid,
   id,
   onChange,
+  selectedId,
   userType = "patient",
   value = "",
   width,
@@ -43,8 +45,9 @@ export function UserCombobox({
 
     if (response && response?.statusCode === 200) {
       setUsers(response?.data);
+      if (selectedId) onChange?.(selectedId);
     }
-  }, [tryCatch, userType]);
+  }, [tryCatch, userType, onChange, selectedId]);
 
   function getSelectedUser(value: string): string {
     const user = users?.find((user) => user.id === value);
