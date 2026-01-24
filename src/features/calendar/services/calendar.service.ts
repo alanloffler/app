@@ -21,8 +21,8 @@ class CalendarModuleService {
     return response.data;
   }
 
-  public async findAll(): Promise<IApiResponse<ICalendarEvent[]>> {
-    const response = await apiClient.get("/events");
+  public async findAll(professionalId: string): Promise<IApiResponse<ICalendarEvent[]>> {
+    const response = await apiClient.get(`events/professional/${professionalId}`);
     const data = response.data;
     if (!data.data) return data;
 
