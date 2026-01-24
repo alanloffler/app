@@ -67,3 +67,10 @@ export function createSlotPropGetter(calendarConfig: ICalendarConfig | null) {
     return {};
   };
 }
+
+export function isExcludedDay(day: Date, excludedDays?: number[]): boolean {
+  if (!excludedDays) return false;
+
+  const dayOfWeek = day.getDay();
+  return excludedDays.includes(dayOfWeek);
+}
