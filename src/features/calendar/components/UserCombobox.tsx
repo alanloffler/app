@@ -10,6 +10,7 @@ import type { IUser } from "@users/interfaces/user.interface";
 import { UsersService } from "@users/services/users.service";
 import { cn } from "@lib/utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
+import { EUserRole } from "@/features/roles/enums/user-role.enum";
 
 interface IProps {
   "aria-invalid"?: boolean;
@@ -49,7 +50,9 @@ export function UserCombobox({
     const user = users?.find((user) => user.id === value);
     if (!users || !value || !user) return "";
 
-    return `${user.firstName} ${user.lastName}`;
+    return userType === EUserRole.professional
+      ? `${user.professionalProfile?.professionalPrefix} ${user.firstName} ${user.lastName}`
+      : `${user.firstName} ${user.lastName}`;
   }
 
   useEffect(() => {
@@ -99,7 +102,9 @@ export function UserCombobox({
                   }}
                   value={user.id}
                 >
-                  {user.firstName} {user.lastName}
+                  {userType === EUserRole.professional
+                    ? `${user.professionalProfile?.professionalPrefix} ${user.firstName} ${user.lastName}`
+                    : `${user.firstName} ${user.lastName}`}
                   <Check className={cn("ml-auto", value === user.id ? "opacity-100" : "opacity-0")} />
                 </CommandItem>
               ))}
