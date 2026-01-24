@@ -71,20 +71,6 @@ export default function Calendar() {
 
   const slotPropGetter = useMemo(() => createSlotPropGetter(calendarConfig), [calendarConfig]);
 
-  const fetchProfessionals = useCallback(async () => {
-    const [response, error] = await tryCatchProfessionals(UsersService.findAll("professional"));
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    if (response && response.statusCode === 200 && response.data) {
-      setProfessionals(response.data);
-      setSelectedProfessional(response.data[0]);
-    }
-  }, [tryCatchProfessionals]);
-
   const getProfessional = useCallback(
     async (id: string): Promise<void> => {
       const [response, error] = await tryCatchProfessional(UsersService.findOne(id));
@@ -110,6 +96,21 @@ export default function Calendar() {
     },
     [tryCatchProfessional],
   );
+
+  const fetchProfessionals = useCallback(async () => {
+    const [response, error] = await tryCatchProfessionals(UsersService.findAll("professional"));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 200 && response.data) {
+      setProfessionals(response.data);
+      setSelectedProfessional(response.data[0]);
+      getProfessional(response.data[0].id);
+    }
+  }, [tryCatchProfessionals, getProfessional]);
 
   const refreshEvents = useCallback(async () => {
     if (!selectedProfessional) return;
@@ -186,6 +187,7 @@ export default function Calendar() {
               toolbar: (props: ToolbarProps<ICalendarEvent>) => (
                 <Toolbar
                   {...props}
+                  calendarConfig={calendarConfig}
                   calendarView={props.view as TView}
                   currentDate={selectedDate}
                   onCreateEvent={refreshEvents}
