@@ -15,6 +15,7 @@ interface IProps extends ToolbarProps<ICalendarEvent> {
   calendarView: TView;
   currentDate: Date;
   onCreateEvent: () => void;
+  selectedId?: string;
 }
 
 export function Toolbar(props: IProps) {
@@ -32,7 +33,11 @@ export function Toolbar(props: IProps) {
       <DateHeader calendarView={props.calendarView} currentDate={props.currentDate} />
       <div className="flex flex-col items-center gap-3 md:flex-row">
         <Navigation {...props} />
-        <AddEvent calendarConfig={props.calendarConfig} onCreateEvent={props.onCreateEvent} />
+        <AddEvent
+          selectedId={props.selectedId}
+          calendarConfig={props.calendarConfig}
+          onCreateEvent={props.onCreateEvent}
+        />
       </div>
     </div>
   );
