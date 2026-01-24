@@ -80,7 +80,7 @@ export function UserCombobox({
         >
           {isLoading && "Cargando..."}
           {error && "Error"}
-          {value ? getSelectedUser(value) : ""}
+          <span>{value ? getSelectedUser(value) : ""}</span>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
