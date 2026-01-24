@@ -156,7 +156,7 @@ export default function Calendar() {
         <div className="flex items-center gap-4">
           <Select
             disabled={!professionals}
-            value={selectedProfessional?.id}
+            defaultValue={selectedProfessional?.id}
             onValueChange={(professionalId) => {
               getProfessional(professionalId);
             }}
@@ -167,7 +167,7 @@ export default function Calendar() {
             <SelectContent>
               {professionals?.map((professional) => (
                 <SelectItem key={professional.id} value={professional.id}>
-                  {professional.firstName}
+                  {`${professional.professionalProfile?.professionalPrefix} ${professional.firstName} ${professional.lastName}`}
                 </SelectItem>
               ))}
             </SelectContent>
