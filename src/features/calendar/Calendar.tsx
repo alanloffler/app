@@ -81,6 +81,7 @@ export default function Calendar() {
 
     if (response && response.statusCode === 200 && response.data) {
       setProfessionals(response.data);
+      setSelectedProfessional(response.data[0]);
     }
   }, [tryCatchProfessionals]);
 
@@ -152,7 +153,7 @@ export default function Calendar() {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
+      <div className="flex h-screen flex-col gap-8">
         <div className="flex items-center gap-4">
           <Select
             disabled={!professionals}
@@ -161,8 +162,10 @@ export default function Calendar() {
               getProfessional(professionalId);
             }}
           >
-            <SelectTrigger id="professionals">
-              <SelectValue placeholder={isLoadingProfessionals ? "Cargando profesionales" : "Seleccione profesional"} />
+            <SelectTrigger className="min-w-60" id="professionals" size="lg">
+              <SelectValue
+                placeholder={isLoadingProfessionals ? "Cargando profesionales" : "Seleccionar profesional"}
+              />
             </SelectTrigger>
             <SelectContent>
               {professionals?.map((professional) => (
@@ -207,7 +210,6 @@ export default function Calendar() {
             slotPropGetter={slotPropGetter}
             startAccessor="startDate"
             step={calendarConfig?.step}
-            style={{ height: 700 }}
             timeslots={calendarConfig?.timeSlots}
             view={selectedView}
             views={["month", "week", "day"]}
