@@ -2,6 +2,26 @@ import type { IApiResponse } from "@core/interfaces/api-response.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import { apiClient } from "@core/client/client";
 
+interface ICreateProfessionalForm {
+  dailyExceptionEnd: string;
+  dailyExceptionStart: string;
+  email: string;
+  endHour: string;
+  firstName: string;
+  ic: string;
+  lastName: string;
+  licenseId: string;
+  password: string;
+  phoneNumber: string;
+  professionalPrefix: string;
+  roleId: string;
+  slotDuration: string;
+  specialty: string;
+  startHour: string;
+  userName: string;
+  workingDays: number[];
+}
+
 class UsersModuleService {
   private static instance: UsersModuleService;
 
@@ -11,6 +31,35 @@ class UsersModuleService {
     }
 
     return UsersModuleService.instance;
+  }
+
+  public async createProfessional(data: ICreateProfessionalForm): Promise<IApiResponse<IUser>> {
+    const payload = {
+      user: {
+        ic: data.ic,
+        userName: data.userName,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+        roleId: data.roleId,
+      },
+      profile: {
+        licenseId: data.licenseId,
+        professionalPrefix: data.professionalPrefix,
+        specialty: data.specialty,
+        workingDays: data.workingDays,
+        startHour: data.startHour,
+        endHour: data.endHour,
+        slotDuration: data.slotDuration,
+        dailyExceptionStart: data.dailyExceptionStart || undefined,
+        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
+      },
+    };
+
+    const response = await apiClient.post("/users/create-professional", payload);
+    return response.data;
   }
 
   public async create(data: Partial<IUser>): Promise<IApiResponse<IUser>> {
