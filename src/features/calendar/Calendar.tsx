@@ -191,6 +191,7 @@ export default function Calendar() {
                   calendarView={props.view as TView}
                   currentDate={selectedDate}
                   onCreateEvent={refreshEvents}
+                  selectedId={selectedProfessional.id}
                 />
               ),
             }}
