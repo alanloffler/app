@@ -33,6 +33,9 @@ export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarCon
 
   const timeSlots = Math.ceil(60 / step);
 
+  const workingDays = profile.workingDays.map((day) => parseInt(day, 10));
+  const excludedDays = [0, 1, 2, 3, 4, 5, 6].filter((day) => !workingDays.includes(day));
+
   return {
     dailyExceptionStart,
     dailyExceptionEnd,
@@ -40,6 +43,7 @@ export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarCon
     endHour,
     step,
     timeSlots,
+    excludedDays,
   };
 }
 
