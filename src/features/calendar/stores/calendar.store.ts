@@ -8,7 +8,7 @@ import type { TView } from "@calendar/interfaces/calendar-view.type";
 interface CalendarState {
   selectedDate: Date;
   selectedProfessional: IUser | null;
-  selectedProfessionalConfig: ICalendarConfig | undefined;
+  selectedProfessionalConfig: ICalendarConfig | null;
   selectedView: TView;
   setSelectedDate: (date: Date) => void;
   setSelectedProfessional: (user: IUser) => void;
@@ -21,7 +21,7 @@ export const useCalendarStore = create(
     (set) => ({
       selectedDate: new Date(),
       selectedProfessional: null,
-      selectedProfessionalConfig: undefined,
+      selectedProfessionalConfig: null,
       selectedView: "week",
       setSelectedDate: (date) => set({ selectedDate: date }),
       setSelectedProfessional: (user) => set({ selectedProfessional: user }),
