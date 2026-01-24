@@ -5,12 +5,11 @@ import type { UseFormReturn } from "react-hook-form";
 import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 
-import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { eventSchema } from "@calendar/schemas/event.schema";
 import { cn } from "@lib/utils";
+import { useCalendarStore } from "@calendar/stores/calendar.store";
 
 interface IProps {
-  config: ICalendarConfig;
   isInvalid?: boolean;
   form: UseFormReturn<z.infer<typeof eventSchema>>;
 }
@@ -24,9 +23,10 @@ function timeToMinutesDate(time: Date): number {
   return time.getHours() * 60 + time.getMinutes();
 }
 
-export function HourGrid({ config, form, isInvalid }: IProps) {
+export function HourGrid({ form, isInvalid }: IProps) {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const dateValue = form.watch("startDate");
+  const { selectedProfessionalConfig } = useCalendarStore();
 
   useEffect(() => {
     if (!dateValue) {
@@ -46,10 +46,10 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
     }
   }, [dateValue]);
 
-  const { startHour, endHour, step, dailyExceptionStart, dailyExceptionEnd } = config;
-
   const { slots, separatorIndex } = useMemo(() => {
-    if (!startHour || !endHour || !step) return { slots: [], separatorIndex: -1 };
+    if (!selectedProfessionalConfig) return { slots: [], separatorIndex: -1 };
+
+    const { startHour, endHour, step, dailyExceptionStart, dailyExceptionEnd } = selectedProfessionalConfig;
 
     const duration = step;
     const startMinutes = timeToMinutesDate(startHour);
@@ -87,7 +87,7 @@ export function HourGrid({ config, form, isInvalid }: IProps) {
       slots: [...morningSlots, ...afternoonSlots],
       separatorIndex: morningSlots.length,
     };
-  }, [startHour, endHour, dailyExceptionEnd, dailyExceptionStart, step]);
+  }, [selectedProfessionalConfig]);
 
   function handleHourClick(hour: string) {
     const currentDate = form.getValues("startDate");
