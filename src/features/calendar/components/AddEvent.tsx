@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
+import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 interface IProps {
@@ -34,6 +35,8 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
+  const { selectedProfessional } = useCalendarStore();
+  const { selectedProfessionalConfig } = useCalendarStore();
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -117,6 +120,7 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
                     <FieldLabel htmlFor="professionalId">Profesional</FieldLabel>
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
+                      defaultSelected={selectedProfessional?.id}
                       id="professionalId"
                       onChange={field.onChange}
                       userType="professional"
@@ -133,6 +137,7 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
                 render={({ field, fieldState }) => (
                   <Field className="col-span-6 md:col-span-3" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="userId">Usuario</FieldLabel>
+                    {/* TODO: FORMAT INVALID CONTENT */}
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
@@ -169,12 +174,15 @@ export function AddEvent({ calendarConfig, onCreateEvent }: IProps) {
                       >
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
                         <div className="flex-1">
-                          {/* TODO: disable days from db config */}
                           {/* disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]} */}
+                          {/* TODO: set to not selected day if the today day is not included in the working days */}
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
-                            disabled={[{ dayOfWeek: [0, 6] }]}
+                            disabled={[
+                              { dayOfWeek: selectedProfessionalConfig?.excludedDays as any },
+                              { from: new Date() },
+                            ]}
                             id="date"
                             locale={es}
                             mode="single"
