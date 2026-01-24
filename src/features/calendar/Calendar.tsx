@@ -16,7 +16,6 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { toast } from "sonner";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TView } from "@calendar/interfaces/calendar-view.type";
@@ -55,7 +54,6 @@ const messages = {
 };
 
 export default function Calendar() {
-  const [calendarConfig, setCalendarConfig] = useState<ICalendarConfig | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [errorNotification, setErrorNotification] = useState<boolean>(false);
   const [events, setEvents] = useState<ICalendarEvent[] | undefined>(undefined);
@@ -67,9 +65,10 @@ export default function Calendar() {
   const { isLoading: isLoadingProfessional, tryCatch: tryCatchProfessional } = useTryCatch();
   const { isLoading: isLoadingProfessionals, tryCatch: tryCatchProfessionals } = useTryCatch();
   const { selectedDate, selectedView, setSelectedDate, setSelectedView } = useCalendarStore();
-  const { selectedProfessional, setSelectedProfessional } = useCalendarStore();
+  const { selectedProfessional, selectedProfessionalConfig, setSelectedProfessional, setSelectedProfessionalConfig } =
+    useCalendarStore();
 
-  const slotPropGetter = useMemo(() => createSlotPropGetter(calendarConfig), [calendarConfig]);
+  const slotPropGetter = useMemo(() => createSlotPropGetter(selectedProfessionalConfig), [selectedProfessionalConfig]);
 
   const getProfessional = useCallback(
     async (id: string): Promise<void> => {
@@ -91,10 +90,10 @@ export default function Calendar() {
         }
 
         setSelectedProfessional(response.data);
-        setCalendarConfig(parseCalendarConfig(response.data.professionalProfile));
+        setSelectedProfessionalConfig(parseCalendarConfig(response.data.professionalProfile));
       }
     },
-    [setSelectedProfessional, tryCatchProfessional],
+    [setSelectedProfessional, setSelectedProfessionalConfig, tryCatchProfessional],
   );
 
   const fetchProfessionals = useCallback(async () => {
@@ -107,10 +106,9 @@ export default function Calendar() {
 
     if (response && response.statusCode === 200 && response.data) {
       setProfessionals(response.data);
-      setSelectedProfessional(response.data[0]);
       getProfessional(response.data[0].id);
     }
-  }, [getProfessional, setSelectedProfessional, tryCatchProfessionals]);
+  }, [getProfessional, tryCatchProfessionals]);
 
   const refreshEvents = useCallback(async () => {
     if (!selectedProfessional) return;
@@ -180,14 +178,14 @@ export default function Calendar() {
           {isLoadingProfessionals && <Loader text="Cargando profesionales" />}
         </div>
         {errorNotification && <ErrorNotification message={errorMessage} tryAgain={false} />}
-        {selectedProfessional && !errorNotification && (
+        {selectedProfessional && selectedProfessionalConfig && !errorNotification && (
           <Schedule
             className={cn("calendar", !canViewEvent && "[&_.rbc-event]:pointer-events-none")}
             components={{
               toolbar: (props: ToolbarProps<ICalendarEvent>) => (
                 <Toolbar
                   {...props}
-                  calendarConfig={calendarConfig}
+                  calendarConfig={selectedProfessionalConfig}
                   calendarView={props.view as TView}
                   currentDate={selectedDate}
                   onCreateEvent={refreshEvents}
@@ -203,16 +201,16 @@ export default function Calendar() {
             }}
             key={selectedProfessional.id}
             localizer={localizer}
-            max={calendarConfig?.endHour}
+            max={selectedProfessionalConfig?.endHour}
             messages={messages}
-            min={calendarConfig?.startHour}
+            min={selectedProfessionalConfig?.startHour}
             onNavigate={setSelectedDate}
             onSelectEvent={onSelectEvent}
             onView={onView}
             slotPropGetter={slotPropGetter}
             startAccessor="startDate"
-            step={calendarConfig?.step}
-            timeslots={calendarConfig?.timeSlots}
+            step={selectedProfessionalConfig?.step}
+            timeslots={selectedProfessionalConfig?.timeSlots}
             view={selectedView}
             views={["month", "week", "day"]}
           />
