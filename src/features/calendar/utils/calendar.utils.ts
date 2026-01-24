@@ -1,34 +1,46 @@
-import { parse } from "date-fns";
-
 import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 
 export function parseCalendarConfig(profile: IProfessionalProfile): ICalendarConfig {
-  const endHour = new Date();
-  endHour.setHours(parseInt(profile.endHour.slice(0, 2), 10), parseInt(profile.endHour.slice(3, 5), 10), 0, 0);
+  const dailyExceptionStart = new Date();
+  dailyExceptionStart.setHours(
+    parseInt(profile.dailyExceptionStart.slice(0, 2), 10),
+    parseInt(profile.dailyExceptionStart.slice(3, 5), 10),
+    0,
+    0,
+  );
+
+  const dailyExceptionEnd = new Date();
+  dailyExceptionEnd.setHours(
+    parseInt(profile.dailyExceptionEnd.slice(0, 2), 10),
+    parseInt(profile.dailyExceptionEnd.slice(3, 5), 10),
+    0,
+    0,
+  );
 
   const startHour = new Date();
   startHour.setHours(parseInt(profile.startHour.slice(0, 2), 10), parseInt(profile.startHour.slice(3, 5), 10), 0, 0);
 
+  const endHour = new Date();
+  endHour.setHours(parseInt(profile.endHour.slice(0, 2), 10), parseInt(profile.endHour.slice(3, 5), 10), 0, 0);
+
   const step = Math.ceil(Number(profile.slotDuration));
+
   const timeSlots = Math.ceil(60 / step);
 
   return {
-    dailyExceptionStart: profile.dailyExceptionStart,
-    dailyExceptionEnd: profile.dailyExceptionEnd,
-    endHour,
+    dailyExceptionStart,
+    dailyExceptionEnd,
     startHour,
+    endHour,
     step,
     timeSlots,
   };
 }
 
-export function dailyExceptionRange(date: Date, dailyExceptionStart: string, dailyExceptionEnd: string): boolean {
-  const from = parse(dailyExceptionStart, "HH:mm", new Date());
-  const to = parse(dailyExceptionEnd, "HH:mm", new Date());
+export function dailyExceptionRange(date: Date, dailyExceptionStart: Date, dailyExceptionEnd: Date): boolean {
   const hour = date.getHours();
-
-  return hour >= from.getHours() && hour < to.getHours();
+  return hour >= dailyExceptionStart.getHours() && hour < dailyExceptionEnd.getHours();
 }
 
 export function createSlotPropGetter(calendarConfig: ICalendarConfig | undefined) {
