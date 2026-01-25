@@ -35,6 +35,7 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
+import { formatIc } from "@core/formatters/ic.formatter";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
@@ -103,7 +104,7 @@ export function ViewEventSheet({ event, onRemoveEvent, open, setOpen, setOpenEdi
                     <Patients className="h-5 w-5 shrink-0 -translate-x-px" />
                     <span>{`${event.user.firstName} ${event.user.lastName}`}</span>
                     <Badge variant="id" size="small">
-                      {event.user.ic}
+                      {formatIc(event.user.ic)}
                     </Badge>
                   </div>
                 </li>
