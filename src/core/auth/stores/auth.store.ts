@@ -2,11 +2,12 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { IAdmin } from "@admin/interfaces/admin.interface";
+import type { IUser } from "@users/interfaces/user.interface";
 import type { TAuthType } from "@auth/interfaces/auth.type";
-import { AccountService } from "@account/services/profile.service";
+import { AuthService } from "@auth/services/auth.service";
 
 interface AuthState {
-  admin?: IAdmin;
+  admin?: IAdmin | IUser;
   loadingAdmin: boolean;
   type?: TAuthType;
   clearAdmin: () => void;
@@ -33,7 +34,7 @@ export const useAuthStore = create(
 
         try {
           set({ loadingAdmin: true });
-          const response = await AccountService.get();
+          const response = await AuthService.getMe();
 
           if (response?.statusCode === 200 && response.data) {
             set({ admin: response.data, loadingAdmin: false });
