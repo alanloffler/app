@@ -95,7 +95,7 @@ export function ViewEventSheet({ event, onRemoveEvent, open, setOpen, setOpenEdi
                 <li>
                   <div className="flex items-center gap-3">
                     <BriefcaseMedical className="h-4.5 w-4.5 shrink-0" strokeWidth={1.5} />
-                    <span>{`${event.professional.firstName} ${event.professional.lastName}`}</span>
+                    <span>{`${event.professional.professionalProfile?.professionalPrefix} ${event.professional.firstName} ${event.professional.lastName}`}</span>
                   </div>
                 </li>
                 <li>
