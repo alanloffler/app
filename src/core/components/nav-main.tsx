@@ -149,8 +149,8 @@ export function NavMain({ items }: IProps) {
               </Collapsible>
             )
           ) : hasRoleAccess(item.role) ? (
-            <SidebarMenuItem key={item.title}>
-              <Protected requiredPermission={item.permission}>
+            <Protected requiredPermission={item.permission}>
+              <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
                   className="group-data-[collapsible=icon]:mx-auto"
@@ -162,8 +162,8 @@ export function NavMain({ items }: IProps) {
                     <span className="group-data-[collapsible=icon]:sr-only">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
-              </Protected>
-            </SidebarMenuItem>
+              </SidebarMenuItem>
+            </Protected>
           ) : null,
         )}
       </SidebarMenu>
