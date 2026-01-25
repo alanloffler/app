@@ -17,12 +17,14 @@ import { addMinutes, format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
+import { UsersService } from "@users/services/users.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
-import { isExcludedDay } from "@calendar/utils/calendar.utils";
+import { isExcludedDay, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
@@ -33,9 +35,10 @@ interface IProps {
 export function AddEvent({ onCreateEvent }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [professionalConfig, setProfessionalConfig] = useState<ICalendarConfig | null>(null);
   const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
   const { selectedProfessional } = useCalendarStore();
-  const { selectedProfessionalConfig } = useCalendarStore();
+  const { tryCatch: tryCatchProfessional } = useTryCatch();
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -48,10 +51,10 @@ export function AddEvent({ onCreateEvent }: IProps) {
   });
 
   async function onSubmit(data: z.infer<typeof eventSchema>): Promise<void> {
-    if (!selectedProfessionalConfig) return;
+    if (!professionalConfig) return;
 
     const startDate = parseISO(data.startDate);
-    const endDate = addMinutes(startDate, selectedProfessionalConfig?.step);
+    const endDate = addMinutes(startDate, professionalConfig.step);
 
     const transformedData = {
       ...data,
@@ -72,15 +75,40 @@ export function AddEvent({ onCreateEvent }: IProps) {
     }
   }
 
+  const professionalId = useWatch({
+    control: form.control,
+    name: "professionalId",
+  });
+
   useEffect(() => {
     if (openSheet === false) {
       form.reset();
-    } else {
-      // TODO: Check also with custom days like one specific day
-      const isTodayExcluded = isExcludedDay(new Date(), selectedProfessionalConfig?.excludedDays);
+    }
+  }, [form, openSheet]);
+
+  useEffect(() => {
+    if (!professionalId) {
+      setProfessionalConfig(null);
+      return;
+    }
+
+    async function fetchProfessionalConfig() {
+      const [response, error] = await tryCatchProfessional(UsersService.findOne(professionalId));
+
+      if (error || !response?.data?.professionalProfile) {
+        setProfessionalConfig(null);
+        return;
+      }
+
+      const config = parseCalendarConfig(response.data.professionalProfile);
+      setProfessionalConfig(config);
+
+      const isTodayExcluded = isExcludedDay(new Date(), config.excludedDays);
       if (isTodayExcluded) form.setValue("startDate", "");
     }
-  }, [openSheet, form, selectedProfessionalConfig]);
+
+    fetchProfessionalConfig();
+  }, [form, professionalId, tryCatchProfessional]);
 
   return (
     <Sheet open={openSheet} onOpenChange={setOpenSheet}>
@@ -183,7 +211,7 @@ export function AddEvent({ onCreateEvent }: IProps) {
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
-                            disabled={[{ dayOfWeek: selectedProfessionalConfig?.excludedDays as number[] }]}
+                            disabled={[{ dayOfWeek: professionalConfig?.excludedDays as number[] }]}
                             id="date"
                             locale={es}
                             mode="single"
@@ -203,7 +231,9 @@ export function AddEvent({ onCreateEvent }: IProps) {
                         style={{ position: "relative", zIndex: 1 }}
                       >
                         <FieldLabel>Horario</FieldLabel>
-                        {selectedProfessionalConfig && <HourGrid form={form} isInvalid={isHourInvalid} />}
+                        {professionalConfig && (
+                          <HourGrid form={form} isInvalid={isHourInvalid} professionalConfig={professionalConfig} />
+                        )}
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     </div>
