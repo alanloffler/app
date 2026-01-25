@@ -5,13 +5,14 @@ import type { UseFormReturn } from "react-hook-form";
 import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 
+import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { eventSchema } from "@calendar/schemas/event.schema";
 import { cn } from "@lib/utils";
-import { useCalendarStore } from "@calendar/stores/calendar.store";
 
 interface IProps {
-  isInvalid?: boolean;
   form: UseFormReturn<z.infer<typeof eventSchema>>;
+  isInvalid?: boolean;
+  professionalConfig: ICalendarConfig;
 }
 
 function parseTime(time: string): { hours: number; minutes: number } {
@@ -23,10 +24,9 @@ function timeToMinutesDate(time: Date): number {
   return time.getHours() * 60 + time.getMinutes();
 }
 
-export function HourGrid({ form, isInvalid }: IProps) {
+export function HourGrid({ form, isInvalid, professionalConfig }: IProps) {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const dateValue = form.watch("startDate");
-  const { selectedProfessionalConfig } = useCalendarStore();
 
   useEffect(() => {
     if (!dateValue) {
@@ -47,9 +47,7 @@ export function HourGrid({ form, isInvalid }: IProps) {
   }, [dateValue]);
 
   const { slots, separatorIndex } = useMemo(() => {
-    if (!selectedProfessionalConfig) return { slots: [], separatorIndex: -1 };
-
-    const { startHour, endHour, step, dailyExceptionStart, dailyExceptionEnd } = selectedProfessionalConfig;
+    const { startHour, endHour, step, dailyExceptionStart, dailyExceptionEnd } = professionalConfig;
 
     const duration = step;
     const startMinutes = timeToMinutesDate(startHour);
@@ -87,7 +85,7 @@ export function HourGrid({ form, isInvalid }: IProps) {
       slots: [...morningSlots, ...afternoonSlots],
       separatorIndex: morningSlots.length,
     };
-  }, [selectedProfessionalConfig]);
+  }, [professionalConfig]);
 
   function handleHourClick(hour: string) {
     const currentDate = form.getValues("startDate");
