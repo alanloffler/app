@@ -5,6 +5,9 @@ export interface IUserEvent {
   id: string;
   lastName: string;
   phoneNumber: string;
+  professionalProfile?: {
+    professionalPrefix: string;
+  };
   role: IUserRole;
 }
 
