@@ -24,7 +24,7 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import { CalendarService } from "@calendar/services/calendar.service";
 import { UsersService } from "@users/services/users.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
-import { isExcludedDay, parseCalendarConfig } from "@calendar/utils/calendar.utils";
+import { isDayAvailable, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
@@ -103,8 +103,8 @@ export function AddEvent({ onCreateEvent }: IProps) {
       const config = parseCalendarConfig(response.data.professionalProfile);
       setProfessionalConfig(config);
 
-      const isTodayExcluded = isExcludedDay(new Date(), config.excludedDays);
-      if (isTodayExcluded) form.setValue("startDate", "");
+      const isTodayExcluded = isDayAvailable(new Date(), config.excludedDays);
+      if (!isTodayExcluded) form.setValue("startDate", "");
     }
 
     fetchProfessionalConfig();
