@@ -21,8 +21,8 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { UsersService } from "@users/services/users.service";
-import { checkEventDateToCalendar, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { eventSchema } from "@calendar/schemas/event.schema";
+import { isDayAvailable, isHourSlotAvailable, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> {
@@ -48,6 +48,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [professionalConfig, setProfessionalConfig] = useState<ICalendarConfig | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const originalStartDateRef = useRef<string | null>(null);
   const { isLoading: isUpdating, tryCatch: tryCatchUpdateEvent } = useTryCatch();
   const { tryCatch: tryCatchProfessional } = useTryCatch();
 
@@ -93,7 +94,9 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
 
   useEffect(() => {
     if (event) {
-      form.reset(getEventFormValues(event));
+      const values = getEventFormValues(event);
+      form.reset(values);
+      originalStartDateRef.current = values.startDate;
     }
   }, [event, form]);
 
@@ -114,9 +117,20 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
       const config = parseCalendarConfig(response.data.professionalProfile);
       setProfessionalConfig(config);
 
-      checkEventDateToCalendar(event?.startDate, config, form);
-      // 2. Check if hour is in professional config hours available
-      console.log("check if hour is in professional config hours available");
+      if (!originalStartDateRef.current) return;
+      const originalDate = parseISO(originalStartDateRef.current);
+
+      if (!isDayAvailable(originalDate, config.excludedDays)) {
+        form.setValue("startDate", "");
+        return;
+      }
+
+      if (isHourSlotAvailable(originalDate, config)) {
+        form.setValue("startDate", originalStartDateRef.current);
+      } else {
+        originalDate.setHours(0, 0, 0, 0);
+        form.setValue("startDate", format(originalDate, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+      }
     }
 
     fetchProfessionalConfig();
@@ -179,7 +193,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field className="col-span-3" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="userId">Usuario</FieldLabel>
+                    <FieldLabel htmlFor="userId">Paciente</FieldLabel>
                     <UserCombobox
                       aria-invalid={fieldState.invalid}
                       id="userId"
