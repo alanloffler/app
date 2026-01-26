@@ -21,8 +21,8 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
 import { UsersService } from "@users/services/users.service";
+import { checkEventDateToCalendar, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { eventSchema } from "@calendar/schemas/event.schema";
-import { parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> {
@@ -113,10 +113,14 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
 
       const config = parseCalendarConfig(response.data.professionalProfile);
       setProfessionalConfig(config);
+
+      checkEventDateToCalendar(event?.startDate, config, form);
+      // 2. Check if hour is in professional config hours available
+      console.log("check if hour is in professional config hours available");
     }
 
     fetchProfessionalConfig();
-  }, [professionalId, tryCatchProfessional]);
+  }, [event, form, professionalId, tryCatchProfessional]);
 
   return (
     <Sheet open={event !== null && open} onOpenChange={setOpen}>
@@ -201,7 +205,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                       return date.getHours() !== 0 || date.getMinutes() !== 0;
                     })();
                   const isDateInvalid = fieldState.invalid && !hasDate;
-                  const isHourInvalid = fieldState.invalid && hasDate && !hasValidHour;
+                  const isHourInvalid = fieldState.invalid && !hasValidHour;
 
                   return (
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:grid-rows-1">
