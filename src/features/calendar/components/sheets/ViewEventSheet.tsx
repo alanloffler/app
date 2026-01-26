@@ -119,7 +119,7 @@ export function ViewEventSheet({ event, onRemoveEvent, open, setOpen, setOpenEdi
                     <Clock className="h-4.5 w-4.5 shrink-0" strokeWidth={1.5} />
                     <span>
                       {event.startDate && format(event.startDate, "HH':'mm", { locale: es }) + " - "}
-                      {event.endDate && format(event.endDate, "HH':'mm", { locale: es })}
+                      {event.endDate && format(event.endDate, "HH':'mm", { locale: es }) + " hs."}
                     </span>
                   </div>
                 </li>
