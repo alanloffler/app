@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 
@@ -70,22 +68,40 @@ export function createSlotPropGetter(calendarConfig: ICalendarConfig | null) {
   };
 }
 
-export function isExcludedDay(day: Date, excludedDays?: number[]): boolean {
+export function isDayAvailable(day: Date, excludedDays?: number[]): boolean {
   if (!excludedDays) return false;
 
   const dayOfWeek = day.getDay();
-  return excludedDays.includes(dayOfWeek);
+  return !excludedDays.includes(dayOfWeek);
 }
 
-export function checkEventDateToCalendar(date: Date | undefined, config: ICalendarConfig | null, form: any) {
-  if (!date || !config) return;
+export function isHourSlotAvailable(date: Date, config: ICalendarConfig): boolean {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
 
-  if (date) {
-    const isExcluded = isExcludedDay(date, config.excludedDays);
-    if (isExcluded) {
-      form.setValue("startDate", "");
-    } else {
-      form.setValue("startDate", format(date, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+  if (hours === 0 && minutes === 0) return true;
+
+  const selectedTimeInMinutes = hours * 60 + minutes;
+  const startMinutes = config.startHour.getHours() * 60 + config.startHour.getMinutes();
+  const endMinutes = config.endHour.getHours() * 60 + config.endHour.getMinutes();
+
+  if (selectedTimeInMinutes < startMinutes || selectedTimeInMinutes >= endMinutes) {
+    return false;
+  }
+
+  if (config.dailyExceptionStart && config.dailyExceptionEnd) {
+    const exceptionStartMinutes = config.dailyExceptionStart.getHours() * 60 + config.dailyExceptionStart.getMinutes();
+    const exceptionEndMinutes = config.dailyExceptionEnd.getHours() * 60 + config.dailyExceptionEnd.getMinutes();
+
+    if (selectedTimeInMinutes >= exceptionStartMinutes && selectedTimeInMinutes < exceptionEndMinutes) {
+      return false;
     }
   }
+
+  const minutesFromStart = selectedTimeInMinutes - startMinutes;
+  if (minutesFromStart % config.step !== 0) {
+    return false;
+  }
+
+  return true;
 }
