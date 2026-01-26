@@ -14,28 +14,16 @@ import { addMinutes, format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { ICalendarEvent } from "@calendar/interfaces/calendar-event.interface";
 import { CalendarService } from "@calendar/services/calendar.service";
+import { UsersService } from "@users/services/users.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
+import { parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
-
-// TODO: get config from backend
-const config = {
-  startHour: "07:00",
-  endHour: "20:00",
-  exceptions: { from: "12:00", to: "13:00" },
-  slotDuration: "30",
-};
-
-interface IProps {
-  event: ICalendarEvent | null;
-  onUpdateEvent: () => void;
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}
 
 function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> {
   return {
@@ -49,10 +37,19 @@ function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> 
   };
 }
 
+interface IProps {
+  event: ICalendarEvent | null;
+  onUpdateEvent: () => void;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+
 export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
+  const [professionalConfig, setProfessionalConfig] = useState<ICalendarConfig | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const { isLoading: isUpdating, tryCatch: tryCatchUpdateEvent } = useTryCatch();
+  const { tryCatch: tryCatchProfessional } = useTryCatch();
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -64,17 +61,11 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
     },
   });
 
-  useEffect(() => {
-    if (event) {
-      form.reset(getEventFormValues(event));
-    }
-  }, [event, form]);
-
   async function onSubmit(data: z.infer<typeof eventSchema>): Promise<void> {
-    if (!event) return;
+    if (!event || !professionalConfig) return;
 
     const startDate = parseISO(data.startDate);
-    const endDate = addMinutes(startDate, Number(config.slotDuration));
+    const endDate = addMinutes(startDate, professionalConfig.step);
 
     const transformedData = {
       ...data,
@@ -94,6 +85,38 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
       onUpdateEvent();
     }
   }
+
+  const professionalId = useWatch({
+    control: form.control,
+    name: "professionalId",
+  });
+
+  useEffect(() => {
+    if (event) {
+      form.reset(getEventFormValues(event));
+    }
+  }, [event, form]);
+
+  useEffect(() => {
+    if (!professionalId) {
+      setProfessionalConfig(null);
+      return;
+    }
+
+    async function fetchProfessionalConfig() {
+      const [response, error] = await tryCatchProfessional(UsersService.findOne(professionalId));
+
+      if (error || !response?.data?.professionalProfile) {
+        setProfessionalConfig(null);
+        return;
+      }
+
+      const config = parseCalendarConfig(response.data.professionalProfile);
+      setProfessionalConfig(config);
+    }
+
+    fetchProfessionalConfig();
+  }, [professionalId, tryCatchProfessional]);
 
   return (
     <Sheet open={event !== null && open} onOpenChange={setOpen}>
@@ -192,7 +215,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
-                            disabled={[{ before: new Date() }, { dayOfWeek: [0, 3, 6] }]}
+                            disabled={[{ dayOfWeek: professionalConfig?.excludedDays as number[] }]}
                             id="date"
                             locale={es}
                             mode="single"
@@ -212,7 +235,9 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                         style={{ position: "relative", zIndex: 1 }}
                       >
                         <FieldLabel>Horario</FieldLabel>
-                        <HourGrid form={form} config={config} isInvalid={isHourInvalid} />
+                        {professionalConfig && (
+                          <HourGrid form={form} isInvalid={isHourInvalid} professionalConfig={professionalConfig} />
+                        )}
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     </div>
