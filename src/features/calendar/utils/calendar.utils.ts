@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.interface";
 import type { IProfessionalProfile } from "@users/interfaces/professional-profile.interface";
 
@@ -73,4 +75,17 @@ export function isExcludedDay(day: Date, excludedDays?: number[]): boolean {
 
   const dayOfWeek = day.getDay();
   return excludedDays.includes(dayOfWeek);
+}
+
+export function checkEventDateToCalendar(date: Date | undefined, config: ICalendarConfig | null, form: any) {
+  if (!date || !config) return;
+
+  if (date) {
+    const isExcluded = isExcludedDay(date, config.excludedDays);
+    if (isExcluded) {
+      form.setValue("startDate", "");
+    } else {
+      form.setValue("startDate", format(date, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+    }
+  }
 }
