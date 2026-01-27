@@ -130,7 +130,8 @@ export function HourGrid({ form, isInvalid, professionalConfig, takenSlots = [] 
       isInvalid && "border-destructive",
       selectedHour === hour &&
         "bg-primary border-primary hover:bg-primary hover:border-primary text-white hover:text-white",
-      isTaken && "border-muted-foreground/14 bg-muted-foreground/7 line-through",
+      isTaken &&
+        "border-rose-100 bg-rose-50 text-rose-400 line-through dark:border-rose-900/30 dark:bg-rose-950/70 dark:text-rose-800",
     );
   }
 
@@ -179,7 +180,7 @@ export function HourGrid({ form, isInvalid, professionalConfig, takenSlots = [] 
         </>
       )}
       <div className="text-muted-foreground mt-2 flex items-center gap-2 place-self-start text-xs">
-        <span className="border-muted-foreground/14 bg-muted-foreground/7 flex size-3 rounded-full border"></span>
+        <span className="flex size-3 rounded-full border border-rose-200 bg-rose-100 dark:border-rose-900 dark:bg-rose-950"></span>
         <span>No disponibles</span>
       </div>
     </div>
