@@ -283,7 +283,7 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                         style={{ position: "relative", zIndex: 2 }}
                       >
                         <FieldLabel htmlFor="date">Fecha</FieldLabel>
-                        <div className="flex-1">
+                        <div className="max-w-90 flex-1 place-self-center">
                           <Calendar
                             aria-invalid={isDateInvalid}
                             className="aspect-square h-fit w-full"
