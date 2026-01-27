@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { lazy, Suspense } from "react";
 
+import { useSettingsStore } from "@settings/stores/settings.store";
+
 import { AdminLogin } from "@login/AdminLogin";
 import { AppInitializer } from "@auth/components/AppInitializer";
 import { GuestRoute } from "@auth/components/GuestRoute";
@@ -461,10 +463,13 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+  const settings = useSettingsStore((state) => state.appSettings);
+  const theme = settings.find((s) => s.key === "theme")?.value as "light" | "dark" | "system";
+
   return (
     <AppInitializer>
       <RouterProvider router={router} />
-      <Toaster position="bottom-center" richColors theme="light" />
+      <Toaster position="bottom-center" richColors theme={theme} />
     </AppInitializer>
   );
 }
