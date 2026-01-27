@@ -30,6 +30,7 @@ export default defineConfig({
       "@layouts": path.resolve(__dirname, "./src/features/layouts"),
       "@lib": path.resolve(__dirname, "./src/lib"),
       "@login": path.resolve(__dirname, "./src/features/login"),
+      "@medical-history": path.resolve(__dirname, "./src/features/medical-history"),
       "@permissions": path.resolve(__dirname, "./src/features/permissions"),
       "@roles": path.resolve(__dirname, "./src/features/roles"),
       "@settings": path.resolve(__dirname, "./src/features/settings"),
