@@ -7,6 +7,7 @@ import { Badge } from "@components/Badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
 import { CreatedAt } from "@components/CreatedAt";
 import { DisplayWorkingDays } from "@components/DisplayWorkingDays";
+import { HistoryTable } from "@medical-history/components/HistoryTable";
 import { HoldButton } from "@components/ui/HoldButton";
 import { Link } from "react-router";
 import { Loader } from "@components/Loader";
@@ -116,159 +117,165 @@ export default function ViewUser() {
   if (!user) return null;
 
   return (
-    <section className="flex flex-col gap-6">
-      <PageHeader title={`Detalles del ${userRole.name.toLowerCase()}`} />
-      <Card className="relative w-full p-6 text-center md:w-[70%]">
-        {isLoadingUser ? (
-          <div className="flex justify-center">
-            <Loader size={20} text={`Cargando ${userRole.name.toLowerCase()}`} />
-          </div>
-        ) : (
-          <>
-            <BackButton />
-            <CardHeader>
-              <CardTitle className="text-xl">
-                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
-                  {`${user.professionalProfile?.professionalPrefix ?? ""} `}
-                </Activity>
-                {`${user.firstName} ${user.lastName}`}
-              </CardTitle>
-              <CardDescription className="text-base">{user.role?.name}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-8 px-0">
-              <div className="columns-1 space-y-6 space-x-6 md:columns-2">
-                <div className="flex break-inside-avoid flex-col items-start gap-3">
-                  <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
-                    Datos personales
-                  </h2>
-                  <ul className="flex flex-col gap-2 text-sm">
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">Nombre:</span>
-                      <span>{user.firstName}</span>
-                    </li>
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">Apellido:</span>
-                      <span>{user.lastName}</span>
-                    </li>
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">Usuario:</span>
-                      <span>{user.userName}</span>
-                    </li>
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">DNI:</span>
-                      <span>{user.ic}</span>
-                    </li>
-                  </ul>
-                </div>
-                <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+    <section className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <PageHeader title={`Detalles del ${userRole.name.toLowerCase()}`} />
+        <Card className="relative w-full p-6 text-center md:w-[70%]">
+          {isLoadingUser ? (
+            <div className="flex justify-center">
+              <Loader size={20} text={`Cargando ${userRole.name.toLowerCase()}`} />
+            </div>
+          ) : (
+            <>
+              <BackButton />
+              <CardHeader>
+                <CardTitle className="text-xl">
+                  <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                    {`${user.professionalProfile?.professionalPrefix ?? ""} `}
+                  </Activity>
+                  {`${user.firstName} ${user.lastName}`}
+                </CardTitle>
+                <CardDescription className="text-base">{user.role?.name}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-8 px-0">
+                <div className="columns-1 space-y-6 space-x-6 md:columns-2">
                   <div className="flex break-inside-avoid flex-col items-start gap-3">
                     <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
-                      Datos profesionales
+                      Datos personales
                     </h2>
                     <ul className="flex flex-col gap-2 text-sm">
                       <li className="flex justify-start gap-2">
-                        <span className="font-semibold">Nº de matrícula:</span>
-                        <span>{user.professionalProfile?.licenseId}</span>
+                        <span className="font-semibold">Nombre:</span>
+                        <span>{user.firstName}</span>
                       </li>
                       <li className="flex justify-start gap-2">
-                        <span className="font-semibold">Especialidad:</span>
-                        <span>{user.professionalProfile?.specialty}</span>
+                        <span className="font-semibold">Apellido:</span>
+                        <span>{user.lastName}</span>
+                      </li>
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">Usuario:</span>
+                        <span>{user.userName}</span>
+                      </li>
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">DNI:</span>
+                        <span>{user.ic}</span>
                       </li>
                     </ul>
                   </div>
-                </Activity>
-                <div className="flex break-inside-avoid flex-col items-start gap-3">
-                  <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
-                    Medios de contacto
-                  </h2>
-                  <ul className="flex flex-col gap-2 text-sm">
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">E-mail:</span>
-                      <span>{user.email}</span>
-                    </li>
-                    <li className="flex justify-start gap-2">
-                      <span className="font-semibold">Teléfono:</span>
-                      <span>{user.phoneNumber}</span>
-                    </li>
-                  </ul>
-                </div>
-                <Activity
-                  mode={
-                    user.role.value === EUserRole["professional"] && user.professionalProfile ? "visible" : "hidden"
-                  }
-                >
+                  <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
+                    <div className="flex break-inside-avoid flex-col items-start gap-3">
+                      <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                        Datos profesionales
+                      </h2>
+                      <ul className="flex flex-col gap-2 text-sm">
+                        <li className="flex justify-start gap-2">
+                          <span className="font-semibold">Nº de matrícula:</span>
+                          <span>{user.professionalProfile?.licenseId}</span>
+                        </li>
+                        <li className="flex justify-start gap-2">
+                          <span className="font-semibold">Especialidad:</span>
+                          <span>{user.professionalProfile?.specialty}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Activity>
                   <div className="flex break-inside-avoid flex-col items-start gap-3">
                     <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
-                      Configuración de la agenda
+                      Medios de contacto
                     </h2>
                     <ul className="flex flex-col gap-2 text-sm">
-                      <li className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold">Días laborales:</span>
-                        <DisplayWorkingDays days={user.professionalProfile?.workingDays} />
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">E-mail:</span>
+                        <span>{user.email}</span>
                       </li>
-                      <li className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold">Horario:</span>
-                        {user.professionalProfile?.dailyExceptionStart && user.professionalProfile?.dailyExceptionEnd
-                          ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${user.professionalProfile?.endHour} hs.`
-                          : `${user.professionalProfile?.startHour} - ${user.professionalProfile?.endHour} hs.`}
-                      </li>
-                      <li className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold">Duración del turno:</span>
-                        <span>{user.professionalProfile?.slotDuration} min.</span>
+                      <li className="flex justify-start gap-2">
+                        <span className="font-semibold">Teléfono:</span>
+                        <span>{user.phoneNumber}</span>
                       </li>
                     </ul>
                   </div>
-                </Activity>
-              </div>
-              <CreatedAt>
-                {`${user.role.name} creado el ${user && format(user.createdAt, "dd/MM/yyyy", { locale: es })}`}
-              </CreatedAt>
-            </CardContent>
-            <Activity mode={hasPermissions ? "visible" : "hidden"}>
-              <CardFooter className="justify-end gap-3 px-0">
-                {user?.deletedAt && user?.deletedAt !== null ? (
-                  <div className="flex w-full items-center justify-between">
-                    <Badge size="small" variant="red">
-                      Eliminado
-                    </Badge>
-                    <Protected requiredPermission={`${userRole.value}-restore` as TPermission}>
-                      <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
-                        <RotateCcw className="h-4 w-4" />
-                      </HoldButton>
-                    </Protected>
-                  </div>
-                ) : (
-                  <>
-                    <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
-                      <Button className="px-5! hover:text-green-500" variant="outline" asChild>
-                        <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
-                          <FilePenLine className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </Protected>
-                    <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
-                      <HoldButton callback={() => id && removeUser(id)} size="icon" type="delete" variant="outline">
-                        <Trash2 className="h-4 w-4" />
-                      </HoldButton>
-                    </Protected>
-                    <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
-                      <HoldButton
-                        callback={() => id && hardRemoveUser(id)}
-                        size="icon"
-                        type="hard-delete"
-                        variant="outline"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span>!</span>
-                      </HoldButton>
-                    </Protected>
-                  </>
-                )}
-              </CardFooter>
-            </Activity>
-          </>
-        )}
-      </Card>
+                  <Activity
+                    mode={
+                      user.role.value === EUserRole["professional"] && user.professionalProfile ? "visible" : "hidden"
+                    }
+                  >
+                    <div className="flex break-inside-avoid flex-col items-start gap-3">
+                      <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                        Configuración de la agenda
+                      </h2>
+                      <ul className="flex flex-col gap-2 text-sm">
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Días laborales:</span>
+                          <DisplayWorkingDays days={user.professionalProfile?.workingDays} />
+                        </li>
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Horario:</span>
+                          {user.professionalProfile?.dailyExceptionStart && user.professionalProfile?.dailyExceptionEnd
+                            ? `${user.professionalProfile?.startHour} - ${user.professionalProfile?.dailyExceptionStart} / ${user.professionalProfile?.dailyExceptionEnd} - ${user.professionalProfile?.endHour} hs.`
+                            : `${user.professionalProfile?.startHour} - ${user.professionalProfile?.endHour} hs.`}
+                        </li>
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Duración del turno:</span>
+                          <span>{user.professionalProfile?.slotDuration} min.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Activity>
+                </div>
+                <CreatedAt>
+                  {`${user.role.name} creado el ${user && format(user.createdAt, "dd/MM/yyyy", { locale: es })}`}
+                </CreatedAt>
+              </CardContent>
+              <Activity mode={hasPermissions ? "visible" : "hidden"}>
+                <CardFooter className="justify-end gap-3 px-0">
+                  {user?.deletedAt && user?.deletedAt !== null ? (
+                    <div className="flex w-full items-center justify-between">
+                      <Badge size="small" variant="red">
+                        Eliminado
+                      </Badge>
+                      <Protected requiredPermission={`${userRole.value}-restore` as TPermission}>
+                        <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
+                          <RotateCcw className="h-4 w-4" />
+                        </HoldButton>
+                      </Protected>
+                    </div>
+                  ) : (
+                    <>
+                      <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
+                        <Button className="px-5! hover:text-green-500" variant="outline" asChild>
+                          <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
+                            <FilePenLine className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </Protected>
+                      <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
+                        <HoldButton callback={() => id && removeUser(id)} size="icon" type="delete" variant="outline">
+                          <Trash2 className="h-4 w-4" />
+                        </HoldButton>
+                      </Protected>
+                      <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
+                        <HoldButton
+                          callback={() => id && hardRemoveUser(id)}
+                          size="icon"
+                          type="hard-delete"
+                          variant="outline"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span>!</span>
+                        </HoldButton>
+                      </Protected>
+                    </>
+                  )}
+                </CardFooter>
+              </Activity>
+            </>
+          )}
+        </Card>
+      </div>
+      <div className="flex flex-col gap-3">
+        <PageHeader title="Historial médico" />
+        <HistoryTable />
+      </div>
     </section>
   );
 }
