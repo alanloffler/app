@@ -56,11 +56,11 @@ export function HoldButton({
         "group relative flex items-center justify-center gap-2 overflow-hidden rounded-md bg-[#f6f5f5] px-6 py-3 text-sm font-medium text-[#21201c] transition-all duration-160 ease-out select-none [-webkit-touch-callout:none] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50",
         className,
         variant === "outline" &&
-          "bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 border px-4 py-2 shadow-xs has-[>svg]:px-3",
+          "bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:hover:bg-accent h-9 border px-4 py-2 shadow-xs has-[>svg]:px-3",
         size === "icon" && "px-5!",
         type === "delete" && "hover:text-rose-500 dark:text-white dark:hover:text-rose-500",
         type === "hard-delete" && "gap-0 text-rose-500 hover:text-rose-500",
-        type === "restore" && "hover:text-amber-500",
+        type === "restore" && "hover:text-amber-500 dark:text-white",
       )}
       disabled={disabled}
       onPointerDown={handlePointerDown}
