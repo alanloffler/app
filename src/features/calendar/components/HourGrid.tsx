@@ -13,6 +13,7 @@ interface IProps {
   form: UseFormReturn<z.infer<typeof eventSchema>>;
   isInvalid?: boolean;
   professionalConfig: ICalendarConfig;
+  takenSlots?: string[];
 }
 
 function parseTime(time: string): { hours: number; minutes: number } {
@@ -24,7 +25,7 @@ function timeToMinutesDate(time: Date): number {
   return time.getHours() * 60 + time.getMinutes();
 }
 
-export function HourGrid({ form, isInvalid, professionalConfig }: IProps) {
+export function HourGrid({ form, isInvalid, professionalConfig, takenSlots = [] }: IProps) {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const dateValue = form.watch("startDate");
 
@@ -122,12 +123,14 @@ export function HourGrid({ form, isInvalid, professionalConfig }: IProps) {
   const gridCols = totalSlots < 21 ? "grid-cols-2" : totalSlots < 34 ? "grid-cols-3" : "grid-cols-4";
 
   function getButtonClasses(hour: string) {
+    const isTaken = takenSlots.includes(hour);
     return cn(
-      "hover:text-foreground text-foreground/60 h-fit w-[52px]",
+      "hover:text-foreground text-foreground/60 h-fit w-[52px] disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-auto",
       totalSlots < 31 ? "px-2 py-1 text-sm" : "px-1.5 py-1 text-xs",
       isInvalid && "border-destructive",
       selectedHour === hour &&
         "bg-primary border-primary hover:bg-primary hover:border-primary text-white hover:text-white",
+      isTaken && "text-muted-foreground border-muted-foreground/20 bg-muted-foreground/10",
     );
   }
 
@@ -137,6 +140,7 @@ export function HourGrid({ form, isInvalid, professionalConfig }: IProps) {
         {beforeSeparator.map((hour) => (
           <Button
             className={getButtonClasses(hour)}
+            disabled={takenSlots.includes(hour)}
             key={hour}
             onClick={() => handleHourClick(hour)}
             type="button"
