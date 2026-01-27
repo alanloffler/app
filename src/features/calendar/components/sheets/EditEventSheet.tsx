@@ -322,8 +322,18 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                 }}
               />
             </FieldGroup>
-            <div className="flex justify-end gap-4 pt-8">
+            <div className="flex flex-col justify-center gap-4 pt-8 md:flex-row md:justify-end">
               <Button
+                className="md:order-2"
+                disabled={!form.formState.isDirty}
+                form="create-event"
+                type="submit"
+                variant="default"
+              >
+                {isUpdating ? <Loader color="white" text="Guardando" /> : "Guardar"}
+              </Button>
+              <Button
+                className="md:order-1"
                 type="button"
                 variant="ghost"
                 onClick={() => {
@@ -333,9 +343,6 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                 }}
               >
                 Cancelar
-              </Button>
-              <Button disabled={!form.formState.isDirty} form="create-event" type="submit" variant="default">
-                {isUpdating ? <Loader color="white" text="Guardando" /> : "Guardar"}
               </Button>
             </div>
           </form>
