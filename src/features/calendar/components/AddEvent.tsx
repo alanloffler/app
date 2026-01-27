@@ -24,7 +24,7 @@ import type { ICalendarConfig } from "@calendar/interfaces/calendar-config.inter
 import { CalendarService } from "@calendar/services/calendar.service";
 import { UsersService } from "@users/services/users.service";
 import { eventSchema } from "@calendar/schemas/event.schema";
-import { isDayAvailable, parseCalendarConfig } from "@calendar/utils/calendar.utils";
+import { isDayAvailable, isHourSlotAvailable, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useCalendarStore } from "@calendar/stores/calendar.store";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
@@ -36,8 +36,10 @@ export function AddEvent({ onCreateEvent }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [professionalConfig, setProfessionalConfig] = useState<ICalendarConfig | null>(null);
+  const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const { isLoading: isSaving, tryCatch: tryCatchCreateEvent } = useTryCatch();
   const { selectedProfessional } = useCalendarStore();
+  const { tryCatch: tryCatchDayEvents } = useTryCatch();
   const { tryCatch: tryCatchProfessional } = useTryCatch();
 
   const form = useForm<z.infer<typeof eventSchema>>({
@@ -103,12 +105,72 @@ export function AddEvent({ onCreateEvent }: IProps) {
       const config = parseCalendarConfig(response.data.professionalProfile);
       setProfessionalConfig(config);
 
-      const isTodayExcluded = isDayAvailable(new Date(), config.excludedDays);
-      if (!isTodayExcluded) form.setValue("startDate", "");
+      const currentStartDate = form.getValues("startDate");
+
+      if (!currentStartDate) {
+        if (isDayAvailable(new Date(), config.excludedDays)) {
+          form.setValue("startDate", format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"));
+        }
+        return;
+      }
+
+      const selectedDate = parseISO(currentStartDate);
+
+      if (!isDayAvailable(selectedDate, config.excludedDays)) {
+        if (isDayAvailable(new Date(), config.excludedDays)) {
+          form.setValue("startDate", format(new Date(), "yyyy-MM-dd'T'00:00:00XXX"));
+        } else {
+          form.setValue("startDate", "");
+        }
+        return;
+      }
+
+      if (!isHourSlotAvailable(selectedDate, config)) {
+        selectedDate.setHours(0, 0, 0, 0);
+        form.setValue("startDate", format(selectedDate, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+      }
     }
 
     fetchProfessionalConfig();
   }, [form, professionalId, tryCatchProfessional]);
+
+  const startDate = useWatch({
+    control: form.control,
+    name: "startDate",
+  });
+
+  useEffect(() => {
+    if (!startDate || !professionalId) {
+      setTakenSlots([]);
+      return;
+    }
+
+    async function fetchDayEvents() {
+      const date = format(parseISO(startDate), "yyyy-MM-dd");
+      const [response, error] = await tryCatchDayEvents(CalendarService.findAllByDateArray(professionalId, date));
+
+      if (error) {
+        toast.error(error.message);
+        setTakenSlots([]);
+        return;
+      }
+
+      if (response?.statusCode === 200 && response.data) {
+        setTakenSlots(response.data);
+
+        const selectedDate = parseISO(startDate);
+        const selectedHour = format(selectedDate, "HH:mm");
+        const hasHour = selectedDate.getHours() !== 0 || selectedDate.getMinutes() !== 0;
+
+        if (hasHour && response.data.includes(selectedHour)) {
+          selectedDate.setHours(0, 0, 0, 0);
+          form.setValue("startDate", format(selectedDate, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+        }
+      }
+    }
+
+    fetchDayEvents();
+  }, [form, professionalId, startDate, tryCatchDayEvents]);
 
   return (
     <Sheet open={openSheet} onOpenChange={setOpenSheet}>
@@ -232,7 +294,12 @@ export function AddEvent({ onCreateEvent }: IProps) {
                       >
                         <FieldLabel>Horario</FieldLabel>
                         {professionalConfig && (
-                          <HourGrid form={form} isInvalid={isHourInvalid} professionalConfig={professionalConfig} />
+                          <HourGrid
+                            form={form}
+                            isInvalid={isHourInvalid}
+                            professionalConfig={professionalConfig}
+                            takenSlots={takenSlots}
+                          />
                         )}
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
