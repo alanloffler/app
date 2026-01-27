@@ -35,6 +35,7 @@
       "@layouts/*": ["./src/features/layouts/*"],
       "@lib/*": ["./src/lib/*"],
       "@login/*": ["./src/features/login/*"],
+      "@medical-history/*": ["./src/features/medical-history/*"],
       "@permissions/*": ["./src/features/permissions/*"],
       "@roles/*": ["./src/features/roles/*"],
       "@settings/*": ["./src/features/settings/*"],
