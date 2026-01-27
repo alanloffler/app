@@ -25,6 +25,7 @@ import { eventSchema } from "@calendar/schemas/event.schema";
 import { isDayAvailable, isHourSlotAvailable, parseCalendarConfig } from "@calendar/utils/calendar.utils";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
+// TODO: refactor to utils?
 function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> {
   return {
     professionalId: event.professionalId,
@@ -35,6 +36,11 @@ function getEventFormValues(event: ICalendarEvent): z.infer<typeof eventSchema> 
     title: event.title,
     userId: event.userId,
   };
+}
+function getEventTimeSlot(event: ICalendarEvent | null): string | null {
+  if (!event?.startDate) return null;
+  const date = typeof event.startDate === "string" ? parseISO(event.startDate) : event.startDate;
+  return format(date, "HH:mm");
 }
 
 interface IProps {
@@ -47,8 +53,11 @@ interface IProps {
 export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) {
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [professionalConfig, setProfessionalConfig] = useState<ICalendarConfig | null>(null);
+  const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const closeRef = useRef<HTMLButtonElement>(null);
   const originalStartDateRef = useRef<string | null>(null);
+  // TODO: handle errors for next 3 hooks
+  const { tryCatch: tryCatchDayEvents } = useTryCatch();
   const { isLoading: isUpdating, tryCatch: tryCatchUpdateEvent } = useTryCatch();
   const { tryCatch: tryCatchProfessional } = useTryCatch();
 
@@ -134,7 +143,52 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
     }
 
     fetchProfessionalConfig();
-  }, [event, form, professionalId, tryCatchProfessional]);
+  }, [event, form, professionalId, tryCatchDayEvents, tryCatchProfessional]);
+
+  const startDate = useWatch({
+    control: form.control,
+    name: "startDate",
+  });
+
+  useEffect(() => {
+    if (!startDate || !professionalId) {
+      setTakenSlots([]);
+      return;
+    }
+
+    async function fetchDayEvents() {
+      const date = format(parseISO(startDate), "yyyy-MM-dd");
+      const [response, error] = await tryCatchDayEvents(CalendarService.findAllByDateArray(professionalId, date));
+
+      if (error) {
+        toast.error(error.message);
+        setTakenSlots([]);
+        return;
+      }
+
+      if (response?.statusCode === 200 && response.data) {
+        const isOriginalProfessional = event?.professionalId === professionalId;
+        const currentEventSlot = isOriginalProfessional ? getEventTimeSlot(event) : null;
+
+        const filtered = currentEventSlot
+          ? response.data.filter((slot: string) => slot !== currentEventSlot)
+          : response.data;
+
+        setTakenSlots(filtered);
+
+        const selectedDate = parseISO(startDate);
+        const selectedHour = format(selectedDate, "HH:mm");
+        const hasHour = selectedDate.getHours() !== 0 || selectedDate.getMinutes() !== 0;
+
+        if (hasHour && filtered.includes(selectedHour)) {
+          selectedDate.setHours(0, 0, 0, 0);
+          form.setValue("startDate", format(selectedDate, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+        }
+      }
+    }
+
+    fetchDayEvents();
+  }, [form, professionalId, event, startDate, tryCatchDayEvents]);
 
   return (
     <Sheet open={event !== null && open} onOpenChange={setOpen}>
@@ -254,7 +308,12 @@ export function EditEventSheet({ event, onUpdateEvent, open, setOpen }: IProps) 
                       >
                         <FieldLabel>Horario</FieldLabel>
                         {professionalConfig && (
-                          <HourGrid form={form} isInvalid={isHourInvalid} professionalConfig={professionalConfig} />
+                          <HourGrid
+                            form={form}
+                            isInvalid={isHourInvalid}
+                            professionalConfig={professionalConfig}
+                            takenSlots={takenSlots}
+                          />
                         )}
                         {isHourInvalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
