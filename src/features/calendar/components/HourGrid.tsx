@@ -125,12 +125,12 @@ export function HourGrid({ form, isInvalid, professionalConfig, takenSlots = [] 
   function getButtonClasses(hour: string) {
     const isTaken = takenSlots.includes(hour);
     return cn(
-      "hover:text-foreground text-foreground/60 h-fit w-[52px] disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-auto",
+      "hover:text-foreground text-foreground/60 h-fit w-[52px] disabled:opacity-100",
       totalSlots < 31 ? "px-2 py-1 text-sm" : "px-1.5 py-1 text-xs",
       isInvalid && "border-destructive",
       selectedHour === hour &&
         "bg-primary border-primary hover:bg-primary hover:border-primary text-white hover:text-white",
-      isTaken && "text-muted-foreground border-muted-foreground/20 bg-muted-foreground/10",
+      isTaken && "border-muted-foreground/14 bg-muted-foreground/7 line-through",
     );
   }
 
@@ -178,6 +178,10 @@ export function HourGrid({ form, isInvalid, professionalConfig, takenSlots = [] 
           </div>
         </>
       )}
+      <div className="text-muted-foreground mt-2 flex items-center gap-2 place-self-start text-xs">
+        <span className="border-muted-foreground/14 bg-muted-foreground/7 flex size-3 rounded-full border"></span>
+        <span>No disponibles</span>
+      </div>
     </div>
   );
 }
