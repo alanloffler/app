@@ -22,17 +22,17 @@ import { useLocation, useNavigate, useParams } from "react-router";
 
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
-import { ERoles } from "@auth/enums/role.enum";
+// import { ERoles } from "@auth/enums/role.enum";
 import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
 import { tryCatch } from "@core/utils/try-catch";
-import { useAuthStore } from "@auth/stores/auth.store";
+// import { useAuthStore } from "@auth/stores/auth.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function ViewUser() {
   const [user, setUser] = useState<IUser | undefined>(undefined);
-  const adminAuth = useAuthStore((state) => state.admin);
+  // const adminAuth = useAuthStore((state) => state.admin);
   const location = useLocation();
   const navigate = useNavigate();
   const userRole = location.state.role;
@@ -51,8 +51,10 @@ export default function ViewUser() {
 
   const findOneUser = useCallback(
     async function (id: string) {
-      const isSuperAdmin = adminAuth?.role.value === ERoles.super;
-      const serviceByRole = isSuperAdmin ? UsersService.findOneSoftRemoved(id) : UsersService.findOne(id);
+      // TODO: handle soft remove, also on BE
+      // const isSuperAdmin = adminAuth?.role.value === ERoles.super;
+      // const serviceByRole = isSuperAdmin ? UsersService.findOneSoftRemoved(id) : UsersService.findOne(id);
+      const serviceByRole = UsersService.findPatientWithHistory(id);
 
       const [response, responseError] = await tryCatchUser(serviceByRole);
 
@@ -65,7 +67,8 @@ export default function ViewUser() {
         setUser(response.data);
       }
     },
-    [adminAuth?.role.value, tryCatchUser],
+    [tryCatchUser],
+    // [adminAuth?.role.value, tryCatchUser],
   );
 
   async function removeUser(id: string): Promise<void> {
@@ -274,7 +277,7 @@ export default function ViewUser() {
       </div>
       <div className="flex flex-col gap-3">
         <PageHeader title="Historial médico" />
-        <HistoryTable />
+        <HistoryTable data={user.medicalHistory} />
       </div>
     </section>
   );
