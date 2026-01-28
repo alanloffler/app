@@ -6,6 +6,7 @@ import { Button } from "@components/ui/button";
 import { Badge } from "@components/Badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
 import { CreatedAt } from "@components/CreatedAt";
+import { DeleteDialog } from "@components/DeleteDialog";
 import { DisplayWorkingDays } from "@components/DisplayWorkingDays";
 import { HistoryTable } from "@medical-history/components/HistoryTable";
 import { HoldButton } from "@components/ui/HoldButton";
@@ -25,18 +26,21 @@ import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
+import { formatIc } from "@core/formatters/ic.formatter";
 import { tryCatch } from "@core/utils/try-catch";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function ViewUser() {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const location = useLocation();
   const navigate = useNavigate();
   const userRole = location.state.role;
   const { id } = useParams();
+  const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
 
   const hasPermissions = usePermission(
@@ -71,7 +75,7 @@ export default function ViewUser() {
   );
 
   async function removeUser(id: string): Promise<void> {
-    const [response, error] = await tryCatch(UsersService.softRemove(id));
+    const [response, error] = await tryCatchRemove(UsersService.softRemove(id));
 
     if (error) {
       toast.error(error.message);
@@ -259,7 +263,7 @@ export default function ViewUser() {
                         <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
                           <Button
                             className="hover:text-red-500"
-                            onClick={() => id && removeUser(id)}
+                            onClick={() => setOpenDeleteDialog(true)}
                             size="icon"
                             variant="outline"
                           >
@@ -290,6 +294,25 @@ export default function ViewUser() {
         <PageHeader title="Historial médico" />
         <HistoryTable data={user.medicalHistory} />
       </div>
+      <DeleteDialog
+        title="Eliminar paciente"
+        description="Seguro que querés eliminar a este paciente?"
+        callback={() => id && removeUser(id)}
+        loader={isRemoving}
+        open={openDeleteDialog}
+        setOpen={setOpenDeleteDialog}
+      >
+        <ul>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre:</span>
+            {`${user.firstName} ${user.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {formatIc(user.ic)}
+          </li>
+        </ul>
+      </DeleteDialog>
     </section>
   );
 }
