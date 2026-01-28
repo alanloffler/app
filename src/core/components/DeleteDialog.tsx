@@ -1,6 +1,7 @@
 import { CircleAlert } from "lucide-react";
 
 import { Button } from "@components/ui/button";
+import { Checkbox } from "@components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -9,9 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/dialog";
+import { Label } from "@components/ui/label";
 import { Loader } from "@components/Loader";
 
-import type { Dispatch, ReactNode, SetStateAction } from "react";
+import { useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 
 interface IProps {
   alertMessage?: string;
@@ -35,6 +37,8 @@ export function DeleteDialog({
   showAlert = false,
   title,
 }: IProps) {
+  const [accepted, setAccepted] = useState<boolean | "indeterminate">(false);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="gap-6 sm:min-w-[480px]">
@@ -45,9 +49,15 @@ export function DeleteDialog({
         <div className="grid gap-4">
           <div className="flex flex-col gap-1">{children}</div>
           {showAlert && (
-            <div className="mx-auto flex w-fit items-center gap-2 rounded-md border border-amber-300/70 bg-amber-200/70 p-2 text-sm font-medium text-pretty text-amber-600">
-              <CircleAlert className="h-5 w-5 shrink-0" />
-              {alertMessage ? alertMessage : "Esta acción es irreversible."}
+            <div className="flex flex-col gap-4">
+              <div className="mx-auto flex w-fit items-center gap-2 rounded-md border border-amber-300/70 bg-amber-200/70 p-2 text-sm font-medium text-pretty text-amber-600">
+                <CircleAlert className="h-5 w-5 shrink-0" />
+                {alertMessage ? alertMessage : "Esta acción es irreversible."}
+              </div>
+              <div className="flex justify-start gap-3">
+                <Checkbox id="accept" className="size-5" checked={accepted} onCheckedChange={setAccepted} />
+                <Label htmlFor="accept">Sí, comprendo que esta acción es irreversible</Label>
+              </div>
             </div>
           )}
         </div>
@@ -56,6 +66,7 @@ export function DeleteDialog({
             Cancelar
           </Button>
           <Button
+            disabled={showAlert && !accepted}
             onClick={() => {
               callback();
               setOpen(false);
