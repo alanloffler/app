@@ -92,6 +92,11 @@ class UsersModuleService {
     return response.data;
   }
 
+  public async findPatientWithHistory(id: string): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.get(`/users/patient-history/${id}`);
+    return response.data;
+  }
+
   public async update(id: string, data: Partial<IUser>): Promise<IApiResponse<IUser>> {
     const response = await apiClient.patch(`/users/${id}`, data);
     return response.data;
