@@ -33,15 +33,17 @@ import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function ViewUser() {
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
+  const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const location = useLocation();
   const navigate = useNavigate();
   const userRole = location.state.role;
   const { id } = useParams();
-  const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
+  const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
+  const { isLoading: isRemovingHard, tryCatch: tryCatchRemoveHard } = useTryCatch();
 
   const hasPermissions = usePermission(
     [
@@ -89,7 +91,7 @@ export default function ViewUser() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    const [response, error] = await tryCatch(UsersService.remove(id));
+    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id));
 
     if (error) {
       toast.error(error.message);
@@ -263,7 +265,7 @@ export default function ViewUser() {
                         <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
                           <Button
                             className="hover:text-red-500"
-                            onClick={() => setOpenDeleteDialog(true)}
+                            onClick={() => setOpenRemoveDialog(true)}
                             size="icon"
                             variant="outline"
                           >
@@ -273,7 +275,7 @@ export default function ViewUser() {
                         <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
                           <Button
                             className="gap-0 hover:text-red-500"
-                            onClick={() => id && hardRemoveUser(id)}
+                            onClick={() => setOpenRemoveHardDialog(true)}
                             size="icon"
                             variant="outline"
                           >
@@ -296,15 +298,36 @@ export default function ViewUser() {
       </div>
       <DeleteDialog
         title="Eliminar paciente"
-        description="Seguro que querés eliminar a este paciente?"
+        description="¿Seguro que querés eliminar a este paciente?"
         callback={() => id && removeUser(id)}
         loader={isRemoving}
-        open={openDeleteDialog}
-        setOpen={setOpenDeleteDialog}
+        open={openRemoveDialog}
+        setOpen={setOpenRemoveDialog}
       >
         <ul>
           <li className="flex items-center gap-2">
             <span className="font-semibold">Nombre:</span>
+            {`${user.firstName} ${user.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {formatIc(user.ic)}
+          </li>
+        </ul>
+      </DeleteDialog>
+      <DeleteDialog
+        title="Eliminar paciente"
+        description="¿Seguro que querés eliminar a este paciente?"
+        alertMessage="Todos los turnos y el historial médico relacionados al paciente, serán eliminados de la base de datos. Esta acción es irreversible."
+        callback={() => id && hardRemoveUser(id)}
+        loader={isRemovingHard}
+        open={openRemoveHardDialog}
+        setOpen={setOpenRemoveHardDialog}
+        showAlert
+      >
+        <ul className="flex flex-col gap-1">
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre completo:</span>
             {`${user.firstName} ${user.lastName}`}
           </li>
           <li className="flex items-center gap-2">
