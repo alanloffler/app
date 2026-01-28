@@ -9,11 +9,12 @@ import { CreatedAt } from "@components/CreatedAt";
 import { DeleteDialog } from "@components/DeleteDialog";
 import { DisplayWorkingDays } from "@components/DisplayWorkingDays";
 import { HistoryTable } from "@medical-history/components/HistoryTable";
-import { HoldButton } from "@components/ui/HoldButton";
 import { Link } from "react-router";
 import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
+import { Tooltip } from "@components/ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -242,46 +243,71 @@ export default function ViewUser() {
                         Eliminado
                       </Badge>
                       <Protected requiredPermission={`${userRole.value}-restore` as TPermission}>
-                        <HoldButton callback={() => id && restoreUser(id)} size="icon" type="restore" variant="outline">
-                          <RotateCcw className="h-4 w-4" />
-                        </HoldButton>
+                        <Button
+                          className="hover:text-amber-600"
+                          onClick={() => id && restoreUser(id)}
+                          size="icon"
+                          variant="outline"
+                        >
+                          <RotateCcw />
+                        </Button>
                       </Protected>
                     </div>
                   ) : (
                     <div className="flex w-full items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Button size="icon" variant="outline">
-                          <FileClock className="h-5 w-5" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button className="hover:text-fuchsia-500" size="icon" variant="outline">
+                              <FileClock className="h-5 w-5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Agregar historia médica</TooltipContent>
+                        </Tooltip>
                       </div>
                       <div className="flex items-center gap-3">
                         <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
-                          <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
-                            <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
-                              <FilePenLine className="h-5 w-5" />
-                            </Link>
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
+                                <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
+                                  <FilePenLine className="h-5 w-5" />
+                                </Link>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
                         </Protected>
                         <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
-                          <Button
-                            className="hover:text-red-500"
-                            onClick={() => setOpenRemoveDialog(true)}
-                            size="icon"
-                            variant="outline"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                className="hover:text-red-500"
+                                onClick={() => setOpenRemoveDialog(true)}
+                                size="icon"
+                                variant="outline"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Eliminar</TooltipContent>
+                          </Tooltip>
                         </Protected>
                         <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
-                          <Button
-                            className="gap-0 hover:text-red-500"
-                            onClick={() => setOpenRemoveHardDialog(true)}
-                            size="icon"
-                            variant="outline"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                            <span>!</span>
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                className="gap-0 hover:text-red-500"
+                                onClick={() => setOpenRemoveHardDialog(true)}
+                                size="icon"
+                                variant="outline"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                                <span>!</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Eliminar irreversible</TooltipContent>
+                          </Tooltip>
                         </Protected>
                       </div>
                     </div>
