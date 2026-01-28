@@ -1,4 +1,4 @@
-import { FilePenLine, RotateCcw, Trash2 } from "lucide-react";
+import { FileClock, FilePenLine, RotateCcw, Trash2 } from "lucide-react";
 
 import { Activity } from "react";
 import { BackButton } from "@components/BackButton";
@@ -229,8 +229,7 @@ export default function ViewUser() {
                 </CreatedAt>
               </CardContent>
               <Activity mode={hasPermissions ? "visible" : "hidden"}>
-                <CardFooter className="justify-end gap-3 px-0">
-                  <div>content here</div>
+                <CardFooter className="px-0">
                   {user?.deletedAt && user?.deletedAt !== null ? (
                     <div className="flex w-full items-center justify-between">
                       <Badge size="small" variant="red">
@@ -243,31 +242,43 @@ export default function ViewUser() {
                       </Protected>
                     </div>
                   ) : (
-                    <>
-                      <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
-                        <Button className="px-5! hover:text-green-500" variant="outline" asChild>
-                          <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
-                            <FilePenLine className="h-4 w-4" />
-                          </Link>
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Button size="icon" variant="outline">
+                          <FileClock className="h-5 w-5" />
                         </Button>
-                      </Protected>
-                      <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
-                        <HoldButton callback={() => id && removeUser(id)} size="icon" type="delete" variant="outline">
-                          <Trash2 className="h-4 w-4" />
-                        </HoldButton>
-                      </Protected>
-                      <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
-                        <HoldButton
-                          callback={() => id && hardRemoveUser(id)}
-                          size="icon"
-                          type="hard-delete"
-                          variant="outline"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span>!</span>
-                        </HoldButton>
-                      </Protected>
-                    </>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
+                          <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
+                            <Link to={`/users/edit/${id}`} state={{ role: userRole.value }}>
+                              <FilePenLine className="h-5 w-5" />
+                            </Link>
+                          </Button>
+                        </Protected>
+                        <Protected requiredPermission={`${userRole.value}-delete` as TPermission}>
+                          <Button
+                            className="hover:text-red-500"
+                            onClick={() => id && removeUser(id)}
+                            size="icon"
+                            variant="outline"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </Protected>
+                        <Protected requiredPermission={`${userRole.value}-delete-hard` as TPermission}>
+                          <Button
+                            className="gap-0 hover:text-red-500"
+                            onClick={() => id && hardRemoveUser(id)}
+                            size="icon"
+                            variant="outline"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                            <span>!</span>
+                          </Button>
+                        </Protected>
+                      </div>
+                    </div>
                   )}
                 </CardFooter>
               </Activity>
