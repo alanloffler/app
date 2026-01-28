@@ -1,15 +1,23 @@
 import { X, Check, FilePenLine, FileText, Trash2 } from "lucide-react";
 
 import { Button } from "@components/ui/button";
+import { Card } from "@components/ui/card";
 import { DataTable } from "@components/data-table/DataTable";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
 
-import { cn } from "@/lib/utils";
+import type { IMedicalHistory } from "@users/interfaces/medical-history.interface";
+import { cn } from "@lib/utils";
 
-export function HistoryTable() {
+interface IProps {
+  data?: IMedicalHistory[];
+}
+
+export function HistoryTable({ data }: IProps) {
+  if (!data) return null;
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "id",
@@ -20,9 +28,9 @@ export function HistoryTable() {
       cell: ({ row }) => <div className="flex justify-center">{row.original?.id?.slice(0, 5)}</div>,
     },
     {
-      accessorKey: "date",
+      accessorKey: "createdAt",
       header: () => <div className="text-center">Fecha de atención</div>,
-      cell: ({ row }) => <div className="text-center">{format(row.original?.date, "P", { locale: es })}</div>,
+      cell: ({ row }) => <div className="text-center">{format(row.original?.createdAt, "P", { locale: es })}</div>,
     },
     {
       accessorKey: "type",
@@ -68,22 +76,9 @@ export function HistoryTable() {
     },
   ];
 
-  const data = [
-    {
-      date: "2023-01-02",
-      type: "Consulta",
-      reason: "Esguince de tobillo",
-      recipe: false,
-      id: "456",
-    },
-    {
-      date: "2023-01-01",
-      type: "Consulta",
-      reason: "Malestar abdominal",
-      recipe: true,
-      id: "123",
-    },
-  ];
-
-  return <DataTable columns={columns} data={data} />;
+  return data.length > 0 ? (
+    <DataTable columns={columns} data={data} />
+  ) : (
+    <Card className="text-muted-foreground text-center">El paciente no posee historial médico</Card>
+  );
 }
