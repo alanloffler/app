@@ -1,4 +1,4 @@
-import { CircleX } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 
 import { Button } from "@components/ui/button";
 import {
@@ -14,6 +14,7 @@ import { Loader } from "@components/Loader";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 interface IProps {
+  alertMessage?: string;
   callback: () => void;
   children: ReactNode;
   description?: string;
@@ -24,6 +25,7 @@ interface IProps {
   title: string;
 }
 export function DeleteDialog({
+  alertMessage,
   callback,
   children,
   description,
@@ -43,9 +45,9 @@ export function DeleteDialog({
         <div className="grid gap-4">
           <div className="flex flex-col gap-1">{children}</div>
           {showAlert && (
-            <div className="mx-auto flex w-fit items-center gap-2 rounded-md border border-red-200 bg-red-100 p-2 text-sm text-red-600">
-              <CircleX className="h-4 w-4" />
-              Esta acción no se puede deshacer
+            <div className="mx-auto flex w-fit items-center gap-2 rounded-md border border-amber-300/70 bg-amber-200/70 p-2 text-sm font-medium text-pretty text-amber-600">
+              <CircleAlert className="h-5 w-5 shrink-0" />
+              {alertMessage ? alertMessage : "Esta acción es irreversible."}
             </div>
           )}
         </div>
