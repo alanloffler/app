@@ -28,7 +28,6 @@ import { ERoles } from "@auth/enums/role.enum";
 import { EUserRole } from "@roles/enums/user-role.enum";
 import { UsersService } from "@users/services/users.service";
 import { formatIc } from "@core/formatters/ic.formatter";
-import { tryCatch } from "@core/utils/try-catch";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
@@ -36,6 +35,7 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 export default function ViewUser() {
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
+  const [openRestoreDialog, setOpenRestoreDialog] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const location = useLocation();
@@ -45,6 +45,7 @@ export default function ViewUser() {
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
   const { isLoading: isRemovingHard, tryCatch: tryCatchRemoveHard } = useTryCatch();
+  const { isLoading: isRestoring, tryCatch: tryCatchRestore } = useTryCatch();
 
   const hasPermissions = usePermission(
     [
@@ -106,7 +107,7 @@ export default function ViewUser() {
   }
 
   async function restoreUser(id: string) {
-    const [response, error] = await tryCatch(UsersService.restore(id));
+    const [response, error] = await tryCatchRestore(UsersService.restore(id));
 
     if (error) {
       toast.error(error.message);
@@ -129,7 +130,7 @@ export default function ViewUser() {
     <section className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <PageHeader title={`Detalles del ${userRole.name.toLowerCase()}`} />
-        <Card className="relative w-full p-6 text-center md:w-[70%]">
+        <Card className="relative w-full p-6 text-center md:w-[80%] lg:w-[60%] xl:w-[50%]">
           {isLoadingUser ? (
             <div className="flex justify-center">
               <Loader size={20} text={`Cargando ${userRole.name.toLowerCase()}`} />
@@ -243,14 +244,19 @@ export default function ViewUser() {
                         Eliminado
                       </Badge>
                       <Protected requiredPermission={`${userRole.value}-restore` as TPermission}>
-                        <Button
-                          className="hover:text-amber-600"
-                          onClick={() => id && restoreUser(id)}
-                          size="icon"
-                          variant="outline"
-                        >
-                          <RotateCcw />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              className="hover:text-amber-600"
+                              onClick={() => setOpenRestoreDialog(true)}
+                              size="icon"
+                              variant="outline"
+                            >
+                              <RotateCcw />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Restaurar</TooltipContent>
+                        </Tooltip>
                       </Protected>
                     </div>
                   ) : (
@@ -339,6 +345,26 @@ export default function ViewUser() {
           <li className="flex items-center gap-2">
             <span className="font-semibold">DNI:</span>
             {formatIc(user.ic)}
+          </li>
+        </ul>
+      </ConfirmDialog>
+      <ConfirmDialog
+        title="Restaurar paciente"
+        description="¿Seguro que querés restaurar a este paciente?"
+        callback={() => id && restoreUser(user.id)}
+        loader={isRestoring}
+        open={openRestoreDialog}
+        setOpen={setOpenRestoreDialog}
+        variant="warning"
+      >
+        <ul>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre:</span>
+            {`${user.firstName} ${user.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {user && formatIc(user.ic)}
           </li>
         </ul>
       </ConfirmDialog>
