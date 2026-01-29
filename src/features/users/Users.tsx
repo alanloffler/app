@@ -2,8 +2,8 @@ import { Ban, FilePenLine, FileText, Plus, RotateCcw, Trash2 } from "lucide-reac
 
 import { Badge } from "@components/Badge";
 import { Button } from "@components/ui/button";
+import { ConfirmDialog } from "@components/ConfirmDialog";
 import { DataTable } from "@components/data-table/DataTable";
-import { DeleteDialog } from "@components/DeleteDialog";
 import { Link } from "react-router";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
@@ -21,7 +21,6 @@ import { ERolePlural } from "@roles/enums/role-plural.enum";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
 import { formatIc } from "@core/formatters/ic.formatter";
-import { tryCatch } from "@core/utils/try-catch";
 import { uppercaseFirst } from "@core/formatters/uppercase-first.formatter";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useSidebar } from "@components/ui/sidebar";
@@ -31,12 +30,14 @@ export default function Users() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean> | undefined>(undefined);
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
+  const [openRestoreDialog, setOpenRestoreDialog] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<IUser | undefined>(undefined);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const admin = useAuthStore((state) => state.admin);
   const { isLoading: isLoadingUsers, tryCatch: tryCatchAdmins } = useTryCatch();
   const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
   const { isLoading: isRemovingHard, tryCatch: tryCatchRemoveHard } = useTryCatch();
+  const { isLoading: isRestoring, tryCatch: tryCatchRestore } = useTryCatch();
   const { open: sidebarIsOpen } = useSidebar();
   const { role } = useParams();
 
@@ -76,7 +77,7 @@ export default function Users() {
   }
 
   async function restoreUser(id: string) {
-    const [response, error] = await tryCatchRemoveHard(UsersService.restore(id));
+    const [response, error] = await tryCatchRestore(UsersService.restore(id));
 
     if (error) {
       toast.error(error.message);
@@ -91,7 +92,7 @@ export default function Users() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    const [response, error] = await tryCatch(UsersService.remove(id));
+    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id));
 
     if (error) {
       toast.error(error.message);
@@ -223,7 +224,15 @@ export default function Users() {
           )}
           {row.original.deletedAt ? (
             <Protected requiredPermission={`${role}-restore` as TPermission}>
-              <Button onClick={() => restoreUser(row.original.id)} size="icon" variant="outline">
+              <Button
+                className="hover:text-amber-600"
+                onClick={() => {
+                  setSelectedUser(row.original);
+                  setOpenRestoreDialog(true);
+                }}
+                size="icon"
+                variant="outline"
+              >
                 <RotateCcw />
               </Button>
             </Protected>
@@ -291,13 +300,14 @@ export default function Users() {
           pageSizes={[5, 10, 20, 50]}
         />
       </div>
-      <DeleteDialog
+      <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
         callback={() => selectedUser && removeUser(selectedUser.id)}
         loader={isRemoving}
         open={openRemoveDialog}
         setOpen={setOpenRemoveDialog}
+        variant="destructive"
       >
         <ul>
           <li className="flex items-center gap-2">
@@ -309,8 +319,28 @@ export default function Users() {
             {selectedUser && formatIc(selectedUser.ic)}
           </li>
         </ul>
-      </DeleteDialog>
-      <DeleteDialog
+      </ConfirmDialog>
+      <ConfirmDialog
+        title="Restaurar paciente"
+        description="¿Seguro que querés restaurar a este paciente?"
+        callback={() => selectedUser && restoreUser(selectedUser.id)}
+        loader={isRestoring}
+        open={openRestoreDialog}
+        setOpen={setOpenRestoreDialog}
+        variant="warning"
+      >
+        <ul>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre:</span>
+            {`${selectedUser?.firstName} ${selectedUser?.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {selectedUser && formatIc(selectedUser.ic)}
+          </li>
+        </ul>
+      </ConfirmDialog>
+      <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
         alertMessage="Todos los turnos y el historial médico relacionados al paciente, serán eliminados de la base de datos. Esta acción es irreversible."
@@ -319,6 +349,7 @@ export default function Users() {
         open={openRemoveHardDialog}
         setOpen={setOpenRemoveHardDialog}
         showAlert
+        variant="destructive"
       >
         <ul className="flex flex-col gap-1">
           <li className="flex items-center gap-2">
@@ -330,7 +361,7 @@ export default function Users() {
             {selectedUser && formatIc(selectedUser.ic)}
           </li>
         </ul>
-      </DeleteDialog>
+      </ConfirmDialog>
     </>
   );
 }
