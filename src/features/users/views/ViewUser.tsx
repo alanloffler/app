@@ -2,11 +2,11 @@ import { FileClock, FilePenLine, RotateCcw, Trash2 } from "lucide-react";
 
 import { Activity } from "react";
 import { BackButton } from "@components/BackButton";
-import { Button } from "@components/ui/button";
 import { Badge } from "@components/Badge";
+import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
+import { ConfirmDialog } from "@components/ConfirmDialog";
 import { CreatedAt } from "@components/CreatedAt";
-import { DeleteDialog } from "@components/DeleteDialog";
 import { DisplayWorkingDays } from "@components/DisplayWorkingDays";
 import { HistoryTable } from "@medical-history/components/HistoryTable";
 import { Link } from "react-router";
@@ -322,13 +322,14 @@ export default function ViewUser() {
         <PageHeader title="Historial médico" />
         <HistoryTable patient={user} />
       </div>
-      <DeleteDialog
+      <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
         callback={() => id && removeUser(id)}
         loader={isRemoving}
         open={openRemoveDialog}
         setOpen={setOpenRemoveDialog}
+        variant="destructive"
       >
         <ul>
           <li className="flex items-center gap-2">
@@ -340,8 +341,8 @@ export default function ViewUser() {
             {formatIc(user.ic)}
           </li>
         </ul>
-      </DeleteDialog>
-      <DeleteDialog
+      </ConfirmDialog>
+      <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
         alertMessage="Todos los turnos y el historial médico relacionados al paciente, serán eliminados de la base de datos. Esta acción es irreversible."
@@ -350,6 +351,7 @@ export default function ViewUser() {
         open={openRemoveHardDialog}
         setOpen={setOpenRemoveHardDialog}
         showAlert
+        variant="destructive"
       >
         <ul className="flex flex-col gap-1">
           <li className="flex items-center gap-2">
@@ -361,7 +363,7 @@ export default function ViewUser() {
             {formatIc(user.ic)}
           </li>
         </ul>
-      </DeleteDialog>
+      </ConfirmDialog>
     </section>
   );
 }
