@@ -1,9 +1,9 @@
-import { Ban, Eye, FilePenLine, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Ban, FilePenLine, FileText, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 import { Badge } from "@components/Badge";
 import { Button } from "@components/ui/button";
 import { DataTable } from "@components/data-table/DataTable";
-import { HoldButton } from "@components/ui/HoldButton";
+import { DeleteDialog } from "@components/DeleteDialog";
 import { Link } from "react-router";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
@@ -29,9 +29,14 @@ import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function Users() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean> | undefined>(undefined);
+  const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
+  const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<IUser | undefined>(undefined);
   const [users, setUsers] = useState<IUser[] | undefined>(undefined);
   const admin = useAuthStore((state) => state.admin);
   const { isLoading: isLoadingUsers, tryCatch: tryCatchAdmins } = useTryCatch();
+  const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
+  const { isLoading: isRemovingHard, tryCatch: tryCatchRemoveHard } = useTryCatch();
   const { open: sidebarIsOpen } = useSidebar();
   const { role } = useParams();
 
@@ -57,7 +62,7 @@ export default function Users() {
   }, [fetchUsers]);
 
   async function removeUser(id: string): Promise<void> {
-    const [response, error] = await tryCatch(UsersService.softRemove(id));
+    const [response, error] = await tryCatchRemove(UsersService.softRemove(id));
 
     if (error) {
       toast.error(error.message);
@@ -71,7 +76,7 @@ export default function Users() {
   }
 
   async function restoreUser(id: string) {
-    const [response, error] = await tryCatch(UsersService.restore(id));
+    const [response, error] = await tryCatchRemoveHard(UsersService.restore(id));
 
     if (error) {
       toast.error(error.message);
@@ -161,16 +166,16 @@ export default function Users() {
       accessorKey: "userName",
       enableHiding: true,
       header: ({ column }) => <SortableHeader column={column}>Usuario</SortableHeader>,
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => <SortableHeader column={column}>Email</SortableHeader>,
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
           <span>{row.original.userName}</span>
           {row.original.deletedAt && <Ban className="h-4 w-4 text-rose-500" />}
         </div>
       ),
-    },
-    {
-      accessorKey: "email",
-      header: ({ column }) => <SortableHeader column={column}>Email</SortableHeader>,
     },
     {
       accessorKey: "firstName",
@@ -202,46 +207,54 @@ export default function Users() {
       minSize: 168,
       cell: ({ row }) => (
         <div className="flex justify-end gap-2">
-          <Button className="px-5! hover:text-sky-500" variant="outline" asChild>
+          <Button className="hover:text-sky-500" size="icon" variant="outline" asChild>
             <Link to={`/users/view/${row.original.id}`} state={{ role: row.original.role }}>
-              <Eye className="h-4 w-4" />
+              <FileText />
             </Link>
           </Button>
           {!row.original.deletedAt && (
             <Protected requiredPermission={`${role}-update` as TPermission}>
-              <Button className="px-5! hover:text-green-500" variant="outline" asChild>
+              <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
                 <Link to={`/users/edit/${row.original.id}`} state={{ role: row.original.role.value }}>
-                  <FilePenLine className="h-4 w-4" />
+                  <FilePenLine />
                 </Link>
               </Button>
             </Protected>
           )}
           {row.original.deletedAt ? (
             <Protected requiredPermission={`${role}-restore` as TPermission}>
-              <HoldButton callback={() => restoreUser(row.original.id)} size="icon" type="restore" variant="outline">
-                <RotateCcw className="h-4 w-4" />
-              </HoldButton>
+              <Button onClick={() => restoreUser(row.original.id)} size="icon" variant="outline">
+                <RotateCcw />
+              </Button>
             </Protected>
           ) : (
             <>
               <Protected requiredPermission={`${role}-delete` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
-                  <HoldButton callback={() => removeUser(row.original.id)} size="icon" type="delete" variant="outline">
-                    <Trash2 className="h-4 w-4" />
-                  </HoldButton>
+                  <Button
+                    className="hover:text-red-500"
+                    onClick={() => {
+                      setSelectedUser(row.original);
+                      setOpenRemoveDialog(true);
+                    }}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <Trash2 />
+                  </Button>
                 )}
               </Protected>
               <Protected requiredPermission={`${role}-delete-hard` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
-                  <HoldButton
-                    callback={() => hardRemoveUser(row.original.id)}
+                  <Button
+                    className="gap-0 hover:text-red-500"
+                    onClick={() => setOpenRemoveHardDialog(true)}
                     size="icon"
-                    type="hard-delete"
                     variant="outline"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 />
                     <span>!</span>
-                  </HoldButton>
+                  </Button>
                 )}
               </Protected>
             </>
@@ -254,28 +267,70 @@ export default function Users() {
   if (!role) return null;
 
   return (
-    <div className="flex flex-col gap-8">
-      <PageHeader
-        title={uppercaseFirst(ERolePlural[role as TUserRole])}
-        subtitle={`Gestioná los ${ERolePlural[role as TUserRole]} del sistema`}
+    <>
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          title={uppercaseFirst(ERolePlural[role as TUserRole])}
+          subtitle={`Gestioná los ${ERolePlural[role as TUserRole]} del sistema`}
+        >
+          <Protected requiredPermission={["admin-create", "patient-create", "professional-create"]} mode="some">
+            <Button variant="default" size="lg" asChild>
+              <Link to="/users/create" state={{ role }}>
+                <Plus /> Crear {ERoles[role as keyof typeof ERoles]}
+              </Link>
+            </Button>
+          </Protected>
+        </PageHeader>
+        <DataTable
+          columnVisibility={columnVisibility}
+          columns={columns}
+          data={users}
+          defaultPageSize={10}
+          defaultSorting={[{ id: "userName", desc: false }]}
+          loading={isLoadingUsers}
+          pageSizes={[5, 10, 20, 50]}
+        />
+      </div>
+      <DeleteDialog
+        title="Eliminar paciente"
+        description="¿Seguro que querés eliminar a este paciente?"
+        callback={() => selectedUser && removeUser(selectedUser.id)}
+        loader={isRemoving}
+        open={openRemoveDialog}
+        setOpen={setOpenRemoveDialog}
       >
-        <Protected requiredPermission={["admin-create", "patient-create", "professional-create"]} mode="some">
-          <Button variant="default" size="lg" asChild>
-            <Link to="/users/create" state={{ role }}>
-              <Plus /> Crear {ERoles[role as keyof typeof ERoles]}
-            </Link>
-          </Button>
-        </Protected>
-      </PageHeader>
-      <DataTable
-        columnVisibility={columnVisibility}
-        columns={columns}
-        data={users}
-        defaultPageSize={10}
-        defaultSorting={[{ id: "userName", desc: false }]}
-        loading={isLoadingUsers}
-        pageSizes={[5, 10, 20, 50]}
-      />
-    </div>
+        <ul>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre:</span>
+            {`${selectedUser?.firstName} ${selectedUser?.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {selectedUser && formatIc(selectedUser.ic)}
+          </li>
+        </ul>
+      </DeleteDialog>
+      <DeleteDialog
+        title="Eliminar paciente"
+        description="¿Seguro que querés eliminar a este paciente?"
+        alertMessage="Todos los turnos y el historial médico relacionados al paciente, serán eliminados de la base de datos. Esta acción es irreversible."
+        callback={() => selectedUser && hardRemoveUser(selectedUser.id)}
+        loader={isRemovingHard}
+        open={openRemoveHardDialog}
+        setOpen={setOpenRemoveHardDialog}
+        showAlert
+      >
+        <ul className="flex flex-col gap-1">
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">Nombre completo:</span>
+            {`${selectedUser?.firstName} ${selectedUser?.lastName}`}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="font-semibold">DNI:</span>
+            {selectedUser && formatIc(selectedUser.ic)}
+          </li>
+        </ul>
+      </DeleteDialog>
+    </>
   );
 }
