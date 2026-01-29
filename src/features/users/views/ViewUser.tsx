@@ -312,7 +312,7 @@ export default function ViewUser() {
                                 <span>!</span>
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Eliminar irreversible</TooltipContent>
+                            <TooltipContent>Eliminar permanente</TooltipContent>
                           </Tooltip>
                         </Protected>
                       </div>
