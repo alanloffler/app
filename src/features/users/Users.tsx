@@ -8,6 +8,7 @@ import { Link } from "react-router";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
 import { SortableHeader } from "@components/data-table/SortableHeader";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
@@ -208,62 +209,87 @@ export default function Users() {
       minSize: 168,
       cell: ({ row }) => (
         <div className="flex justify-end gap-2">
-          <Button className="hover:text-sky-500" size="icon" variant="outline" asChild>
-            <Link to={`/users/view/${row.original.id}`} state={{ role: row.original.role }}>
-              <FileText />
-            </Link>
-          </Button>
-          {!row.original.deletedAt && (
-            <Protected requiredPermission={`${role}-update` as TPermission}>
-              <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
-                <Link to={`/users/edit/${row.original.id}`} state={{ role: row.original.role.value }}>
-                  <FilePenLine />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button className="hover:text-sky-500" size="icon" variant="outline" asChild>
+                <Link to={`/users/view/${row.original.id}`} state={{ role: row.original.role }}>
+                  <FileText />
                 </Link>
               </Button>
+            </TooltipTrigger>
+            <TooltipContent>Ver detalles</TooltipContent>
+          </Tooltip>
+          {!row.original.deletedAt && (
+            <Protected requiredPermission={`${role}-update` as TPermission}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button className="hover:text-green-500" size="icon" variant="outline" asChild>
+                    <Link to={`/users/edit/${row.original.id}`} state={{ role: row.original.role.value }}>
+                      <FilePenLine />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Editar</TooltipContent>
+              </Tooltip>
             </Protected>
           )}
           {row.original.deletedAt ? (
             <Protected requiredPermission={`${role}-restore` as TPermission}>
-              <Button
-                className="hover:text-amber-600"
-                onClick={() => {
-                  setSelectedUser(row.original);
-                  setOpenRestoreDialog(true);
-                }}
-                size="icon"
-                variant="outline"
-              >
-                <RotateCcw />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="hover:text-amber-600"
+                    onClick={() => {
+                      setSelectedUser(row.original);
+                      setOpenRestoreDialog(true);
+                    }}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <RotateCcw />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Restaurar</TooltipContent>
+              </Tooltip>
             </Protected>
           ) : (
             <>
               <Protected requiredPermission={`${role}-delete` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
-                  <Button
-                    className="hover:text-red-500"
-                    onClick={() => {
-                      setSelectedUser(row.original);
-                      setOpenRemoveDialog(true);
-                    }}
-                    size="icon"
-                    variant="outline"
-                  >
-                    <Trash2 />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="hover:text-red-500"
+                        onClick={() => {
+                          setSelectedUser(row.original);
+                          setOpenRemoveDialog(true);
+                        }}
+                        size="icon"
+                        variant="outline"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Eliminar</TooltipContent>
+                  </Tooltip>
                 )}
               </Protected>
               <Protected requiredPermission={`${role}-delete-hard` as TPermission}>
                 {admin && row.original.ic !== admin.ic && (
-                  <Button
-                    className="gap-0 hover:text-red-500"
-                    onClick={() => setOpenRemoveHardDialog(true)}
-                    size="icon"
-                    variant="outline"
-                  >
-                    <Trash2 />
-                    <span>!</span>
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="gap-0 hover:text-red-500"
+                        onClick={() => setOpenRemoveHardDialog(true)}
+                        size="icon"
+                        variant="outline"
+                      >
+                        <Trash2 />
+                        <span>!</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Eliminar permanente</TooltipContent>
+                  </Tooltip>
                 )}
               </Protected>
             </>
