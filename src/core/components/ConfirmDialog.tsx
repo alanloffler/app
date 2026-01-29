@@ -25,8 +25,9 @@ interface IProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
   showAlert?: boolean;
   title: string;
+  variant: "destructive" | "warning";
 }
-export function DeleteDialog({
+export function ConfirmDialog({
   alertMessage,
   callback,
   children,
@@ -36,6 +37,7 @@ export function DeleteDialog({
   setOpen,
   showAlert = false,
   title,
+  variant,
 }: IProps) {
   const [accepted, setAccepted] = useState<boolean | "indeterminate">(false);
 
@@ -71,9 +73,15 @@ export function DeleteDialog({
               callback();
               setOpen(false);
             }}
-            variant="destructive"
+            variant={variant}
           >
-            {loader ? <Loader color="white" text="Eliminando" /> : "Eliminar"}
+            {loader ? (
+              <Loader color="white" text={variant === "destructive" ? "Eliminando" : "Restaurando"} />
+            ) : variant === "destructive" ? (
+              "Eliminar"
+            ) : (
+              "Restaurar"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
