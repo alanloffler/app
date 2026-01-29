@@ -320,7 +320,7 @@ export default function ViewUser() {
       </div>
       <div className="flex flex-col gap-3">
         <PageHeader title="Historial médico" />
-        <HistoryTable data={user.medicalHistory} />
+        <HistoryTable patient={user} />
       </div>
       <DeleteDialog
         title="Eliminar paciente"
