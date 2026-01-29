@@ -1,22 +1,29 @@
 import { X, Check, FilePenLine, FileText, Trash2 } from "lucide-react";
 
+import { Badge } from "@components/Badge";
 import { Button } from "@components/ui/button";
 import { Card } from "@components/ui/card";
 import { DataTable } from "@components/data-table/DataTable";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
+import { useState } from "react";
 
 import type { IMedicalHistory } from "@users/interfaces/medical-history.interface";
+import type { IUser } from "@users/interfaces/user.interface";
 import { cn } from "@lib/utils";
 
 interface IProps {
-  data?: IMedicalHistory[];
+  patient?: IUser;
 }
 
-export function HistoryTable({ data }: IProps) {
-  if (!data) return null;
+export function HistoryTable({ patient }: IProps) {
+  const [openSheet, setOpenSheet] = useState(false);
+  const [history, setHistory] = useState<IMedicalHistory | undefined>(undefined);
+
+  if (!patient) return null;
 
   const columns: ColumnDef<any>[] = [
     {
@@ -25,7 +32,13 @@ export function HistoryTable({ data }: IProps) {
       enableSorting: false,
       size: 80,
       header: () => <div className="text-center">ID</div>,
-      cell: ({ row }) => <div className="flex justify-center">{row.original?.id?.slice(0, 5)}</div>,
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <Badge size="small" variant="id">
+            {row.original?.id.slice(0, 5)}
+          </Badge>
+        </div>
+      ),
     },
     {
       accessorKey: "createdAt",
@@ -62,7 +75,14 @@ export function HistoryTable({ data }: IProps) {
       header: () => <div>Acciones</div>,
       cell: ({ row }) => (
         <div className="flex justify-start gap-1">
-          <Button onClick={() => console.log(`Ver ${row.original.id}`)} size="icon-sm" variant="ghost">
+          <Button
+            onClick={() => {
+              setOpenSheet(true);
+              setHistory({ ...row.original, idx: row.index });
+            }}
+            size="icon-sm"
+            variant="ghost"
+          >
             <FileText />
           </Button>
           <Button onClick={() => console.log(`Editar ${row.original.id}`)} size="icon-sm" variant="ghost">
@@ -76,8 +96,44 @@ export function HistoryTable({ data }: IProps) {
     },
   ];
 
-  return data.length > 0 ? (
-    <DataTable columns={columns} data={data} />
+  return patient.medicalHistory && patient.medicalHistory?.length > 0 ? (
+    <>
+      {history && (
+        <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+          <SheetTrigger asChild></SheetTrigger>
+          <SheetContent className="sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+            <SheetHeader className="pt-8">
+              <SheetTitle className="text-lg">Historia médica</SheetTitle>
+              <SheetDescription className="text-base">Detalles de la historia médica seleccionada</SheetDescription>
+            </SheetHeader>
+            <div className="flex flex-col gap-6 p-4">
+              <ul className="flex flex-col gap-3">
+                <li>
+                  <h1 className="text-center text-xl font-semibold">{history.reason}</h1>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold">Paciente:</span>
+                  <span>{`${patient.firstName} ${patient.lastName}`}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold">Fecha de atención:</span>
+                  <span>{format(history.createdAt, "P", { locale: es })}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold">Receta:</span>
+                  {history.recipe ? <p>Contenido de la receta de medicamentos</p> : <p>Sin receta de medicamentos</p>}
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold">Notas:</span>
+                  <p>Notas adicionales para el historial</p>
+                </li>
+              </ul>
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
+      <DataTable columns={columns} data={patient.medicalHistory} />
+    </>
   ) : (
     <Card className="text-muted-foreground text-center">El paciente no posee historial médico</Card>
   );
