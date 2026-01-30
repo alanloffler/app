@@ -52,7 +52,7 @@ export function NavActions({ items }: IProps) {
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
             <Protected requiredPermission={item.permission}>
-              <SidebarMenuButton asChild isActive={isActive(item.url)}>
+              <SidebarMenuButton asChild isActive={isActive(item.url, item.state)}>
                 <Link to={item.url} state={item.state}>
                   {showMenuIcons && <item.icon />}
                   <span>{item.name}</span>
