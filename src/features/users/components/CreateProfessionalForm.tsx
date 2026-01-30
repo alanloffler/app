@@ -62,8 +62,6 @@ export function CreateProfessionalForm() {
   });
 
   async function onSubmit(data: z.infer<typeof createProfessionalSchema>) {
-    console.log(data);
-
     if (emailError) {
       form.setError("email", { message: emailError });
       return;
@@ -153,7 +151,6 @@ export function CreateProfessionalForm() {
       }
 
       if (roles && roles.statusCode === 200 && roles.data) {
-        console.log("inside getRoles", role);
         const foundedRole = roles.data.find((r) => r.value === role);
         if (foundedRole) {
           form.setValue("roleId", foundedRole.id);
