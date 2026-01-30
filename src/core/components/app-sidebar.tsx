@@ -138,6 +138,13 @@ const data = {
       state: { role: "patient" },
     },
     {
+      name: "Crear profesional",
+      url: "/users/create",
+      icon: Plus,
+      permission: "professional-create" as TPermission,
+      state: { role: "professional" },
+    },
+    {
       name: "Crear rol",
       url: "/roles/create",
       icon: ShieldPlus,
