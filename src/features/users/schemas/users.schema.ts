@@ -9,7 +9,6 @@ export const userSchema = z.object({
     .string()
     .nonempty("El número de teléfono es obligatorio")
     .length(10, "El número de teléfono debe tener 10 dígitos"),
-  roleId: z.string().nonempty("El rol es obligatorio"),
   userName: z
     .string()
     .min(2, "El nombre de usuario es obligatorio")
