@@ -93,12 +93,12 @@ class UsersModuleService {
   }
 
   public async softRemove(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.delete(`/users/soft-remove/${id}`);
+    const response = await apiClient.delete(`/users/${id}/soft`);
     return response.data;
   }
 
   public async restore(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.patch(`/users/restore/${id}`);
+    const response = await apiClient.patch(`/users/${id}/restore`);
     return response.data;
   }
 
