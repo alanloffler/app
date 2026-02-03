@@ -16,7 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { TUserRole } from "@roles/interfaces/user-role.type";
 import { ERoles } from "@auth/enums/role.enum";
-import { RolesService } from "@roles/services/roles.service";
 import { UsersService } from "@users/services/users.service";
 import { createProfessionalSchema } from "@users/schemas/create-professional.schema";
 import { tryCatch } from "@core/utils/try-catch";
@@ -31,9 +30,7 @@ export function CreateProfessionalForm() {
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const role = location.state.role;
   const roleTranslated = ERoles[location.state.role as TUserRole];
-  const { isLoading: isLoadingRoles, tryCatch: tryCatchRoles } = useTryCatch();
   const { isLoading: isSaving, tryCatch: tryCatchUser } = useTryCatch();
 
   const debouncedUsername = useDebounce(username, 500);
@@ -49,7 +46,6 @@ export function CreateProfessionalForm() {
       password: "",
       phoneNumber: "",
       professionalPrefix: "",
-      roleId: "",
       specialty: "",
       userName: "@",
       workingDays: [],
@@ -139,27 +135,6 @@ export function CreateProfessionalForm() {
 
     checkUsername();
   }, [debouncedUsername, form]);
-
-  useEffect(() => {
-    async function getRoles() {
-      const [roles, rolesError] = await tryCatchRoles(RolesService.findAll());
-
-      if (rolesError) {
-        toast.error(rolesError.message);
-        form.control.setError("roleId", { message: "Error obteniendo roles" });
-        return;
-      }
-
-      if (roles && roles.statusCode === 200 && roles.data) {
-        const foundedRole = roles.data.find((r) => r.value === role);
-        if (foundedRole) {
-          form.setValue("roleId", foundedRole.id);
-        }
-      }
-    }
-
-    getRoles();
-  }, [form, role, tryCatchRoles]);
 
   function resetForm(): void {
     form.reset();
@@ -516,7 +491,7 @@ export function CreateProfessionalForm() {
         </form>
       </CardContent>
       <CardFooter className="flex items-center justify-between pt-4">
-        <div>{isLoadingRoles && <Loader className="text-sm" size={18} text="Cargando roles" />}</div>
+        <div></div>
         <div className="flex gap-4">
           <Button variant="ghost" onClick={resetForm}>
             Cancelar
