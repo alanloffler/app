@@ -1,26 +1,7 @@
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
+import type { ICreateProfessionalForm } from "@users/interfaces/create-professional.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import { apiClient } from "@core/client/client";
-
-interface ICreateProfessionalForm {
-  dailyExceptionEnd: string;
-  dailyExceptionStart: string;
-  email: string;
-  endHour: string;
-  firstName: string;
-  ic: string;
-  lastName: string;
-  licenseId: string;
-  password: string;
-  phoneNumber: string;
-  professionalPrefix: string;
-  roleId: string;
-  slotDuration: string;
-  specialty: string;
-  startHour: string;
-  userName: string;
-  workingDays: number[];
-}
 
 class UsersModuleService {
   private static instance: UsersModuleService;
@@ -43,7 +24,6 @@ class UsersModuleService {
         email: data.email,
         phoneNumber: data.phoneNumber,
         password: data.password,
-        roleId: data.roleId,
       },
       profile: {
         licenseId: data.licenseId,
