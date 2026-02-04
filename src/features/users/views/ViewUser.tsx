@@ -94,7 +94,7 @@ export default function ViewUser() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id));
+    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id, userRole.value));
 
     if (error) {
       toast.error(error.message);
