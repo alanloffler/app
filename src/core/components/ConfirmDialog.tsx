@@ -13,7 +13,7 @@ import {
 import { Label } from "@components/ui/label";
 import { Loader } from "@components/Loader";
 
-import { useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 
 interface IProps {
   alertMessage?: string;
@@ -40,6 +40,10 @@ export function ConfirmDialog({
   variant,
 }: IProps) {
   const [accepted, setAccepted] = useState<boolean | "indeterminate">(false);
+
+  useEffect(() => {
+    if (open === false) setAccepted(false);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
