@@ -78,8 +78,9 @@ export default function ViewUser() {
     [adminAuth?.role.value, tryCatchUser],
   );
 
+  // TODO: check if work, has error trying to show the user with profile if it's a professional
   async function removeUser(id: string): Promise<void> {
-    const [response, error] = await tryCatchRemove(UsersService.softRemove(id));
+    const [response, error] = await tryCatchRemove(UsersService.softRemove(id, userRole.value));
 
     if (error) {
       toast.error(error.message);
@@ -107,7 +108,7 @@ export default function ViewUser() {
   }
 
   async function restoreUser(id: string) {
-    const [response, error] = await tryCatchRestore(UsersService.restore(id));
+    const [response, error] = await tryCatchRestore(UsersService.restore(id, userRole.value));
 
     if (error) {
       toast.error(error.message);
