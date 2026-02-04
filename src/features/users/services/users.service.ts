@@ -99,19 +99,8 @@ class UsersModuleService {
     return response.data;
   }
 
-  public async restore(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.patch(`/users/${id}/restore`);
-    return response.data;
-  }
-
-  // Professional services
-  public async softRemoveProfessional(id: string): Promise<IApiResponse<void>> {
-    const response = await apiClient.delete(`/users/${id}/professional/soft`);
-    return response.data;
-  }
-
-  public async restoreProfessional(id: string): Promise<IApiResponse<void>> {
-    const response = await apiClient.patch(`/users/${id}/professional/restore`);
+  public async restore(id: string, type: TUserRole): Promise<IApiResponse<void>> {
+    const response = await apiClient.patch(`/users/${id}/${type}/restore`);
     return response.data;
   }
 
