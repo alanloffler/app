@@ -102,6 +102,13 @@ class UsersModuleService {
     return response.data;
   }
 
+  // Professional services
+  public async restoreProfessional(id: string): Promise<IApiResponse<void>> {
+    const response = await apiClient.patch(`/users/${id}/professional/restore`);
+    return response.data;
+  }
+
+  // Check services
   public async checkEmailAvailability(email: string): Promise<IApiResponse<boolean>> {
     const response = await apiClient.get(`/users/check/email/${email}`);
     return response.data;
