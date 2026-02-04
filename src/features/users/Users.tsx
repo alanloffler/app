@@ -78,7 +78,7 @@ export default function Users() {
   }
 
   async function restoreUser(id: string) {
-    const [response, error] = await tryCatchRestore(UsersService.restore(id));
+    const [response, error] = await tryCatchRestore(UsersService.restoreProfessional(id));
 
     if (error) {
       toast.error(error.message);
