@@ -88,12 +88,13 @@ class UsersModuleService {
     return response.data;
   }
 
-  public async remove(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.delete(`/users/${id}`);
+  // Common services
+  public async remove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
+    console.log(`/users/${id}/${type}`);
+    const response = await apiClient.delete(`/users/${id}/${type}`);
     return response.data;
   }
 
-  // Common services
   public async softRemove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
     const response = await apiClient.delete(`/users/${id}/${type}/soft`);
     return response.data;
