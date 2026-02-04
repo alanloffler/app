@@ -75,13 +75,11 @@ class UsersModuleService {
 
   // Common services
   public async findWithProfile(id: string, type: TUserRole): Promise<IApiResponse<IUser>> {
-    console.log("Find with profile");
     const response = await apiClient.get(`/users/${id}/${type}/profile`);
     return response.data;
   }
 
   public async findSoftRemovedWithProfile(id: string, type: TUserRole): Promise<IApiResponse<IUser>> {
-    console.log("Find soft removed with profile");
     const response = await apiClient.get(`/users/${id}/${type}/profile/soft`);
     return response.data;
   }
