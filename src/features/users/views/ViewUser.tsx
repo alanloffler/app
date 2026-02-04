@@ -61,8 +61,8 @@ export default function ViewUser() {
     async function (id: string) {
       const isSuperAdmin = adminAuth?.role.value === ERoles.super;
       const serviceByRole = isSuperAdmin
-        ? UsersService.findPatientSoftRemovedWithHistory(id)
-        : UsersService.findPatientWithHistory(id);
+        ? UsersService.findSoftRemovedWithProfile(id, userRole.value)
+        : UsersService.findWithProfile(id, userRole.value);
 
       const [response, responseError] = await tryCatchUser(serviceByRole);
 
@@ -75,10 +75,9 @@ export default function ViewUser() {
         setUser(response.data);
       }
     },
-    [adminAuth?.role.value, tryCatchUser],
+    [adminAuth?.role.value, tryCatchUser, userRole.value],
   );
 
-  // TODO: check if work, has error trying to show the user with profile if it's a professional
   async function removeUser(id: string): Promise<void> {
     const [response, error] = await tryCatchRemove(UsersService.softRemove(id, userRole.value));
 
@@ -325,10 +324,12 @@ export default function ViewUser() {
           )}
         </Card>
       </div>
-      <div className="flex flex-col gap-3">
-        <PageHeader title="Historial médico" />
-        <HistoryTable patient={user} />
-      </div>
+      {userRole === EUserRole["patient"] && (
+        <div className="flex flex-col gap-3">
+          <PageHeader title="Historial médico" />
+          <HistoryTable patient={user} />
+        </div>
+      )}
       <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
