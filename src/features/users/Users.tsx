@@ -64,7 +64,7 @@ export default function Users() {
   }, [fetchUsers]);
 
   async function removeUser(id: string): Promise<void> {
-    const [response, error] = await tryCatchRemove(UsersService.softRemove(id));
+    const [response, error] = await tryCatchRemove(UsersService.softRemove(id, role as TUserRole));
 
     if (error) {
       toast.error(error.message);
