@@ -1,6 +1,7 @@
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
 import type { ICreateProfessionalForm } from "@users/interfaces/create-professional.interface";
 import type { IUser } from "@users/interfaces/user.interface";
+import type { TUserRole } from "@roles/interfaces/user-role.type";
 import { apiClient } from "@core/client/client";
 
 class UsersModuleService {
@@ -92,8 +93,9 @@ class UsersModuleService {
     return response.data;
   }
 
-  public async softRemove(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.delete(`/users/${id}/soft`);
+  // Common services
+  public async softRemove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
+    const response = await apiClient.delete(`/users/${id}/${type}/soft`);
     return response.data;
   }
 
@@ -103,6 +105,11 @@ class UsersModuleService {
   }
 
   // Professional services
+  public async softRemoveProfessional(id: string): Promise<IApiResponse<void>> {
+    const response = await apiClient.delete(`/users/${id}/professional/soft`);
+    return response.data;
+  }
+
   public async restoreProfessional(id: string): Promise<IApiResponse<void>> {
     const response = await apiClient.patch(`/users/${id}/professional/restore`);
     return response.data;
