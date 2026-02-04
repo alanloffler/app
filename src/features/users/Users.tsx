@@ -93,7 +93,8 @@ export default function Users() {
   }
 
   async function hardRemoveUser(id: string): Promise<void> {
-    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id));
+    console.log("remove hard");
+    const [response, error] = await tryCatchRemoveHard(UsersService.remove(id, role as TUserRole));
 
     if (error) {
       toast.error(error.message);
@@ -280,7 +281,10 @@ export default function Users() {
                     <TooltipTrigger asChild>
                       <Button
                         className="gap-0 hover:text-red-500"
-                        onClick={() => setOpenRemoveHardDialog(true)}
+                        onClick={() => {
+                          setSelectedUser(row.original);
+                          setOpenRemoveHardDialog(true);
+                        }}
                         size="icon"
                         variant="outline"
                       >
