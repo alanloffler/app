@@ -16,28 +16,7 @@ class UsersModuleService {
   }
 
   public async createProfessional(data: ICreateProfessionalForm): Promise<IApiResponse<IUser>> {
-    const payload = {
-      user: {
-        ic: data.ic,
-        userName: data.userName,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        password: data.password,
-      },
-      profile: {
-        licenseId: data.licenseId,
-        professionalPrefix: data.professionalPrefix,
-        specialty: data.specialty,
-        workingDays: data.workingDays,
-        startHour: data.startHour,
-        endHour: data.endHour,
-        slotDuration: data.slotDuration,
-        dailyExceptionStart: data.dailyExceptionStart || undefined,
-        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
-      },
-    };
+    const payload = this.toProfessionalData(data);
 
     const response = await apiClient.post("/users/create-professional", payload);
     return response.data;
@@ -100,28 +79,7 @@ class UsersModuleService {
     type: TUserRole,
     data: Partial<ICreateProfessionalForm>,
   ): Promise<IApiResponse<IUser>> {
-    const payload = {
-      user: {
-        ic: data.ic,
-        userName: data.userName,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        password: data.password,
-      },
-      profile: {
-        licenseId: data.licenseId,
-        professionalPrefix: data.professionalPrefix,
-        specialty: data.specialty,
-        workingDays: data.workingDays,
-        startHour: data.startHour,
-        endHour: data.endHour,
-        slotDuration: data.slotDuration,
-        dailyExceptionStart: data.dailyExceptionStart || undefined,
-        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
-      },
-    };
+    const payload = this.toProfessionalData(data);
 
     const response = await apiClient.patch(`/users/${id}/${type}`, payload);
     return response.data;
@@ -157,6 +115,31 @@ class UsersModuleService {
   public async checkUsernameAvailability(username: string): Promise<IApiResponse<boolean>> {
     const response = await apiClient.get(`/users/check/username/${username}`);
     return response.data;
+  }
+
+  private toProfessionalData(data: Partial<ICreateProfessionalForm>) {
+    return {
+      user: {
+        ic: data.ic,
+        userName: data.userName,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+      },
+      profile: {
+        licenseId: data.licenseId,
+        professionalPrefix: data.professionalPrefix,
+        specialty: data.specialty,
+        workingDays: data.workingDays,
+        startHour: data.startHour,
+        endHour: data.endHour,
+        slotDuration: data.slotDuration,
+        dailyExceptionStart: data.dailyExceptionStart || undefined,
+        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
+      },
+    };
   }
 }
 
