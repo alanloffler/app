@@ -15,18 +15,32 @@ class UsersModuleService {
     return UsersModuleService.instance;
   }
 
+  // Professionals services
   public async createProfessional(data: ICreateProfessionalForm): Promise<IApiResponse<IUser>> {
     const payload = this.toProfessionalData(data);
 
-    const response = await apiClient.post("/users/create-professional", payload);
+    const response = await apiClient.post("/users/professional", payload);
     return response.data;
   }
 
-  public async create(data: Partial<IUser>): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.post("/users", data);
+  // Patients services
+  public async createPatient(data: ICreatePatientForm): Promise<IApiResponse<IUser>> {
+    const payload = this.toPatientData(data);
+
+    const response = await apiClient.post("/users/patient", payload);
+    return response.data;
+  }
+  public async findPatientWithHistory(id: string): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.get(`/users/patient-history/${id}`);
     return response.data;
   }
 
+  public async findPatientSoftRemovedWithHistory(id: string): Promise<IApiResponse<IUser>> {
+    const response = await apiClient.get(`/users/patient-soft-removed-history/${id}`);
+    return response.data;
+  }
+
+  // TODO: order and usage confirmation
   public async findAll(role: string): Promise<IApiResponse<IUser[]>> {
     const response = await apiClient.get(`/users/role/${role}`);
     return response.data;
@@ -53,6 +67,7 @@ class UsersModuleService {
   }
 
   // Common services
+  // Get()
   public async findWithProfile(id: string, type: TUserRole): Promise<IApiResponse<IUser>> {
     const response = await apiClient.get(`/users/${id}/${type}/profile`);
     return response.data;
@@ -63,17 +78,7 @@ class UsersModuleService {
     return response.data;
   }
 
-  // TODO: maybe remove
-  public async findPatientWithHistory(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.get(`/users/patient-history/${id}`);
-    return response.data;
-  }
-
-  public async findPatientSoftRemovedWithHistory(id: string): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.get(`/users/patient-soft-removed-history/${id}`);
-    return response.data;
-  }
-
+  // Patch()
   public async update(
     id: string,
     type: TUserRole,
@@ -85,7 +90,12 @@ class UsersModuleService {
     return response.data;
   }
 
-  // Common services
+  public async restore(id: string, type: TUserRole): Promise<IApiResponse<void>> {
+    const response = await apiClient.patch(`/users/${id}/${type}/restore`);
+    return response.data;
+  }
+
+  // Delete()
   public async remove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
     const response = await apiClient.delete(`/users/${id}/${type}`);
     return response.data;
@@ -93,11 +103,6 @@ class UsersModuleService {
 
   public async softRemove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
     const response = await apiClient.delete(`/users/${id}/${type}/soft`);
-    return response.data;
-  }
-
-  public async restore(id: string, type: TUserRole): Promise<IApiResponse<void>> {
-    const response = await apiClient.patch(`/users/${id}/${type}/restore`);
     return response.data;
   }
 
@@ -117,6 +122,7 @@ class UsersModuleService {
     return response.data;
   }
 
+  // Private methods
   private toProfessionalData(data: Partial<ICreateProfessionalForm>) {
     return {
       user: {
