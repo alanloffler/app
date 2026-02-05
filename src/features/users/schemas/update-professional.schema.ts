@@ -1,0 +1,56 @@
+import z from "zod";
+
+import { userSchema } from "@users/schemas/users.schema";
+
+const hourSchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Formato inválido");
+
+const optionalHourSchema = z
+  .string()
+  .refine((v) => v === "" || /^([01]\d|2[0-3]):([0-5]\d)$/.test(v), "Formato inválido");
+
+export const updateProfessionalSchema = userSchema.extend({
+  password: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 8, "La contraseña debe tener al menos 8 caracteres"),
+  licenseId: z
+    .string()
+    .nonempty("La matrícula es obligatoria")
+    .min(3, "La matrícula debe tener al menos 3 caracteres")
+    .max(20, "La matrícula debe tener como máximo 20 caracteres"),
+  professionalPrefix: z
+    .string()
+    .nonempty("El prefijo profesional es obligatorio")
+    .min(3, "El prefijo profesional debe tener al menos 3 caracteres")
+    .max(20, "El prefijo profesional debe tener como máximo 20 caracteres"),
+  specialty: z
+    .string()
+    .nonempty("La especialidad es obligatoria")
+    .min(3, "La especialidad debe tener al menos 3 caracteres")
+    .max(20, "La especialidad debe tener como máximo 20 caracteres"),
+  workingDays: z
+    .array(
+      z.coerce
+        .number({ message: "Cada día laboral debe ser un número entero" })
+        .int({ message: "Cada día laboral debe ser un número entero" })
+        .min(0, { message: "El día laboral mínimo es 0 (Domingo)" })
+        .max(6, { message: "El día máximo es 6 (Sábado)" }),
+    )
+    .nonempty("Debes agregar al menos un día laboral"),
+  startHour: hourSchema,
+  endHour: hourSchema,
+  dailyExceptionStart: optionalHourSchema,
+  dailyExceptionEnd: optionalHourSchema,
+  slotDuration: z
+    .string()
+    .regex(/^\d+$/, "Debe ser un número")
+    .refine(
+      (v) => {
+        const n = Number(v);
+        return n >= 5 && n <= 120;
+      },
+      {
+        message: "Entre 5 y 120",
+      },
+    ),
+});
