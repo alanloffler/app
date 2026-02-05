@@ -261,16 +261,20 @@ export default function ViewUser() {
                     </div>
                   ) : (
                     <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button className="hover:text-fuchsia-500" size="icon" variant="outline">
-                              <FileClock className="h-5 w-5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Agregar historia médica</TooltipContent>
-                        </Tooltip>
-                      </div>
+                      {userRole.value === EUserRole["patient"] ? (
+                        <div className="flex items-center gap-3">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button className="hover:text-fuchsia-500" size="icon" variant="outline">
+                                <FileClock className="h-5 w-5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Agregar historia médica</TooltipContent>
+                          </Tooltip>
+                        </div>
+                      ) : (
+                        <div></div>
+                      )}
                       <div className="flex items-center gap-3">
                         <Protected requiredPermission={`${userRole.value}-update` as TPermission}>
                           <Tooltip>
