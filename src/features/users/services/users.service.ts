@@ -1,4 +1,5 @@
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
+import type { ICreatePatientForm } from "@users/interfaces/create-patient.interface";
 import type { ICreateProfessionalForm } from "@users/interfaces/create-professional.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TUserRole } from "@roles/interfaces/user-role.type";
@@ -30,6 +31,7 @@ class UsersModuleService {
     const response = await apiClient.post("/users/patient", payload);
     return response.data;
   }
+
   public async findPatientWithHistory(id: string): Promise<IApiResponse<IUser>> {
     const response = await apiClient.get(`/users/patient-history/${id}`);
     return response.data;
@@ -126,24 +128,47 @@ class UsersModuleService {
   private toProfessionalData(data: Partial<ICreateProfessionalForm>) {
     return {
       user: {
-        ic: data.ic,
-        userName: data.userName,
-        firstName: data.firstName,
-        lastName: data.lastName,
         email: data.email,
-        phoneNumber: data.phoneNumber,
+        firstName: data.firstName,
+        ic: data.ic,
+        lastName: data.lastName,
         password: data.password,
+        phoneNumber: data.phoneNumber,
+        userName: data.userName,
       },
       profile: {
+        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
+        dailyExceptionStart: data.dailyExceptionStart || undefined,
+        endHour: data.endHour,
         licenseId: data.licenseId,
         professionalPrefix: data.professionalPrefix,
-        specialty: data.specialty,
-        workingDays: data.workingDays,
-        startHour: data.startHour,
-        endHour: data.endHour,
         slotDuration: data.slotDuration,
-        dailyExceptionStart: data.dailyExceptionStart || undefined,
-        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
+        specialty: data.specialty,
+        startHour: data.startHour,
+        workingDays: data.workingDays,
+      },
+    };
+  }
+
+  private toPatientData(data: Partial<ICreatePatientForm>) {
+    return {
+      user: {
+        email: data.email,
+        firstName: data.firstName,
+        ic: data.ic,
+        lastName: data.lastName,
+        password: data.password,
+        phoneNumber: data.phoneNumber,
+        userName: data.userName,
+      },
+      profile: {
+        birthDay: data.birthDay,
+        bloodType: data.bloodType,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        gender: data.gender,
+        height: data.height,
+        weight: data.weight,
       },
     };
   }
