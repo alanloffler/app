@@ -30,7 +30,7 @@ export const updateProfessionalSchema = userSchema.extend({
     .max(20, "La especialidad debe tener como máximo 20 caracteres"),
   workingDays: z
     .array(
-      z.coerce
+      z
         .number({ message: "Cada día laboral debe ser un número entero" })
         .int({ message: "Cada día laboral debe ser un número entero" })
         .min(0, { message: "El día laboral mínimo es 0 (Domingo)" })
