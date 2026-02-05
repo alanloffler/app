@@ -95,14 +95,40 @@ class UsersModuleService {
     return response.data;
   }
 
-  public async update(id: string, data: Partial<IUser>): Promise<IApiResponse<IUser>> {
-    const response = await apiClient.patch(`/users/${id}`, data);
+  public async update(
+    id: string,
+    type: TUserRole,
+    data: Partial<ICreateProfessionalForm>,
+  ): Promise<IApiResponse<IUser>> {
+    const payload = {
+      user: {
+        ic: data.ic,
+        userName: data.userName,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+      },
+      profile: {
+        licenseId: data.licenseId,
+        professionalPrefix: data.professionalPrefix,
+        specialty: data.specialty,
+        workingDays: data.workingDays,
+        startHour: data.startHour,
+        endHour: data.endHour,
+        slotDuration: data.slotDuration,
+        dailyExceptionStart: data.dailyExceptionStart || undefined,
+        dailyExceptionEnd: data.dailyExceptionEnd || undefined,
+      },
+    };
+
+    const response = await apiClient.patch(`/users/${id}/${type}`, payload);
     return response.data;
   }
 
   // Common services
   public async remove(id: string, type: TUserRole): Promise<IApiResponse<void>> {
-    console.log(`/users/${id}/${type}`);
     const response = await apiClient.delete(`/users/${id}/${type}`);
     return response.data;
   }
