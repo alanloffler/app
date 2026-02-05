@@ -13,7 +13,6 @@ interface IProps {
 }
 
 export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, value = [] }: IProps) {
-  const _value = value.map(Number);
   const firstDayOfCurrentWeek = startOfWeek(new Date(), { locale: es });
   const weekdays = eachDayOfInterval({
     start: firstDayOfCurrentWeek,
@@ -28,9 +27,9 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
     const dayValue = indexToDayValue(index);
 
     if (checked === true) {
-      onChange([..._value, dayValue].sort((a, b) => a - b));
+      onChange([...value, dayValue].sort((a, b) => a - b));
     } else {
-      onChange(_value.filter((day) => day !== dayValue));
+      onChange(value.filter((day) => day !== dayValue));
     }
   }
 
@@ -45,7 +44,7 @@ export function WorkingDays({ "aria-invalid": ariaInvalid, disabled, onChange, v
         <div key={index} className="flex flex-col items-center gap-1">
           <Checkbox
             aria-invalid={ariaInvalid}
-            checked={_value.includes(indexToDayValue(index))}
+            checked={value.includes(indexToDayValue(index))}
             disabled={disabled}
             id="workingDays"
             onCheckedChange={(checked) => handleChecked(index, checked)}
