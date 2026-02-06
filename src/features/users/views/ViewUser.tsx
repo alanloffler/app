@@ -13,6 +13,7 @@ import { Link } from "react-router";
 import { Loader } from "@components/Loader";
 import { PageHeader } from "@components/pages/PageHeader";
 import { Protected } from "@auth/components/Protected";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@components/ui/sheet";
 import { Tooltip } from "@components/ui/tooltip";
 import { TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
 
@@ -36,6 +37,7 @@ export default function ViewUser() {
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
   const [openRestoreDialog, setOpenRestoreDialog] = useState<boolean>(false);
+  const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const adminAuth = useAuthStore((state) => state.admin);
   const location = useLocation();
@@ -312,7 +314,12 @@ export default function ViewUser() {
                         <div className="flex items-center gap-3">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button className="hover:text-fuchsia-500" size="icon" variant="outline">
+                              <Button
+                                className="hover:text-fuchsia-500"
+                                onClick={() => setOpenSheet(true)}
+                                size="icon"
+                                variant="outline"
+                              >
                                 <FileClock className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
@@ -443,6 +450,23 @@ export default function ViewUser() {
           </li>
         </ul>
       </ConfirmDialog>
+      <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+        <SheetContent className="sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <SheetHeader className="pt-8">
+            <SheetTitle className="text-lg">Agregar historia médica</SheetTitle>
+            <SheetDescription className="text-base">
+              Creación de historia para el paciente {user?.firstName} {user?.lastName}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex flex-col gap-6 p-4">
+            <ul>
+              <li>Event id or event???</li>
+              <li>reason</li>
+              <li>recipe</li>
+            </ul>
+          </div>
+        </SheetContent>
+      </Sheet>
     </section>
   );
 }
