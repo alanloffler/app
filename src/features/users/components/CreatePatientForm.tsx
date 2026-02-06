@@ -39,6 +39,7 @@ export function CreatePatientForm() {
 
   const birthDayRef = useMaskito({ options: dateMask });
   const icRef = useMaskito({ options: digitsMask });
+  const heightRef = useMaskito({ options: digitsMask });
   const phoneRef = useMaskito({ options: digitsMask });
 
   const form = useForm<z.infer<typeof createPatientSchema>>({
@@ -295,7 +296,16 @@ export function CreatePatientForm() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="height">Altura (Cm)</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="height" maxLength={21} {...field} />
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="height"
+                        maxLength={3}
+                        {...field}
+                        ref={(node) => {
+                          field.ref(node);
+                          heightRef(node);
+                        }}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
