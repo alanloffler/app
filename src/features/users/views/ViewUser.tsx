@@ -170,8 +170,43 @@ export default function ViewUser() {
                         <span className="font-semibold">DNI:</span>
                         <span>{user.ic}</span>
                       </li>
+                      {user.role.value === EUserRole["patient"] && user.patientProfile?.birthDay && (
+                        <li className="flex flex-wrap justify-start gap-2">
+                          <span className="shrink-0 font-semibold">Fecha de nacimiento:</span>
+                          <span className="break-all">
+                            {format(user.patientProfile?.birthDay, "P", { locale: es })}
+                          </span>
+                        </li>
+                      )}
+                      {user.role.value === EUserRole["patient"] && (
+                        <li className="flex flex-wrap justify-start gap-2">
+                          <span className="shrink-0 font-semibold">Género:</span>
+                          <span className="break-all">{user.patientProfile?.gender}</span>
+                        </li>
+                      )}
                     </ul>
                   </div>
+                  <Activity mode={user.role.value === EUserRole["patient"] ? "visible" : "hidden"}>
+                    <div className="flex break-inside-avoid flex-col items-start gap-3">
+                      <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
+                        Datos médicos
+                      </h2>
+                      <ul className="flex flex-col gap-2 text-sm">
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Tipo de sangre:</span>
+                          <span>{user.patientProfile?.bloodType}</span>
+                        </li>
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Peso (Kg):</span>
+                          <span>{user.patientProfile?.weight}</span>
+                        </li>
+                        <li className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">Altura (Cm):</span>
+                          <span>{user.patientProfile?.height}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Activity>
                   <Activity mode={user.role.value === EUserRole["professional"] ? "visible" : "hidden"}>
                     <div className="flex break-inside-avoid flex-col items-start gap-3">
                       <h2 className="text-muted-foreground w-full border-b text-start text-base font-medium">
@@ -202,6 +237,18 @@ export default function ViewUser() {
                         <span className="font-semibold">Teléfono:</span>
                         <span>{user.phoneNumber}</span>
                       </li>
+                      {user.role.value === EUserRole["patient"] && (
+                        <li className="flex flex-wrap justify-start gap-2">
+                          <span className="shrink-0 text-start font-semibold">Contacto de emergencia:</span>
+                          <span className="break-all">{user.patientProfile?.emergencyContactName}</span>
+                        </li>
+                      )}
+                      {user.role.value === EUserRole["patient"] && (
+                        <li className="flex flex-wrap justify-start gap-2">
+                          <span className="shrink-0 text-start font-semibold">Teléfono de emergencia:</span>
+                          <span className="break-all">{user.patientProfile?.emergencyContactPhone}</span>
+                        </li>
+                      )}
                     </ul>
                   </div>
                   <Activity
