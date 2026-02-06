@@ -5,19 +5,21 @@ import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
-import { WorkingDays } from "@components/WorkingDays";
 
 import z from "zod";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
+import { useMaskito } from "@maskito/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { TUserRole } from "@roles/interfaces/user-role.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { UsersService } from "@users/services/users.service";
 import { createPatientSchema } from "@users/schemas/create-patient.schema";
+import { dateMask } from "@core/masks/maskito-date";
+import { digitsMask } from "@core/masks/maskito-digits";
 import { tryCatch } from "@core/utils/try-catch";
 import { uppercaseFirst } from "@core/formatters/uppercase-first.formatter";
 import { useDebounce } from "@core/hooks/useDebounce";
@@ -34,6 +36,10 @@ export function CreatePatientForm() {
   const { isLoading: isSaving, tryCatch: tryCatchPatient } = useTryCatch();
 
   const debouncedUsername = useDebounce(username, 500);
+
+  const birthDayRef = useMaskito({ options: dateMask });
+  const icRef = useMaskito({ options: digitsMask });
+  const phoneRef = useMaskito({ options: digitsMask });
 
   const form = useForm<z.infer<typeof createPatientSchema>>({
     resolver: zodResolver(createPatientSchema),
@@ -218,26 +224,51 @@ export function CreatePatientForm() {
                         id="ic"
                         maxLength={9}
                         {...field}
-                        onChange={async (e) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          field.onChange(value);
-
-                          setIcError(null);
-                          form.clearErrors("ic");
-
-                          if (value.length > 7) {
-                            const [response, error] = await tryCatch(UsersService.checkIcAvailability(value));
-                            if (response?.data === false || error) {
-                              const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado";
-                              setIcError(errorMsg);
-                              form.setError("ic", { message: errorMsg });
-                            }
-                          }
+                        ref={(node) => {
+                          field.ref(node);
+                          icRef(node);
                         }}
                       />
+                      {/*                       onChange={async (e) => { */}
+                      {/*   const value = e.target.value.replace(/\D/g, ""); */}
+                      {/*   field.onChange(value); */}
+                      {/**/}
+                      {/*   setIcError(null); */}
+                      {/*   form.clearErrors("ic"); */}
+                      {/**/}
+                      {/*   if (value.length > 7) { */}
+                      {/*     const [response, error] = await tryCatch(UsersService.checkIcAvailability(value)); */}
+                      {/*     if (response?.data === false || error) { */}
+                      {/*       const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado"; */}
+                      {/*       setIcError(errorMsg); */}
+                      {/*       form.setError("ic", { message: errorMsg }); */}
+                      {/*     } */}
+                      {/*   } */}
+                      {/* }} */}
+
                       {(fieldState.invalid || icError) && (
                         <FieldError errors={icError ? [{ message: icError }] : [fieldState.error]} />
                       )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="birthDay"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="birthDay">Fecha de nacimiento</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="birthDay"
+                        {...field}
+                        placeholder="dd/mm/aaaa"
+                        ref={(node) => {
+                          field.ref(node);
+                          birthDayRef(node);
+                        }}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
                 />
@@ -355,9 +386,40 @@ export function CreatePatientForm() {
                         aria-invalid={fieldState.invalid}
                         id="phone"
                         maxLength={11}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          field.onChange(value);
+                        ref={(node) => {
+                          field.ref(node);
+                          phoneRef(node);
+                        }}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="emergencyContactName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="emergencyContactName">Contacto de emergencia</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="emergencyContactName" maxLength={51} {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="emergencyContactPhone"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-6" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="emergencyContactPhone">Teléfono de emergencia</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="emergencyContactPhone"
+                        maxLength={11}
+                        ref={(node) => {
+                          field.ref(node);
+                          phoneRef(node);
                         }}
                       />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
