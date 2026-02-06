@@ -47,7 +47,7 @@ export function EditProfessionalForm({ userId }: IProps) {
 
   const debouncedUsername = useDebounce(username, 500);
 
-  const canUpdatePassword = usePermission(`${userRole.value}-update-password` as TPermission);
+  const canUpdatePassword = usePermission(`${userRole}-update-password` as TPermission);
 
   const form = useForm<z.infer<typeof updateProfessionalSchema>>({
     resolver: zodResolver(updateProfessionalSchema),
@@ -127,7 +127,7 @@ export function EditProfessionalForm({ userId }: IProps) {
     }
 
     findOneWithCredentials();
-  }, [userId, form, tryCatchProfessional, userRole.value]);
+  }, [userId, form, tryCatchProfessional]);
 
   function togglePasswordField(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
@@ -444,9 +444,10 @@ export function EditProfessionalForm({ userId }: IProps) {
                           {...field}
                         />
                         <button
-                          type="button"
-                          className="p-1 transition-colors duration-150 hover:text-sky-500"
+                          className="disabled:hover:text-foreground p-1 transition-colors duration-150 hover:text-sky-500 disabled:opacity-50"
+                          disabled={!canUpdatePassword}
                           onClick={(e) => togglePasswordField(e)}
+                          type="button"
                         >
                           {passwordField ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
                         </button>
