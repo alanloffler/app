@@ -229,24 +229,24 @@ export function CreatePatientForm() {
                           field.ref(node);
                           icRef(node);
                         }}
-                      />
-                      {/*                       onChange={async (e) => { */}
-                      {/*   const value = e.target.value.replace(/\D/g, ""); */}
-                      {/*   field.onChange(value); */}
-                      {/**/}
-                      {/*   setIcError(null); */}
-                      {/*   form.clearErrors("ic"); */}
-                      {/**/}
-                      {/*   if (value.length > 7) { */}
-                      {/*     const [response, error] = await tryCatch(UsersService.checkIcAvailability(value)); */}
-                      {/*     if (response?.data === false || error) { */}
-                      {/*       const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado"; */}
-                      {/*       setIcError(errorMsg); */}
-                      {/*       form.setError("ic", { message: errorMsg }); */}
-                      {/*     } */}
-                      {/*   } */}
-                      {/* }} */}
+                        onChange={async (e) => {
+                          field.onChange(e);
 
+                          const value = e.target.value;
+
+                          setIcError(null);
+                          form.clearErrors("ic");
+
+                          if (value.length > 7) {
+                            const [response, error] = await tryCatch(UsersService.checkIcAvailability(value));
+                            if (response?.data === false || error) {
+                              const errorMsg = error ? "Error al comprobar DNI" : "DNI ya registrado";
+                              setIcError(errorMsg);
+                              form.setError("ic", { message: errorMsg });
+                            }
+                          }
+                        }}
+                      />
                       {(fieldState.invalid || icError) && (
                         <FieldError errors={icError ? [{ message: icError }] : [fieldState.error]} />
                       )}
