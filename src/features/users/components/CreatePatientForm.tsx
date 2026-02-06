@@ -42,7 +42,7 @@ export function CreatePatientForm() {
   const heightRef = useMaskito({ options: digitsMask });
   const phoneRef = useMaskito({ options: digitsMask });
 
-  const form = useForm<z.infer<typeof createPatientSchema>>({
+  const form = useForm<z.input<typeof createPatientSchema>, unknown, z.output<typeof createPatientSchema>>({
     resolver: zodResolver(createPatientSchema),
     defaultValues: {
       email: "",
@@ -62,7 +62,7 @@ export function CreatePatientForm() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof createPatientSchema>) {
+  async function onSubmit(data: z.output<typeof createPatientSchema>) {
     if (emailError) {
       form.setError("email", { message: emailError });
       return;
