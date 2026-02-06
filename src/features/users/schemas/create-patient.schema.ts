@@ -39,7 +39,7 @@ export const createPatientSchema = userSchema.extend({
     .string()
     .nonempty("El nombre de contacto de emergencia es obligatorio")
     .min(3, "El nombre de contacto de emergencia debe tener al menos 3 caracteres")
-    .max(20, "El nombre de contacto de emergencia debe tener como máximo 20 caracteres"),
+    .max(50, "El nombre de contacto de emergencia debe tener como máximo 50 caracteres"),
   emergencyContactPhone: z
     .string()
     .nonempty("El teléfono de emergencia es obligatorio")
