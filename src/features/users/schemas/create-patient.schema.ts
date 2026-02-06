@@ -29,12 +29,12 @@ export const createPatientSchema = userSchema.extend({
       if (isNaN(num)) throw new Error("El peso debe ser un número válido");
       return num;
     })
-    .pipe(z.number().min(0.001, "El peso debe ser mayor a 0.000").max(999.999, "El peso debe ser menor a 999.999")),
+    .pipe(z.number().min(0.01, "El peso debe ser mayor a 0,00").max(999.99, "El peso debe ser menor a 999,99")),
   height: z
     .string()
     .nonempty("La altura es obligatoria")
-    .min(30, "La altura mínima es 30 cms")
-    .max(300, "La altura máxima es 300 cms"),
+    .transform((val) => parseFloat(val))
+    .pipe(z.number().min(30, "La altura mínima es 30 cms").max(300, "La altura máxima es 300 cms")),
   emergencyContactName: z
     .string()
     .nonempty("El nombre de contacto de emergencia es obligatorio")
