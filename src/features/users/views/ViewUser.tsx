@@ -197,12 +197,12 @@ export default function ViewUser() {
                           <span>{user.patientProfile?.bloodType}</span>
                         </li>
                         <li className="flex flex-wrap items-center gap-2">
-                          <span className="font-semibold">Peso (Kg):</span>
-                          <span>{user.patientProfile?.weight}</span>
+                          <span className="font-semibold">Peso:</span>
+                          <span>{`${user.patientProfile?.weight} kgs.`}</span>
                         </li>
                         <li className="flex flex-wrap items-center gap-2">
-                          <span className="font-semibold">Altura (Cm):</span>
-                          <span>{user.patientProfile?.height}</span>
+                          <span className="font-semibold">Altura:</span>
+                          <span>{`${user.patientProfile?.height} cms.`}</span>
                         </li>
                       </ul>
                     </div>
