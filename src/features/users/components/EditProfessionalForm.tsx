@@ -1,3 +1,5 @@
+import { Eye, EyeOff } from "lucide-react";
+
 import { BackButton } from "@components/BackButton";
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@components/ui/card";
@@ -5,7 +7,7 @@ import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
-import { WorkingDays } from "@core/components/WorkingDays";
+import { WorkingDays } from "@components/WorkingDays";
 
 import z from "zod";
 import { toast } from "sonner";
@@ -17,8 +19,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { UsersService } from "@users/services/users.service";
-import { updateProfessionalSchema } from "@users/schemas/update-professional.schema";
 import { tryCatch } from "@core/utils/try-catch";
+import { updateProfessionalSchema } from "@users/schemas/update-professional.schema";
 import { useAuthStore } from "@auth/stores/auth.store";
 import { useDebounce } from "@core/hooks/useDebounce";
 import { usePermission } from "@permissions/hooks/usePermission";
@@ -40,7 +42,7 @@ export function EditProfessionalForm({ userId }: IProps) {
   const navigate = useNavigate();
   const refreshAdmin = useAuthStore((state) => state.refreshAdmin);
   const userRole = location.state.role;
-  const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
+  const { isLoading: isLoadingProfessional, tryCatch: tryCatchProfessional } = useTryCatch();
   const { isLoading: isSaving, tryCatch: tryCatchSubmit } = useTryCatch();
 
   const debouncedUsername = useDebounce(username, 500);
@@ -88,7 +90,7 @@ export function EditProfessionalForm({ userId }: IProps) {
 
   useEffect(() => {
     async function findOneWithCredentials(): Promise<void> {
-      const [user, userError] = await tryCatchUser(UsersService.findWithProfile(userId, "professional"));
+      const [user, userError] = await tryCatchProfessional(UsersService.findWithProfile(userId, "professional"));
 
       if (userError) {
         toast.error(userError.message);
@@ -125,7 +127,7 @@ export function EditProfessionalForm({ userId }: IProps) {
     }
 
     findOneWithCredentials();
-  }, [userId, form, tryCatchUser, userRole.value]);
+  }, [userId, form, tryCatchProfessional, userRole.value]);
 
   function togglePasswordField(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
@@ -431,7 +433,24 @@ export function EditProfessionalForm({ userId }: IProps) {
                   render={({ field, fieldState }) => (
                     <Field className="col-span-8" data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="password" {...field} />
+                      <div className="flex items-center gap-2">
+                        <Input
+                          aria-invalid={fieldState.invalid}
+                          className={!canUpdatePassword ? "placeholder:text-red-500" : ""}
+                          disabled={!canUpdatePassword}
+                          id="password"
+                          type={passwordField ? "password" : "text"}
+                          placeholder={!canUpdatePassword ? "Permiso requerido" : ""}
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          className="p-1 transition-colors duration-150 hover:text-sky-500"
+                          onClick={(e) => togglePasswordField(e)}
+                        >
+                          {passwordField ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                        </button>
+                      </div>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -565,7 +584,7 @@ export function EditProfessionalForm({ userId }: IProps) {
         </form>
       </CardContent>
       <CardFooter className="flex items-center justify-between pt-4">
-        <div></div>
+        <div>{isLoadingProfessional && <Loader className="text-sm" size={18} text="Cargando profesional" />}</div>
         <div className="flex gap-4">
           <Button variant="ghost" onClick={handleCancel}>
             Cancelar
