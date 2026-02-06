@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
 import type { ICreatePatientForm } from "@users/interfaces/create-patient.interface";
 import type { ICreateProfessionalForm } from "@users/interfaces/create-professional.interface";
@@ -162,7 +164,7 @@ class UsersModuleService {
         userName: data.userName,
       },
       profile: {
-        birthDay: data.birthDay,
+        birthDay: format(data.birthDay!, "yyyy-MM-dd"),
         bloodType: data.bloodType,
         emergencyContactName: data.emergencyContactName,
         emergencyContactPhone: data.emergencyContactPhone,
