@@ -1,6 +1,6 @@
 import { maskitoNumberOptionsGenerator } from "@maskito/kit";
 
-export default maskitoNumberOptionsGenerator({
+export const numberMask = maskitoNumberOptionsGenerator({
   maximumFractionDigits: 0,
   min: 0,
 });
