@@ -277,7 +277,36 @@ export function CreatePatientForm() {
             </div>
             <div className="flex flex-col gap-3 border-t pt-4">
               <h2 className="text-muted-foreground text-base font-medium">Datos médicos</h2>
-              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* TODO: select with options */}
+                <Controller
+                  name="gender"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="gender">Género</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="gender"
+                        maxLength={21}
+                        placeholder="Ej. Masculino / Femenino"
+                        {...field}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="bloodType"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="bloodType">Tipo de sangre</FieldLabel>
+                      <Input aria-invalid={fieldState.invalid} id="bloodType" maxLength={21} {...field} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
                 <Controller
                   name="weight"
                   control={form.control}
@@ -305,24 +334,6 @@ export function CreatePatientForm() {
                           field.ref(node);
                           heightRef(node);
                         }}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-                {/* TODO: select with options */}
-                <Controller
-                  name="gender"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="gender">Género</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="gender"
-                        maxLength={21}
-                        placeholder="Ej. Masculino / Femenino"
-                        {...field}
                       />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
