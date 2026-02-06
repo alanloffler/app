@@ -1,5 +1,5 @@
 export interface ICreatePatientForm {
-  birthDay: Date;
+  birthDay: string;
   bloodType: string;
   email: string;
   emergencyContactName: string;
