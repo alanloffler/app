@@ -22,6 +22,7 @@ import { UsersService } from "@users/services/users.service";
 import { createPatientSchema } from "@users/schemas/create-patient.schema";
 import { dateMask } from "@core/masks/maskito-date";
 import { digitsMask } from "@core/masks/maskito-digits";
+import { numberMask } from "@core/masks/maskito-number";
 import { tryCatch } from "@core/utils/try-catch";
 import { uppercaseFirst } from "@core/formatters/uppercase-first.formatter";
 import { useDebounce } from "@core/hooks/useDebounce";
@@ -43,6 +44,7 @@ export function CreatePatientForm() {
   const icRef = useMaskito({ options: digitsMask });
   const heightRef = useMaskito({ options: digitsMask });
   const phoneRef = useMaskito({ options: digitsMask });
+  const weightRef = useMaskito({ options: numberMask });
 
   const form = useForm<z.input<typeof createPatientSchema>, unknown, z.output<typeof createPatientSchema>>({
     resolver: zodResolver(createPatientSchema),
@@ -280,7 +282,6 @@ export function CreatePatientForm() {
             <div className="flex flex-col gap-3 border-t pt-4">
               <h2 className="text-muted-foreground text-base font-medium">Datos médicos</h2>
               <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* TODO: select with options */}
                 <Controller
                   name="gender"
                   control={form.control}
@@ -323,10 +324,18 @@ export function CreatePatientForm() {
                   name="weight"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    // TODO: accept only numbers
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="weight">Peso (Kg)</FieldLabel>
-                      <Input aria-invalid={fieldState.invalid} id="weight" maxLength={21} {...field} />
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        id="weight"
+                        maxLength={6}
+                        {...field}
+                        ref={(node) => {
+                          field.ref(node);
+                          weightRef(node);
+                        }}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
