@@ -25,10 +25,11 @@ import { createHistorySchema } from "@medical-history/schemas/create-history.sch
 
 interface IProps {
   user: IUser;
+  onCreated: () => void;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function CreateHistoryForm({ user, setOpen }: IProps) {
+export function CreateHistoryForm({ user, onCreated, setOpen }: IProps) {
   const [date, setDate] = useState<Date>();
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
   const { isLoading: isSaving, tryCatch: tryCatchCreateHistory } = useTryCatch();
@@ -68,6 +69,7 @@ export function CreateHistoryForm({ user, setOpen }: IProps) {
 
     if (response && response.statusCode === 201) {
       toast.success("Historial médico creado");
+      onCreated();
       resetForm();
     }
   }
