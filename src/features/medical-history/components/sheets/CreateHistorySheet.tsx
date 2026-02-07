@@ -14,7 +14,7 @@ interface IProps {
 export function CreateHistorySheet({ user, open, setOpen }: IProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent className="sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <SheetContent className="sm:min-w-[480px]">
         <SheetHeader className="pt-8">
           <SheetTitle className="text-lg">Agregar historia médica</SheetTitle>
           <SheetDescription className="text-base">
@@ -22,7 +22,7 @@ export function CreateHistorySheet({ user, open, setOpen }: IProps) {
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-6 p-4">
-          <CreateHistoryForm />
+          <CreateHistoryForm user={user} setOpen={setOpen} />
         </div>
       </SheetContent>
     </Sheet>
