@@ -40,9 +40,9 @@ export function HistoryTable({ history }: IProps) {
       ),
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "date",
       header: () => <div className="text-center">Fecha de atención</div>,
-      cell: ({ row }) => <div className="text-center">{format(row.original?.createdAt, "P", { locale: es })}</div>,
+      cell: ({ row }) => <div className="text-center">{format(row.original?.date, "P", { locale: es })}</div>,
     },
     {
       accessorKey: "type",
