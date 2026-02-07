@@ -10,7 +10,7 @@ interface IProps {
 export function DisplayWorkingDays({ days }: IProps) {
   if (!days) return;
 
-  const firstDayOfCurrentWeek = startOfWeek(new Date(), { locale: es });
+  const firstDayOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 0 });
   const weekdays = eachDayOfInterval({
     start: firstDayOfCurrentWeek,
     end: addDays(firstDayOfCurrentWeek, 6),
