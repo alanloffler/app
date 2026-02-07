@@ -1,14 +1,20 @@
+import { CalendarIcon } from "lucide-react";
+
 import { Button } from "@components/ui/button";
+import { Calendar } from "@components/ui/calendar";
 import { Checkbox } from "@components/ui/checkbox";
 import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
+import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover";
 import { Textarea } from "@components/ui/textarea";
 
 import type z from "zod";
-import type { Dispatch, SetStateAction } from "react";
+import { es } from "date-fns/locale";
+import { format } from "date-fns";
 import { useForm } from "react-hook-form";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { IUser } from "@users/interfaces/user.interface";
@@ -20,11 +26,15 @@ interface IProps {
 }
 
 export function CreateHistoryForm({ user, setOpen }: IProps) {
+  const [date, setDate] = useState<Date>();
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof createHistorySchema>>({
     resolver: zodResolver(createHistorySchema),
     defaultValues: {
       businessId: "",
       comments: "",
+      date: undefined,
       eventId: undefined,
       reason: "",
       recipe: false,
@@ -32,10 +42,15 @@ export function CreateHistoryForm({ user, setOpen }: IProps) {
     },
   });
 
-  console.log(user.id);
-  console.log(user.businessId);
   form.setValue("userId", user.id);
   form.setValue("businessId", user.businessId);
+
+  function onSelectDate(date: Date | undefined) {
+    if (!date) return;
+
+    setDate(date);
+    form.setValue("date", date);
+  }
 
   async function onSubmit(data: z.infer<typeof createHistorySchema>) {
     console.log(data);
@@ -50,6 +65,40 @@ export function CreateHistoryForm({ user, setOpen }: IProps) {
     <div className="flex flex-col gap-10">
       <form className="grid grid-cols-1 gap-6" id="create-history" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className="grid grid-cols-1 gap-6">
+          <Controller
+            name="date"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="date">Fecha:</FieldLabel>
+                <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+                  <PopoverTrigger className="w-60!" asChild onClick={() => setOpenCalendar(true)}>
+                    <Button
+                      variant="outline"
+                      data-empty={!date}
+                      className="data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal"
+                    >
+                      <CalendarIcon />
+                      {date ? format(date, "P", { locale: es }) : <span>Seleccionar</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      locale={es}
+                      onSelect={(date) => {
+                        onSelectDate(date);
+                        setOpenCalendar(false);
+                      }}
+                      {...field}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           <Controller
             name="reason"
             control={form.control}
