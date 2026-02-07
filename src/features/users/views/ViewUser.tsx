@@ -80,6 +80,10 @@ export default function ViewUser() {
     [adminAuth?.role.value, tryCatchUser, userRole.value],
   );
 
+  const getMedicalHistory = useCallback((id: string) => {
+    console.log(`Get history for userId: ${id}`);
+  }, []);
+
   async function removeUser(id: string): Promise<void> {
     const [response, error] = await tryCatchRemove(UsersService.softRemove(id, userRole.value));
 
@@ -382,7 +386,7 @@ export default function ViewUser() {
           )}
         </Card>
       </div>
-      {userRole === EUserRole["patient"] && (
+      {userRole.value === EUserRole["patient"] && (
         <div className="flex flex-col gap-3">
           <PageHeader title="Historial médico" />
           <HistoryTable patient={user} />
@@ -450,7 +454,12 @@ export default function ViewUser() {
           </li>
         </ul>
       </ConfirmDialog>
-      <CreateHistorySheet user={user} open={openSheet} setOpen={setOpenSheet} />
+      <CreateHistorySheet
+        user={user}
+        onCreated={() => getMedicalHistory(user.id)}
+        open={openSheet}
+        setOpen={setOpenSheet}
+      />
     </section>
   );
 }
