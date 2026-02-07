@@ -4,6 +4,7 @@ import type { IProfessionalProfile } from "@users/interfaces/professional-profil
 import type { IRole } from "@roles/interfaces/role.interface";
 
 export interface IUser {
+  businessId: string;
   createdAt: string;
   deletedAt?: string;
   email: string;
