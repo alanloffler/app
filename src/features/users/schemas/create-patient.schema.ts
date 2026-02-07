@@ -25,7 +25,7 @@ export const createPatientSchema = userSchema.extend({
     .string()
     .min(1, "El peso es obligatorio")
     .transform((val) => {
-      const num = parseFloat(val.replace(",", "."));
+      const num = parseFloat(val.replace(/\s/g, "").replace(",", "."));
       if (isNaN(num)) throw new Error("El peso debe ser un número válido");
       return num;
     })
