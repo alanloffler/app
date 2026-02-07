@@ -23,10 +23,12 @@ import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 
+import type { IMedicalHistory } from "@medical-history/interfaces/medical-history.interface";
 import type { IUser } from "@users/interfaces/user.interface";
 import type { TPermission } from "@permissions/interfaces/permission.type";
 import { ERoles } from "@auth/enums/role.enum";
 import { EUserRole } from "@roles/enums/user-role.enum";
+import { MedicalHistoryService } from "@medical-history/services/medical-history.service";
 import { UsersService } from "@users/services/users.service";
 import { formatIc } from "@core/formatters/ic.formatter";
 import { useAuthStore } from "@auth/stores/auth.store";
@@ -34,6 +36,7 @@ import { usePermission } from "@permissions/hooks/usePermission";
 import { useTryCatch } from "@core/hooks/useTryCatch";
 
 export default function ViewUser() {
+  const [medicalHistory, setMedicalHistory] = useState<IMedicalHistory[] | undefined>();
   const [openRemoveDialog, setOpenRemoveDialog] = useState<boolean>(false);
   const [openRemoveHardDialog, setOpenRemoveHardDialog] = useState<boolean>(false);
   const [openRestoreDialog, setOpenRestoreDialog] = useState<boolean>(false);
@@ -44,6 +47,7 @@ export default function ViewUser() {
   const navigate = useNavigate();
   const userRole = location.state.role;
   const { id } = useParams();
+  const { isLoading: isLoadingMedicalHistory, tryCatch: tryCatchMedicalHistory } = useTryCatch();
   const { isLoading: isLoadingUser, tryCatch: tryCatchUser } = useTryCatch();
   const { isLoading: isRemoving, tryCatch: tryCatchRemove } = useTryCatch();
   const { isLoading: isRemovingHard, tryCatch: tryCatchRemoveHard } = useTryCatch();
@@ -57,6 +61,22 @@ export default function ViewUser() {
       `${userRole.value}-update`,
     ] as TPermission[],
     "some",
+  );
+
+  const getMedicalHistory = useCallback(
+    async function (id: string): Promise<void> {
+      const [response, error] = await tryCatchMedicalHistory(MedicalHistoryService.findAllByPatient(id));
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (response && response.statusCode === 200) {
+        setMedicalHistory(response.data);
+      }
+    },
+    [tryCatchMedicalHistory],
   );
 
   const findOneUser = useCallback(
@@ -75,14 +95,11 @@ export default function ViewUser() {
 
       if (response && response.statusCode === 200) {
         setUser(response.data);
+        if (response.data) getMedicalHistory(response.data.id);
       }
     },
-    [adminAuth?.role.value, tryCatchUser, userRole.value],
+    [adminAuth?.role.value, getMedicalHistory, tryCatchUser, userRole.value],
   );
-
-  const getMedicalHistory = useCallback((id: string) => {
-    console.log(`Get history for userId: ${id}`);
-  }, []);
 
   async function removeUser(id: string): Promise<void> {
     const [response, error] = await tryCatchRemove(UsersService.softRemove(id, userRole.value));
@@ -389,7 +406,7 @@ export default function ViewUser() {
       {userRole.value === EUserRole["patient"] && (
         <div className="flex flex-col gap-3">
           <PageHeader title="Historial médico" />
-          <HistoryTable patient={user} />
+          <HistoryTable history={medicalHistory} />
         </div>
       )}
       <ConfirmDialog
