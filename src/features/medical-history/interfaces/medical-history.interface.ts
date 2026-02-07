@@ -1,8 +1,11 @@
+import type { IUser } from "@users/interfaces/user.interface";
+
 export interface IMedicalHistory extends IMedicalHistoryCreate {
   createdAt: Date;
   deletedAt: Date;
   id: string;
   updatedAt: Date;
+  user: IUser;
 }
 
 export interface IMedicalHistoryCreate {
