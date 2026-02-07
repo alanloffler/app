@@ -5,6 +5,7 @@ import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@components/ui/field";
 import { Input } from "@components/ui/input";
 import { Loader } from "@components/Loader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 
 import z from "zod";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { TUserRole } from "@roles/interfaces/user-role.type";
 import { ERoles } from "@auth/enums/role.enum";
+import { GENDER } from "@medical-history/constants/gender.constant";
 import { UsersService } from "@users/services/users.service";
 import { createPatientSchema } from "@users/schemas/create-patient.schema";
 import { dateMask } from "@core/masks/maskito-date";
@@ -285,13 +287,23 @@ export function CreatePatientForm() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="gender">Género</FieldLabel>
-                      <Input
-                        aria-invalid={fieldState.invalid}
-                        id="gender"
-                        maxLength={21}
-                        placeholder="Ej. Masculino / Femenino"
-                        {...field}
-                      />
+                      <Select
+                        disabled={GENDER.length === 0}
+                        key={field.value}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger id="roleId" aria-invalid={fieldState.invalid}>
+                          <SelectValue placeholder="Seleccione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {GENDER.map((gender) => (
+                            <SelectItem key={gender.value} value={gender.value}>
+                              {gender.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
