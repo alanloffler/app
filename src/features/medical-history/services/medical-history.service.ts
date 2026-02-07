@@ -1,5 +1,5 @@
 import type { IApiResponse } from "@core/interfaces/api-response.interface";
-import type { IMedicalHistoryCreate } from "@medical-history/interfaces/medical-history.interface";
+import type { IMedicalHistory, IMedicalHistoryCreate } from "@medical-history/interfaces/medical-history.interface";
 import { apiClient } from "@core/client/client";
 
 class MedicalHistoryModuleService {
@@ -15,6 +15,11 @@ class MedicalHistoryModuleService {
 
   public async create(data: IMedicalHistoryCreate): Promise<IApiResponse> {
     const response = await apiClient.post("/medical-history", data);
+    return response.data;
+  }
+
+  public async findAllByPatient(id: string): Promise<IApiResponse<IMedicalHistory[]>> {
+    const response = await apiClient.get(`/medical-history/${id}/patient`);
     return response.data;
   }
 }
