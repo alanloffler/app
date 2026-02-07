@@ -11,19 +11,18 @@ import { es } from "date-fns/locale";
 import { format } from "date-fns";
 import { useState } from "react";
 
-import type { IMedicalHistory } from "@users/interfaces/medical-history.interface";
-import type { IUser } from "@users/interfaces/user.interface";
+import type { IMedicalHistory } from "@medical-history/interfaces/medical-history.interface";
 import { cn } from "@lib/utils";
 
 interface IProps {
-  patient?: IUser;
+  history?: IMedicalHistory[];
 }
 
-export function HistoryTable({ patient }: IProps) {
-  const [openSheet, setOpenSheet] = useState(false);
-  const [history, setHistory] = useState<IMedicalHistory | undefined>(undefined);
+export function HistoryTable({ history }: IProps) {
+  const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [selectedHistory, setSelectedHistory] = useState<IMedicalHistory | undefined>(undefined);
 
-  if (!patient) return null;
+  if (!history) return null;
 
   const columns: ColumnDef<any>[] = [
     {
@@ -78,7 +77,7 @@ export function HistoryTable({ patient }: IProps) {
           <Button
             onClick={() => {
               setOpenSheet(true);
-              setHistory({ ...row.original, idx: row.index });
+              setSelectedHistory({ ...row.original, idx: row.index });
             }}
             size="icon-sm"
             variant="ghost"
@@ -96,9 +95,9 @@ export function HistoryTable({ patient }: IProps) {
     },
   ];
 
-  return patient.medicalHistory && patient.medicalHistory?.length > 0 ? (
+  return history && history.length > 0 ? (
     <>
-      {history && (
+      {selectedHistory && (
         <Sheet open={openSheet} onOpenChange={setOpenSheet}>
           <SheetTrigger asChild></SheetTrigger>
           <SheetContent className="sm:min-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -109,30 +108,34 @@ export function HistoryTable({ patient }: IProps) {
             <div className="flex flex-col gap-6 p-4">
               <ul className="flex flex-col gap-3">
                 <li>
-                  <h1 className="text-center text-xl font-semibold">{history.reason}</h1>
+                  <h1 className="text-center text-xl font-semibold">{selectedHistory.reason}</h1>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold">Paciente:</span>
-                  <span>{`${patient.firstName} ${patient.lastName}`}</span>
+                  <span>{`${selectedHistory.user.firstName} ${selectedHistory.user.lastName}`}</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold">Fecha de atención:</span>
-                  <span>{format(history.createdAt, "P", { locale: es })}</span>
+                  <span>{format(selectedHistory.createdAt, "P", { locale: es })}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold">Título:</span>
+                  <p>{selectedHistory.reason}</p>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold">Receta:</span>
-                  {history.recipe ? <p>Contenido de la receta de medicamentos</p> : <p>Sin receta de medicamentos</p>}
+                  {selectedHistory.recipe ? <p>Contiene receta (true)</p> : <p>No contiene receta (false)</p>}
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold">Notas:</span>
-                  <p>Notas adicionales para el historial</p>
+                  <p>{selectedHistory.comments}</p>
                 </li>
               </ul>
             </div>
           </SheetContent>
         </Sheet>
       )}
-      <DataTable columns={columns} data={patient.medicalHistory} />
+      <DataTable columns={columns} data={history} />
     </>
   ) : (
     <Card className="text-muted-foreground text-center">El paciente no posee historial médico</Card>
