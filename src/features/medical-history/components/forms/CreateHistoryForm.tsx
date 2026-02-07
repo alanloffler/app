@@ -13,11 +13,14 @@ import { Textarea } from "@components/ui/textarea";
 import type z from "zod";
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useState, type Dispatch, type SetStateAction } from "react";
+import { useTryCatch } from "@core/hooks/useTryCatch";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { IUser } from "@users/interfaces/user.interface";
+import { MedicalHistoryService } from "@medical-history/services/medical-history.service";
 import { createHistorySchema } from "@medical-history/schemas/create-history.schema";
 
 interface IProps {
@@ -28,6 +31,7 @@ interface IProps {
 export function CreateHistoryForm({ user, setOpen }: IProps) {
   const [date, setDate] = useState<Date>();
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+  const { isLoading: isSaving, tryCatch: tryCatchCreateHistory } = useTryCatch();
 
   const form = useForm<z.infer<typeof createHistorySchema>>({
     resolver: zodResolver(createHistorySchema),
@@ -53,7 +57,19 @@ export function CreateHistoryForm({ user, setOpen }: IProps) {
   }
 
   async function onSubmit(data: z.infer<typeof createHistorySchema>) {
-    console.log(data);
+    if (!data) return;
+
+    const [response, error] = await tryCatchCreateHistory(MedicalHistoryService.create(data));
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    if (response && response.statusCode === 201) {
+      toast.success("Historial médico creado");
+      resetForm();
+    }
   }
 
   function resetForm(): void {
@@ -149,7 +165,7 @@ export function CreateHistoryForm({ user, setOpen }: IProps) {
           Cancelar
         </Button>
         <Button disabled={!form.formState.isDirty} form="create-history" type="submit" variant="default">
-          {false ? <Loader color="white" text="Guardando" /> : "Guardar"}
+          {isSaving ? <Loader color="white" text="Guardando" /> : "Guardar"}
         </Button>
       </div>
     </div>
