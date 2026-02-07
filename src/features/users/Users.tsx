@@ -175,7 +175,7 @@ export default function Users() {
       header: ({ column }) => <SortableHeader column={column}>Email</SortableHeader>,
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          <span>{row.original.userName}</span>
+          <span>{row.original.email}</span>
           {row.original.deletedAt && <Ban className="h-4 w-4 text-rose-500" />}
         </div>
       ),
