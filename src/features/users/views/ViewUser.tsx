@@ -406,7 +406,7 @@ export default function ViewUser() {
       {userRole.value === EUserRole["patient"] && (
         <div className="flex flex-col gap-3">
           <PageHeader title="Historial médico" />
-          <HistoryTable history={medicalHistory} />
+          <HistoryTable history={medicalHistory} isLoading={isLoadingMedicalHistory} />
         </div>
       )}
       <ConfirmDialog
