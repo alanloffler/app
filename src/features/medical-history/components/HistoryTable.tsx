@@ -16,9 +16,10 @@ import { cn } from "@lib/utils";
 
 interface IProps {
   history?: IMedicalHistory[];
+  isLoading?: boolean;
 }
 
-export function HistoryTable({ history }: IProps) {
+export function HistoryTable({ history, isLoading }: IProps) {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [selectedHistory, setSelectedHistory] = useState<IMedicalHistory | undefined>(undefined);
 
@@ -135,7 +136,7 @@ export function HistoryTable({ history }: IProps) {
           </SheetContent>
         </Sheet>
       )}
-      <DataTable columns={columns} data={history} />
+      <DataTable columns={columns} data={history} loading={isLoading} />
     </>
   ) : (
     <Card className="text-muted-foreground text-center">El paciente no posee historial médico</Card>
