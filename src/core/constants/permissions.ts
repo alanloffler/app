@@ -29,6 +29,14 @@ export const PERMISSIONS = [
     ],
   },
   {
+    name: "Historia médica",
+    value: "medical_history",
+    actions: [
+      { name: "Crear", value: "medical_history-create" },
+      { name: "Ver", value: "medical_history-view" },
+    ],
+  },
+  {
     name: "Pacientes",
     value: "patient",
     actions: [
