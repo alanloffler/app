@@ -403,12 +403,14 @@ export default function ViewUser() {
           )}
         </Card>
       </div>
-      {userRole.value === EUserRole["patient"] && (
-        <div className="flex flex-col gap-3">
-          <PageHeader title="Historial médico" />
-          <HistoryTable history={medicalHistory} isLoading={isLoadingMedicalHistory} />
-        </div>
-      )}
+      <Protected requiredPermission={`medical_history-view` as TPermission}>
+        {userRole.value === EUserRole["patient"] && (
+          <div className="flex flex-col gap-3">
+            <PageHeader title="Historial médico" />
+            <HistoryTable history={medicalHistory} isLoading={isLoadingMedicalHistory} />
+          </div>
+        )}
+      </Protected>
       <ConfirmDialog
         title="Eliminar paciente"
         description="¿Seguro que querés eliminar a este paciente?"
